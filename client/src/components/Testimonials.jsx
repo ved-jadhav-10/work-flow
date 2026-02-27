@@ -1,80 +1,50 @@
 import React from "react";
-
-const testimonials = [
-  {
-    quote:
-      "Before Cognify AI, we juggled five different tools to manage clients, tasks, and reports. Now it's all in one place. We launched 3 campaigns faster this quarter than ever before.",
-    name: "Sofia Delgado",
-    role: "Product Manager, NovaTech",
-    avatar: "S",
-    color: "bg-purple-200",
-  },
-  {
-    quote:
-      "Cognify AI completely transformed how our design team collaborates. The real-time features are incredible and the AI suggestions save us hours every week.",
-    name: "Marcus Chen",
-    role: "Lead Designer, Pixel Studio",
-    avatar: "M",
-    color: "bg-blue-200",
-  },
-];
+import { motion } from "framer-motion";
 
 const Testimonials = () => {
   return (
-    <section className="py-24 bg-white px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row items-start gap-16 mb-16">
-          <div className="flex-1">
-            <h2 className="text-4xl font-extrabold text-black leading-tight">
+    <section className="py-32 bg-white px-8">
+      <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row justify-between items-start gap-24">
+        <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex-1 max-w-2xl"
+        >
+            <h2 className="text-7xl font-extrabold text-black leading-tight mb-10">
               Loved by designers & teams
             </h2>
-            <div className="flex mt-6">
-              {["🧑", "👩", "👨", "👩", "👦"].map((a, i) => (
-                <div
-                  key={i}
-                  className={`w-10 h-10 rounded-full bg-purple-${
-                    100 + i * 100
-                  } border-2 border-white flex items-center justify-center text-lg ${
-                    i > 0 ? "-ml-2" : ""
-                  }`}
-                >
-                  {a}
-                </div>
-              ))}
-              <span className="ml-3 text-sm text-gray-500 self-center">
-                +2,400 happy users
-              </span>
-            </div>
-          </div>
-          <div className="flex-1 text-gray-500 text-sm leading-relaxed">
-            Join thousands of designers, developers, and product teams who have
-            supercharged their workflow with Cognify AI.
-          </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-100"
-            >
-              <p className="text-gray-700 text-sm leading-relaxed mb-6 italic">
-                "{t.quote}"
-              </p>
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center font-bold text-gray-700`}
-                >
-                  {t.avatar}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-black">{t.name}</p>
-                  <p className="text-xs text-gray-400">{t.role}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex-1 max-w-2xl"
+        >
+             {/* Avatars */}
+             <div className="flex mb-10">
+                 {[1, 5, 8, 3, 12].map((id, i) => (
+                    <img 
+                        key={i}
+                        src={`https://i.pravatar.cc/150?img=${id}`} 
+                        alt="Avatar" 
+                        className={`w-20 h-20 rounded-2xl border-4 border-white shadow-md object-cover ${i > 0 ? '-ml-6' : ''}`} 
+                    />
+                 ))}
+             </div>
+
+             <p className="text-gray-900 text-3xl font-medium leading-relaxed mb-8">
+                "This tool has completely transformed how our team collaborates. The real-time editing and seamless integrations make our process so much smoother!"
+             </p>
+             
+             <div className="flex flex-col">
+                  <span className="text-xl font-bold text-black">Emily Ray</span>
+                  <span className="text-lg text-gray-500 font-medium">UX Designer</span>
+             </div>
+        </motion.div>
       </div>
     </section>
   );
