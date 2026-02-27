@@ -1,8 +1,39 @@
+# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
+
+# Python
+server/venv/
+server/__pycache__/
+server/**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Environment
 .env
+.env.local
+.env.production
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Build
 build/
 client/build/
+client/.next/
+client/out/
+
+# Logs
 *.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.swp
+*.swo
