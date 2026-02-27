@@ -3,8 +3,13 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 
 const API_URL = process.env.BACKEND_URL || "http://localhost:8000";
+const AUTH_SECRET =
+  process.env.NEXTAUTH_SECRET ||
+  process.env.AUTH_SECRET ||
+  "dev-insecure-secret-change-me";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: AUTH_SECRET,
   providers: [
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -52,13 +57,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      // On initial sign-in, attach backend token
+      // On initial sign-in with credentials, attach backend token
       if (user) {
         token.id = user.id;
         token.backendToken = (user as any).backendToken;
       }
       // For GitHub OAuth, register/fetch user from backend
-      if (account?.provider === "github" && account.access_token) {
+      if (account?.provider === "github") {
         try {
           const res = await fetch(`${API_URL}/api/auth/oauth`, {
             method: "POST",

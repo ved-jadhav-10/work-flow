@@ -45,7 +45,10 @@ def health_check():
     return {"status": "ok", "service": "Workflow API"}
 
 
-# ── Routers (registered as they are built in later phases) ───────────────────
-# from routers import auth, projects, learning, developer, workflow, chat
-# app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+# ── Routers ───────────────────────────────────────────────────────────────────
+from routers import auth as auth_router
+app.include_router(auth_router.router, prefix="/api/auth", tags=["auth"])
+
+# Future phase routers:
+# from routers import projects, learning, developer, workflow, chat
 # app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
