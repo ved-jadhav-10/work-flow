@@ -30,9 +30,15 @@ interface SidebarProps {
   projectId?: string;
 }
 
-export default function Sidebar({ projectId }: SidebarProps) {
+export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+
+  // Auto-detect projectId from URL: /dashboard/projects/<uuid>/...
+  const projectId = propProjectId ?? (() => {
+    const match = pathname.match(/\/dashboard\/projects\/([^/]+)/);
+    return match?.[1] ?? undefined;
+  })();
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) return pathname === href;

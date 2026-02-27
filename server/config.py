@@ -34,7 +34,11 @@ class Settings(BaseSettings):
     ollama_model: str = "phi3:mini"
 
     # CORS
-    backend_cors_origins: list[str] = ["http://localhost:3000"]
+    backend_cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+    ]
 
 
 settings = Settings()

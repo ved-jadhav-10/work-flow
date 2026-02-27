@@ -47,8 +47,10 @@ def health_check():
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 from routers import auth as auth_router
+from routers import projects as projects_router
+
 app.include_router(auth_router.router, prefix="/api/auth", tags=["auth"])
+app.include_router(projects_router.router, prefix="/api/projects", tags=["projects"])
 
 # Future phase routers:
-# from routers import projects, learning, developer, workflow, chat
-# app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
+# from routers import learning, developer, workflow, chat
