@@ -168,7 +168,9 @@ class LLMService:
                     provider.name,
                     status,
                 )
-                if status != 429 and provider == self.primary:
+                # Always allow fallback on 429 and 400 (model may be deprecated).
+                # For other errors from the primary, bubble up immediately.
+                if status not in (429, 400) and provider == self.primary:
                     raise
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
                 logger.warning(
