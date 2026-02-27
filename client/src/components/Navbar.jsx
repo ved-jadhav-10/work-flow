@@ -15,15 +15,15 @@ const Navbar = () => {
         scrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-[90rem] mx-auto px-8 py-6 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2 text-xl font-bold text-black">
-          <span className="text-2xl text-purple-600">♛</span>
+        <div className="flex items-center gap-3 text-2xl font-bold text-black tracking-tight">
+          <span className="text-3xl text-purple-600">♛</span>
           Draftr
         </div>
 
         {/* Nav Links */}
-        <ul className="hidden md:flex items-center gap-8 text-gray-600 font-medium text-sm">
+        <ul className="hidden md:flex items-center gap-10 text-gray-600 font-medium text-lg">
           {["About", "Blog", "Changelog", "Contact", "Power-Ups"].map((item) => (
             <li
               key={item}
@@ -35,7 +35,7 @@ const Navbar = () => {
         </ul>
 
         {/* CTA */}
-        <button className="bg-black text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition">
+        <button className="bg-black text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-800 transition">
           Login now
         </button>
       </div>

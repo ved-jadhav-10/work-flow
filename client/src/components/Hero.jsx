@@ -2,22 +2,22 @@ import React from "react";
 
 const Hero = () => {
   return (
-    <section className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100 to-purple-200 flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 overflow-hidden">
+    <section className="min-h-screen bg-gradient-to-b from-purple-50 via-purple-100 to-purple-200 flex flex-col items-center justify-center text-center px-6 pt-40 pb-32 overflow-hidden">
       {/* Badge */}
-      <div className="flex items-center gap-3 bg-white border border-gray-200 text-gray-600 text-sm pl-1 pr-4 py-1 rounded-full mb-8 shadow-sm">
-        <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs font-bold">
+      <div className="flex items-center gap-4 bg-white border border-gray-200 text-gray-600 text-lg pl-2 pr-6 py-2 rounded-full mb-10 shadow-sm">
+        <span className="bg-black text-white px-3 py-1 rounded-full text-sm font-bold">
           New
         </span>
         Revolutionize your design workflow
       </div>
 
       {/* Heading */}
-      <h1 className="text-5xl md:text-7xl font-extrabold text-black leading-tight max-w-4xl">
+      <h1 className="text-6xl md:text-8xl font-extrabold text-black leading-[1.1] max-w-6xl tracking-tight">
         Bring ideas to life in just a few clicks.
       </h1>
 
       {/* Subtext */}
-      <p className="mt-6 text-gray-500 text-lg max-w-2xl leading-relaxed">
+      <p className="mt-8 text-gray-500 text-2xl max-w-4xl leading-relaxed">
         Design, prototype, and collaborate in real-time - all in one powerful
         platform. Elevate your{" "}
         <span className="font-bold text-black">creative process</span> with{" "}
@@ -26,17 +26,17 @@ const Hero = () => {
       </p>
 
       {/* CTA */}
-      <button className="mt-10 flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white pl-8 pr-2 py-2 rounded-full text-lg font-semibold transition shadow-lg shadow-purple-200">
+      <button className="mt-12 flex items-center gap-4 bg-purple-600 hover:bg-purple-700 text-white pl-10 pr-3 py-3 rounded-full text-xl font-semibold transition shadow-xl shadow-purple-200">
         Get Started - It's free
-        <div className="bg-white text-purple-600 rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-sm">
+        <div className="bg-white text-purple-600 rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-sm">
           →
         </div>
       </button>
 
       {/* App Screenshots Mockup */}
-      <div className="mt-16 flex flex-col md:flex-row gap-6 justify-center items-start max-w-6xl w-full px-4">
+      <div className="mt-24 flex flex-col md:flex-row gap-8 justify-center items-start max-w-[85rem] w-full px-4">
         {/* Left Big Panel - Browser Mockup */}
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden w-full md:w-2/3 h-[500px] flex flex-col relative">
+        <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-200 overflow-hidden w-full md:w-2/3 h-[600px] flex flex-col relative">
           {/* Browser Header */}
           <div className="bg-white px-4 h-12 flex items-center justify-between border-b border-gray-100">
              <div className="flex gap-4 items-center w-1/3">
