@@ -18,8 +18,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2 text-xl font-bold text-black">
-          <span className="text-2xl">🧠</span>
-          Cognify AI
+          <span className="text-2xl text-purple-600">♛</span>
+          Draftr
         </div>
 
         {/* Nav Links */}

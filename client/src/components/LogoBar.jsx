@@ -1,14 +1,13 @@
 import React from "react";
 
 const logos = [
+  "Swiss",
   "KOBE",
-  "On_Edge",
-  "Thrar—",
-  "OSLO.",
-  "Imprntly",
-  "Berlin",
-  "↺ U-Turn",
-  "+5 more",
+  "On_Event",
+  "Thrn",
+  "oslo.",
+  "Imprintify",
+  "Berlin.",
 ];
 
 const LogoBar = () => {
