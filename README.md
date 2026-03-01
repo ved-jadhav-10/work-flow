@@ -1,6 +1,6 @@
 # Workflow AI — Persistent AI Context Layer
 
-> **CognifyOS**: A production-ready AI assistant that actually remembers your project context — across documents, code, and conversations.
+> **Workflow AI**: A production-ready AI assistant that actually remembers your project context — across documents, code, and conversations.
 
 Workflow AI is an intelligent project management and AI assistance platform that maintains persistent context across all your work. Unlike traditional AI tools that forget previous interactions, Workflow AI builds a comprehensive understanding of your projects, learning materials, code, and tasks — providing context-aware assistance that evolves with your work.
 
