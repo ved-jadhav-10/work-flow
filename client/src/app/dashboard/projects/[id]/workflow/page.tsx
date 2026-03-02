@@ -38,8 +38,8 @@ interface Task {
 interface TaskListResponse {
   tasks: Task[];
   total: number;
-  by_priority: Record<string, number>;
-  by_status: Record<string, number>;
+  by_priority: { high: number; medium: number; low: number };
+  by_status: { pending: number; done: number };
 }
 
 interface ExtractResponse {
