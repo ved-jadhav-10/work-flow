@@ -24,6 +24,7 @@ from schemas.workflow import (
     TaskUpdate,
 )
 from services import workflow_service
+from services.context_engine import update_context
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +115,17 @@ async def extract_tasks(
     db.commit()
     for t in saved_tasks:
         db.refresh(t)
+
+    # Feed context engine with task summary
+    try:
+        task_preview = "; ".join(t.description for t in saved_tasks[:5])
+        await update_context(
+            str(project.id), "decision",
+            f"[Workflow] {len(saved_tasks)} tasks extracted ({body.source_type}): {task_preview[:200]}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after task extraction — non-blocking")
 
     return ExtractTasksResponse(
         tasks=[TaskResponse.model_validate(t) for t in saved_tasks],

@@ -12,6 +12,7 @@ import {
   Code2,
   ListTodo,
   MessageSquare,
+  Brain,
 } from "lucide-react";
 import Link from "next/link";
 import { projectsApi } from "@/lib/api";
@@ -200,6 +201,39 @@ export default function ProjectOverviewPage() {
             </p>
           </Link>
         ))}
+      </div>
+
+      {/* Context health bar */}
+      <div className="mb-8 p-4 bg-gray-900 border border-gray-800 rounded-xl">
+        <div className="flex items-center gap-2 mb-3">
+          <Brain className="w-4 h-4 text-indigo-400" />
+          <h3 className="text-sm font-medium text-gray-200">AI Context Health</h3>
+        </div>
+        <p className="text-xs text-gray-400 mb-3">
+          Your AI assistant draws from all project data below to give context-aware answers.
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+            <FileText className="w-4 h-4 text-blue-400 mx-auto mb-1" />
+            <p className="text-lg font-semibold text-white">{project.document_count ?? 0}</p>
+            <p className="text-[10px] text-gray-500">Documents</p>
+          </div>
+          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+            <Code2 className="w-4 h-4 text-green-400 mx-auto mb-1" />
+            <p className="text-lg font-semibold text-white">{project.insight_count ?? 0}</p>
+            <p className="text-[10px] text-gray-500">Code Insights</p>
+          </div>
+          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
+            <ListTodo className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+            <p className="text-lg font-semibold text-white">{project.task_count ?? 0}</p>
+            <p className="text-[10px] text-gray-500">Tasks</p>
+          </div>
+        </div>
+        {((project.document_count ?? 0) + (project.insight_count ?? 0) + (project.task_count ?? 0)) === 0 && (
+          <p className="text-xs text-gray-500 mt-3 text-center">
+            Upload documents, analyze code, or extract tasks to enrich your AI context.
+          </p>
+        )}
       </div>
 
       {/* Goal */}

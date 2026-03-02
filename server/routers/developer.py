@@ -28,6 +28,9 @@ from schemas.developer import (
 )
 from services import developer_service
 from services.developer_service import parse_insight
+from services.context_engine import update_context
+from services import embedding_service
+from models.embedding import Embedding
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +95,33 @@ async def explain_code(
     db.commit()
     db.refresh(insight)
 
+    # Feed context engine + generate embeddings for code insight
+    try:
+        await update_context(
+            str(project.id), "decision",
+            f"[Developer] Code explained ({body.language}): {result['overview'][:200]}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after explain — non-blocking")
+
+    try:
+        explanation_text = result.get("overview", "")
+        if explanation_text:
+            vectors = await embedding_service.generate_embeddings_batch([explanation_text])
+            if vectors:
+                emb = Embedding(
+                    project_id=project.id,
+                    source_type="code_insight",
+                    source_id=insight.id,
+                    content_chunk=explanation_text[:2000],
+                    embedding=vectors[0],
+                )
+                db.add(emb)
+                db.commit()
+    except Exception:
+        logger.warning("Embedding generation failed for code insight — non-blocking")
+
     return ExplainResponse(
         id=insight.id,
         language=insight.language,
@@ -133,6 +163,35 @@ async def debug_code(
     db.add(insight)
     db.commit()
     db.refresh(insight)
+
+    # Feed context engine + generate embeddings for debug insight
+    try:
+        n_bugs = len(result.get("bugs", []))
+        overview = f"{n_bugs} bug{'s' if n_bugs != 1 else ''} found in {body.language} code"
+        await update_context(
+            str(project.id), "decision",
+            f"[Developer] Debug analysis ({body.language}): {overview}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after debug — non-blocking")
+
+    try:
+        bug_text = "; ".join(b.get("description", "") for b in result.get("bugs", [])[:3])
+        if bug_text:
+            vectors = await embedding_service.generate_embeddings_batch([bug_text])
+            if vectors:
+                emb = Embedding(
+                    project_id=project.id,
+                    source_type="code_insight",
+                    source_id=insight.id,
+                    content_chunk=bug_text[:2000],
+                    embedding=vectors[0],
+                )
+                db.add(emb)
+                db.commit()
+    except Exception:
+        logger.warning("Embedding generation failed for debug insight — non-blocking")
 
     return DebugResponse(
         id=insight.id,

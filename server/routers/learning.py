@@ -27,6 +27,7 @@ from schemas.learning import (
     StepsResponse,
 )
 from services import pdf_service, file_storage, embedding_service, learning_service
+from services.context_engine import update_context
 
 logger = logging.getLogger(__name__)
 
@@ -193,6 +194,16 @@ async def summarize_document(
     doc.summary = summary
     db.commit()
 
+    # Feed context engine
+    try:
+        await update_context(
+            str(project_id), "decision",
+            f"[Learning] Document '{doc.filename}' summarized ({body.level}): {summary[:200]}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after summarise — non-blocking")
+
     return SummaryResponse(summary=summary, level=body.level)
 
 
@@ -221,6 +232,17 @@ async def extract_concepts(
     doc.key_concepts = concepts
     db.commit()
 
+    # Feed context engine
+    try:
+        concept_names = [c.get("name", "") for c in concepts[:5]]
+        await update_context(
+            str(project_id), "decision",
+            f"[Learning] Key concepts from '{doc.filename}': {', '.join(concept_names)}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after concept extraction — non-blocking")
+
     return ConceptsResponse(concepts=concepts)
 
 
@@ -247,6 +269,17 @@ async def generate_steps(
 
     doc.implementation_steps = steps
     db.commit()
+
+    # Feed context engine
+    try:
+        step_preview = "; ".join(steps[:3]) if steps else "no steps"
+        await update_context(
+            str(project_id), "decision",
+            f"[Learning] Implementation steps from '{doc.filename}': {step_preview[:200]}",
+            db,
+        )
+    except Exception:
+        logger.warning("Context update failed after step generation — non-blocking")
 
     return StepsResponse(steps=steps)
 

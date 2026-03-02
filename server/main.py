@@ -76,6 +76,7 @@ from routers import projects as projects_router
 from routers import learning as learning_router
 from routers import developer as developer_router
 from routers import workflow as workflow_router
+from routers import chat as chat_router
 
 app.include_router(auth_router.router, prefix="/api/auth", tags=["auth"])
 app.include_router(projects_router.router, prefix="/api/projects", tags=["projects"])
@@ -94,6 +95,8 @@ app.include_router(
     prefix="/api/projects/{project_id}",
     tags=["workflow"],
 )
-
-# Future phase routers:
-# from routers import chat
+app.include_router(
+    chat_router.router,
+    prefix="/api/projects/{project_id}/chat",
+    tags=["chat"],
+)
