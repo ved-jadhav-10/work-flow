@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
 import { useParams } from "next/navigation";
 import {
   MessageSquare,
@@ -486,7 +486,7 @@ function InlineFormat({ text }: { text: string }) {
 
 const MODULE_META: Record<
   string,
-  { label: string; icon: JSX.Element; color: string }
+  { label: string; icon: ReactElement; color: string }
 > = {
   learning: {
     label: "Learning",
