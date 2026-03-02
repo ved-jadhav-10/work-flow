@@ -4,12 +4,13 @@ import Credentials from "next-auth/providers/credentials";
 
 const API_URL = process.env.BACKEND_URL || "http://localhost:8000";
 const AUTH_SECRET =
-  process.env.NEXTAUTH_SECRET ||
   process.env.AUTH_SECRET ||
+  process.env.NEXTAUTH_SECRET ||
   "dev-insecure-secret-change-me";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: AUTH_SECRET,
+  trustHost: true,
   providers: [
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -34,7 +35,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }),
           });
 
-          if (!res.ok) return null;
+          if (!res.ok) {
+            console.error("[NextAuth] Login failed:", res.status, await res.text().catch(() => ""));
+            return null;
+          }
 
           const data = await res.json();
 
@@ -49,7 +53,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             };
           }
           return null;
-        } catch {
+        } catch (err) {
+          console.error("[NextAuth] authorize error:", err);
           return null;
         }
       },
