@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -67,15 +68,15 @@ export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
       {/* Logo */}
       <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: "linear-gradient(135deg,#FFD700,#f59e0b)", boxShadow: "0 0 14px rgba(255,215,0,0.30)" }}
-          >
-            <Sparkles className="w-3.5 h-3.5" style={{ color: "#060B19" }} />
+          <div className="relative w-32 h-8 shrink-0 rounded-xl">
+            <Image
+              src="/assets/workflow_logo_yellow.png"
+              alt="Workflow Logo"
+              width={200}
+              height={50}
+              className="w-full h-full object-contain"
+            />
           </div>
-          <span className="font-bold text-white text-[17px] tracking-wide select-none" style={{ fontFamily: "var(--font-playfair), serif" }}>
-            Workflow<span style={{ color: "#FFD700" }}>.</span>
-          </span>
         </Link>
       </div>
 

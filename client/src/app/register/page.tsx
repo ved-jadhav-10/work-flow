@@ -4,6 +4,7 @@ import React from "react";
 import { signIn } from "next-auth/react";
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Github, Eye, EyeOff } from "lucide-react";
 
@@ -101,11 +102,15 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 select-none">
-          <span className="text-white font-semibold text-[17px] tracking-tight">Workflow</span>
-          <span
-            className="w-1.5 h-1.5 rounded-full mt-0.5"
-            style={{ background: "#d4aa70", boxShadow: "0 0 6px rgba(212,170,112,0.8)" }}
-          />
+          <div className="relative w-40 h-12 shrink-0 rounded-xl">
+            <Image
+              src="/assets/workflow_logo_yellow.png"
+              alt="Workflow Logo"
+              width={200}
+              height={60}
+              className="w-full h-full object-contain"
+            />
+          </div>
         </div>
 
         {/* Middle copy */}

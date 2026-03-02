@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import {
   BookOpen,
@@ -22,11 +23,15 @@ export default function LandingPage() {
         style={{ background: "rgba(6,13,31,0.65)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto w-full">
           <Link href="/" className="flex items-center gap-1.5 select-none">
-            <span className="text-lg font-semibold tracking-tight text-white">Workflow</span>
-            <span
-              className="w-1.5 h-1.5 rounded-full mt-0.5"
-              style={{ background: "#d4aa70", boxShadow: "0 0 6px rgba(212,170,112,0.8)" }}
-            />
+            <div className="relative w-32 h-8 shrink-0 rounded-lg">
+              <Image
+                src="/assets/workflow_logo_yellow.png"
+                alt="Workflow Logo"
+                width={200}
+                height={50}
+                className="w-full h-full object-contain"
+              />
+            </div>
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-[13px] text-white/55 font-medium">
