@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 from pathlib import Path
+import json
 
 # Try server/.env first, then fall back to root .env
 _env_file = Path(__file__).parent / ".env"
@@ -42,6 +44,20 @@ class Settings(BaseSettings):
         "http://localhost:3001",
         "http://localhost:3002",
     ]
+
+    @field_validator("backend_cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: object) -> list[str]:
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            v = v.strip()
+            # JSON array: ["https://...","https://..."]
+            if v.startswith("["):
+                return json.loads(v)
+            # Comma-separated: https://a.com,https://b.com
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
 
 settings = Settings()
