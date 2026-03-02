@@ -33,9 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning style={{ scrollPaddingTop: "72px" }}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+        suppressHydrationWarning
       >
         <StarryBackground />
         <Providers>{children}</Providers>

@@ -18,12 +18,12 @@ export default function AppBackground({
   return (
     <div
       className={[
-        "relative min-h-screen bg-background text-foreground overflow-hidden",
+        "relative min-h-screen bg-background text-foreground",
         className,
       ].join(" ")}
     >
       {/* Ambient glows + vignette */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-44 -left-44 h-[520px] w-[520px] rounded-full bg-accent/10 blur-[120px]" />
         <div className="absolute bottom-[-140px] right-[-160px] h-[560px] w-[560px] rounded-full bg-gold/8 blur-[140px]" />
 

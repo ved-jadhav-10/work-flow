@@ -17,6 +17,47 @@ export default function LandingPage() {
   return (
     <AppBackground variant="hero" className="overflow-x-hidden">
 
+      {/* ── Fixed Nav ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md transition-all duration-300"
+        style={{ background: "rgba(6,13,31,0.65)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="flex items-center justify-between px-8 py-4 max-w-7xl mx-auto w-full">
+          <Link href="/" className="flex items-center gap-1.5 select-none">
+            <span className="text-lg font-semibold tracking-tight text-white">Workflow</span>
+            <span
+              className="w-1.5 h-1.5 rounded-full mt-0.5"
+              style={{ background: "#d4aa70", boxShadow: "0 0 6px rgba(212,170,112,0.8)" }}
+            />
+          </Link>
+
+          <div className="hidden md:flex items-center gap-8 text-[13px] text-white/55 font-medium">
+            {[
+              { label: "How it works", href: "#how-it-works" },
+              { label: "Features",     href: "#features"     },
+              { label: "Privacy",      href: "#privacy"      },
+            ].map(({ label, href }) => (
+              <a key={label} href={href}
+                className="hover:text-white/90 transition-colors duration-200 tracking-wide">{label}</a>
+            ))}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2">
+            <Link href="/login"
+              className="px-4 py-2 text-[13px] text-white/60 hover:text-white transition-colors duration-200 font-medium">
+              Sign in
+            </Link>
+            <Link href="/register"
+              className="px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-200"
+              style={{
+                background: "rgba(212,170,112,0.12)",
+                border: "1px solid rgba(212,170,112,0.30)",
+                color: "#d4aa70",
+              }}>
+              Get started
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* ══ HERO ══════════════════════════════════════════════════════════ */}
       <section className="relative h-screen min-h-[740px] flex flex-col overflow-hidden">
 
@@ -53,46 +94,8 @@ export default function LandingPage() {
           }}
         />
 
-        {/* ── Nav ── */}
-        <nav className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
-          <div className="flex items-center gap-1.5 select-none">
-            <span className="text-lg font-semibold tracking-tight text-white">Workflow</span>
-            <span
-              className="w-1.5 h-1.5 rounded-full mt-0.5"
-              style={{ background: "#d4aa70", boxShadow: "0 0 6px rgba(212,170,112,0.8)" }}
-            />
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-[13px] text-white/55 font-medium">
-            {[
-              { label: "How it works", href: "#how-it-works" },
-              { label: "Features",     href: "#features"     },
-              { label: "Privacy",      href: "#privacy"      },
-            ].map(({ label, href }) => (
-              <a key={label} href={href}
-                className="hover:text-white/90 transition-colors duration-200 tracking-wide">{label}</a>
-            ))}
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2">
-            <Link href="/login"
-              className="px-4 py-2 text-[13px] text-white/60 hover:text-white transition-colors duration-200 font-medium">
-              Sign in
-            </Link>
-            <Link href="/register"
-              className="px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-200"
-              style={{
-                background: "rgba(212,170,112,0.12)",
-                border: "1px solid rgba(212,170,112,0.30)",
-                color: "#d4aa70",
-              }}>
-              Get started
-            </Link>
-          </div>
-        </nav>
-
         {/* ── Hero copy ── */}
-        <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pb-28">
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pt-16 pb-28">
           {/* Tag pill */}
           <div
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-widest uppercase mb-8"
