@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from contextlib import asynccontextmanager
 import logging
 
@@ -43,6 +44,30 @@ app.add_middleware(
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "service": "Workflow API"}
+
+
+# ── File download proxy (Appwrite Storage) ───────────────────────────────────
+from fastapi import Depends
+from middleware.auth import get_current_user
+from services import file_storage
+
+
+@app.get("/api/files/{file_id}/download")
+async def download_file(file_id: str, current_user=Depends(get_current_user)):
+    """Proxy file downloads from Appwrite Storage — keeps API key server-side."""
+    try:
+        meta = await file_storage.get_file_metadata(file_id)
+        content = await file_storage.download_file(file_id)
+        return Response(
+            content=content,
+            media_type=meta.get("mimeType", "application/octet-stream"),
+            headers={
+                "Content-Disposition": f'attachment; filename="{meta.get("name", file_id)}"',
+            },
+        )
+    except Exception as exc:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"File not found: {exc}")
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────

@@ -1,73 +1,103 @@
 """
-File storage via Supabase Storage.
+File storage via Appwrite Storage.
 
-Uploads/deletes files in the private 'documents' bucket.
-Uses signed URLs for secure time-limited access.
+Uploads/deletes files in the 'documents' bucket on Appwrite Cloud.
+Downloads are proxied through the backend to keep the API key server-side.
 """
 
 from __future__ import annotations
 
+import io
 import logging
 import uuid
 from pathlib import PurePosixPath
 
-from supabase import create_client, Client
+from appwrite.client import Client
+from appwrite.services.storage import Storage
+from appwrite.input_file import InputFile
+from appwrite.id import ID
 
 from config import settings
 
 logger = logging.getLogger(__name__)
 
-BUCKET = "documents"
-SIGNED_URL_EXPIRY = 60 * 60  # 1 hour in seconds
-
 _client: Client | None = None
+_storage: Storage | None = None
 
 
-def _get_supabase() -> Client:
-    global _client
-    if _client is None:
-        _client = create_client(settings.supabase_url, settings.supabase_service_role_key)
-    return _client
+def _get_storage() -> Storage:
+    """Lazy-init and return the Appwrite Storage service."""
+    global _client, _storage
+    if _storage is None:
+        _client = Client()
+        _client.set_endpoint(settings.appwrite_endpoint)
+        _client.set_project(settings.appwrite_project_id)
+        _client.set_key(settings.appwrite_api_key)
+        _storage = Storage(_client)
+    return _storage
 
 
 # ── Upload ────────────────────────────────────────────────────────────────────
 
 async def upload_file(file_bytes: bytes, filename: str, project_id: str) -> str:
     """
-    Upload a file to Supabase Storage under `documents/<project_id>/<uuid>_<filename>`.
-    Returns the **storage path** (not a URL) — use get_signed_url() to generate
-    a time-limited download link when needed.
+    Upload a file to Appwrite Storage.
+    Returns the Appwrite **file ID** — use get_file_download() or the proxy
+    endpoint to retrieve the file content.
     """
-    sb = _get_supabase()
+    storage = _get_storage()
     safe_name = PurePosixPath(filename).name  # strip directory parts
-    storage_path = f"{project_id}/{uuid.uuid4().hex[:8]}_{safe_name}"
+    file_id = f"{project_id[:8]}-{uuid.uuid4().hex[:8]}"
 
-    sb.storage.from_(BUCKET).upload(
-        path=storage_path,
-        file=file_bytes,
-        file_options={"content-type": _guess_content_type(filename)},
+    input_file = InputFile.from_bytes(
+        file_bytes,
+        file_id + "_" + safe_name,
+        _guess_content_type(filename),
     )
 
-    logger.info("Uploaded %s → %s/%s", filename, BUCKET, storage_path)
-    return storage_path
+    storage.create_file(
+        bucket_id=settings.appwrite_bucket_id,
+        file_id=file_id,
+        file=input_file,
+    )
+
+    logger.info("Uploaded %s → appwrite bucket %s / %s", filename, settings.appwrite_bucket_id, file_id)
+    return file_id
 
 
-# ── Signed URL ────────────────────────────────────────────────────────────────
+# ── Download (bytes) ──────────────────────────────────────────────────────────
 
-async def get_signed_url(storage_path: str, expires_in: int = SIGNED_URL_EXPIRY) -> str:
-    """Generate a time-limited signed URL for a private file."""
-    sb = _get_supabase()
-    result = sb.storage.from_(BUCKET).create_signed_url(storage_path, expires_in)
-    return result["signedURL"]
+async def download_file(file_id: str) -> bytes:
+    """Download file content from Appwrite Storage. Returns raw bytes."""
+    storage = _get_storage()
+    result = storage.get_file_download(
+        bucket_id=settings.appwrite_bucket_id,
+        file_id=file_id,
+    )
+    return result
+
+
+# ── File metadata ─────────────────────────────────────────────────────────────
+
+async def get_file_metadata(file_id: str) -> dict:
+    """Get file metadata (name, size, mimeType, etc.) from Appwrite."""
+    storage = _get_storage()
+    return storage.get_file(
+        bucket_id=settings.appwrite_bucket_id,
+        file_id=file_id,
+    )
 
 
 # ── Delete ────────────────────────────────────────────────────────────────────
 
-async def delete_file(storage_path: str) -> None:
-    """Delete a file from Supabase Storage given its storage path."""
-    sb = _get_supabase()
-    sb.storage.from_(BUCKET).remove([storage_path])
-    logger.info("Deleted %s", storage_path)
+async def delete_file(file_id: str) -> None:
+    """Delete a file from Appwrite Storage given its file ID."""
+    storage = _get_storage()
+    storage.delete_file(
+        bucket_id=settings.appwrite_bucket_id,
+        file_id=file_id,
+    )
+    logger.info("Deleted file %s from Appwrite", file_id)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

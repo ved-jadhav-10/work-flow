@@ -14,11 +14,14 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Supabase
-    supabase_url: str
-    supabase_anon_key: str
-    supabase_service_role_key: str
-    supabase_db_url: str
+    # Database (Neon PostgreSQL)
+    database_url: str
+
+    # Appwrite (File Storage)
+    appwrite_endpoint: str = "https://cloud.appwrite.io/v1"
+    appwrite_project_id: str
+    appwrite_api_key: str
+    appwrite_bucket_id: str
 
     # AI providers
     gemini_api_key: str

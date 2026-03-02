@@ -97,7 +97,7 @@ async def upload_document(
     else:
         raw_text = file_bytes.decode("utf-8", errors="replace")
 
-    # 2. Upload to Supabase Storage
+    # 2. Upload to Appwrite Storage
     storage_path = await file_storage.upload_file(file_bytes, file.filename, str(project.id))
 
     # 3. Create DB record

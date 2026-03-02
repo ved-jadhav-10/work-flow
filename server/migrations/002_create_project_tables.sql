@@ -1,5 +1,6 @@
 -- Phase 3: Create all project-related tables
--- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
+-- Run this in Neon SQL Console (console.neon.tech → SQL Editor)
+-- Requires: CREATE EXTENSION IF NOT EXISTS vector; (run first)
 
 -- 1. Projects
 CREATE TABLE IF NOT EXISTS projects (
