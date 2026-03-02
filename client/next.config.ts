@@ -22,8 +22,24 @@ if (existsSync(rootEnv)) {
   }
 }
 
+const BACKEND = process.env.BACKEND_URL || "http://localhost:8000";
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  // ── Proxy backend API calls through Next.js (browser only needs port 3000) ──
+  // NextAuth's own routes (/api/auth/callback/*, /api/auth/session, etc.)
+  // are handled by the App Router and listed first so they are never rewritten.
+  async rewrites() {
+    return [
+      // Backend auth endpoints
+      { source: "/api/auth/login",    destination: `${BACKEND}/api/auth/login` },
+      { source: "/api/auth/register", destination: `${BACKEND}/api/auth/register` },
+      { source: "/api/auth/oauth",    destination: `${BACKEND}/api/auth/oauth` },
+      { source: "/api/auth/me",       destination: `${BACKEND}/api/auth/me` },
+      // All other backend routes
+      { source: "/api/projects/:path*", destination: `${BACKEND}/api/projects/:path*` },
+      { source: "/api/health",          destination: `${BACKEND}/api/health` },
+    ];
+  },
 };
 
 export default nextConfig;

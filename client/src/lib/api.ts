@@ -1,9 +1,13 @@
 /**
  * Central API client for all calls to the FastAPI backend.
  * Automatically attaches the backend JWT from the NextAuth session.
+ *
+ * In development the Next.js rewrite rules in next.config.ts proxy
+ * /api/* → http://localhost:8000/api/* so the browser only ever talks
+ * to port 3000.  In production set NEXT_PUBLIC_API_URL to the backend URL.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 async function getBackendToken(): Promise<string | null> {
   // Dynamically import to avoid SSR issues

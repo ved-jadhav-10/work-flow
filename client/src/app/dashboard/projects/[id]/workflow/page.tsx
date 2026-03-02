@@ -111,8 +111,8 @@ function TaskCard({
     <div
       className={`group flex gap-3 p-4 rounded-xl border transition-all ${
         task.status === "done"
-          ? "border-gray-700/50 bg-gray-800/20 opacity-60"
-          : "border-gray-700 bg-gray-800/40 hover:border-gray-600"
+          ? "border-border bg-surface-2 opacity-60"
+          : "border-border bg-surface-2 hover:border-border-strong"
       }`}
     >
       {/* Checkbox */}
@@ -140,7 +140,7 @@ function TaskCard({
                 if (e.key === "Enter") handleSaveEdit();
                 if (e.key === "Escape") setEditing(false);
               }}
-              className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-surface-2 border border-border rounded-xl px-3 py-1.5 text-sm text-white focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
             />
             <button
               onClick={handleSaveEdit}
@@ -150,7 +150,7 @@ function TaskCard({
             </button>
             <button
               onClick={() => { setEditing(false); setEditValue(task.description); }}
-              className="p-1.5 rounded-lg bg-gray-700 text-gray-400 hover:bg-gray-600 transition-colors"
+              className="p-1.5 rounded-xl bg-surface-2 text-white/60 hover:bg-surface-3 border border-border transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -158,7 +158,7 @@ function TaskCard({
         ) : (
           <p
             className={`text-sm leading-relaxed ${
-              task.status === "done" ? "line-through text-gray-500" : "text-gray-200"
+              task.status === "done" ? "line-through text-muted-2" : "text-white/90"
             }`}
           >
             {task.description}
@@ -169,12 +169,12 @@ function TaskCard({
         {(assignee || deadline) && (
           <div className="flex flex-wrap gap-3 mt-2">
             {assignee && (
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-muted-2">
                 <User className="w-3 h-3" /> {assignee}
               </span>
             )}
             {deadline && (
-              <span className="flex items-center gap-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1 text-xs text-muted-2">
                 <Clock className="w-3 h-3" /> {deadline}
               </span>
             )}
@@ -188,13 +188,13 @@ function TaskCard({
         <div className="relative">
           <button
             onClick={() => setShowPriorityMenu((v) => !v)}
-            className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
             title="Change priority"
           >
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-white/60" />
           </button>
           {showPriorityMenu && (
-            <div className="absolute right-0 top-8 z-10 bg-gray-800 border border-gray-700 rounded-xl shadow-xl py-1 min-w-25">
+            <div className="absolute right-0 top-8 z-10 bg-surface border border-border rounded-2xl shadow-xl py-1 min-w-25 backdrop-blur-md">
               {(["high", "medium", "low"] as const).map((p) => (
                 <button
                   key={p}
@@ -202,8 +202,8 @@ function TaskCard({
                     onUpdatePriority(task.id, p);
                     setShowPriorityMenu(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-700 transition-colors flex items-center gap-2 ${
-                    task.priority === p ? "text-white font-medium" : "text-gray-400"
+                  className={`w-full text-left px-3 py-2 text-xs hover:bg-white/[0.06] transition-colors flex items-center gap-2 ${
+                    task.priority === p ? "text-white font-medium" : "text-white/70"
                   }`}
                 >
                   <Flag className="w-3 h-3" /> {p}
@@ -217,10 +217,10 @@ function TaskCard({
         {/* Edit */}
         <button
           onClick={() => { setEditing(true); setShowPriorityMenu(false); }}
-          className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
+          className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
           title="Edit description"
         >
-          <Pencil className="w-4 h-4 text-gray-400" />
+          <Pencil className="w-4 h-4 text-white/60" />
         </button>
 
         {/* Delete */}
@@ -235,19 +235,19 @@ function TaskCard({
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
+              className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
               title="Cancel"
             >
-              <X className="w-4 h-4 text-gray-400" />
+              <X className="w-4 h-4 text-white/60" />
             </button>
           </div>
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
-            className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
             title="Delete task"
           >
-            <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-400" />
+            <Trash2 className="w-4 h-4 text-white/60 hover:text-red-300" />
           </button>
         )}
       </div>
@@ -264,7 +264,7 @@ function TaskCard({
 
 export default function WorkflowPage() {
   const params = useParams();
-  const projectId = params.id as string;
+  const projectId = (params?.id ?? "") as string;
 
   const [text, setText] = useState("");
   const [sourceType, setSourceType] = useState<"transcript" | "email">("transcript");
@@ -445,10 +445,10 @@ export default function WorkflowPage() {
     <div className="p-8 text-white max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
-        <ListTodo className="w-6 h-6 text-indigo-400" />
+        <ListTodo className="w-6 h-6 text-accent" />
         <h1 className="text-2xl font-bold">Workflow</h1>
       </div>
-      <p className="text-gray-400 text-sm mb-8">
+      <p className="text-muted text-sm mb-8">
         Paste a meeting transcript or email thread to extract and manage actionable tasks.
       </p>
 
@@ -461,8 +461,8 @@ export default function WorkflowPage() {
               onClick={() => setSourceType("transcript")}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
                 sourceType === "transcript"
-                  ? "bg-indigo-600 border-indigo-500 text-white"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600"
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-surface-2 border-border text-white/70 hover:border-white/15"
               }`}
             >
               <Mic className="w-4 h-4" /> Transcript
@@ -471,8 +471,8 @@ export default function WorkflowPage() {
               onClick={() => setSourceType("email")}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
                 sourceType === "email"
-                  ? "bg-indigo-600 border-indigo-500 text-white"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600"
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-surface-2 border-border text-white/70 hover:border-white/15"
               }`}
             >
               <Mail className="w-4 h-4" /> Email
@@ -490,13 +490,13 @@ export default function WorkflowPage() {
                   : "Paste your email thread here…\n\nExample:\nFrom: Sarah\nTo: Team\n\nHi all, can you please update the API docs and deploy to staging by next Monday? Also, Bob please schedule a sync with the client."
               }
               rows={16}
-              className={`w-full bg-gray-800/60 border rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-colors font-mono leading-relaxed ${
-                isOverLimit ? "border-red-500" : "border-gray-700"
+              className={`w-full bg-surface-2 border rounded-2xl px-4 py-3 text-sm text-white/90 placeholder:text-muted-2 resize-none focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors font-mono leading-relaxed ${
+                isOverLimit ? "border-red-500/60" : "border-border"
               }`}
             />
             <div
               className={`absolute bottom-3 right-3 text-xs ${
-                isOverLimit ? "text-red-400" : "text-gray-600"
+                isOverLimit ? "text-red-300" : "text-white/40"
               }`}
             >
               {charCount.toLocaleString()} / {charLimit.toLocaleString()}
@@ -505,7 +505,7 @@ export default function WorkflowPage() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-start gap-2 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+            <div className="flex items-start gap-2 px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-2xl text-sm text-red-300">
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               {error}
             </div>
@@ -515,7 +515,7 @@ export default function WorkflowPage() {
           <button
             onClick={handleExtract}
             disabled={extracting || isOverLimit}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-sm font-semibold transition-colors"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white/10 border border-white/20 hover:bg-white/[0.17] disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl text-sm font-semibold transition-colors backdrop-blur-sm"
           >
             {extracting ? (
               <>
@@ -532,7 +532,7 @@ export default function WorkflowPage() {
 
           {/* Last extract result */}
           {lastExtracted && (
-            <div className="flex items-center gap-2 px-4 py-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-sm text-emerald-400">
+            <div className="flex items-center gap-2 px-4 py-3 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-sm text-emerald-300">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>
                 Extracted <strong>{lastExtracted.count}</strong> task
@@ -544,19 +544,19 @@ export default function WorkflowPage() {
 
           {/* Stats bar */}
           <div className="grid grid-cols-3 gap-3 mt-2">
-            <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-3 text-center">
-              <div className="flex items-center justify-center gap-1.5 text-gray-400 text-xs mb-1">
+            <div className="bg-surface border border-border rounded-2xl p-3 text-center backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-1.5 text-white/70 text-xs mb-1">
                 <BarChart3 className="w-3 h-3" /> Total
               </div>
               <div className="text-2xl font-bold text-white">{stats.total}</div>
             </div>
-            <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-3 text-center">
+            <div className="bg-surface border border-border rounded-2xl p-3 text-center backdrop-blur-sm">
               <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-xs mb-1">
                 <CheckCircle2 className="w-3 h-3" /> Done
               </div>
               <div className="text-2xl font-bold text-white">{stats.by_status.done}</div>
             </div>
-            <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-3 text-center">
+            <div className="bg-surface border border-border rounded-2xl p-3 text-center backdrop-blur-sm">
               <div className="flex items-center justify-center gap-1.5 text-yellow-400 text-xs mb-1">
                 <Circle className="w-3 h-3" /> Pending
               </div>
@@ -574,7 +574,7 @@ export default function WorkflowPage() {
                   low: "text-blue-400",
                 };
                 return (
-                  <div key={p} className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <div key={p} className="flex items-center gap-1.5 text-xs text-white/70">
                     <Flag className={`w-3 h-3 ${colorMap[p]}`} />
                     <span className={`font-medium ${colorMap[p]}`}>
                       {stats.by_priority[p] ?? 0}
@@ -594,11 +594,11 @@ export default function WorkflowPage() {
               <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
             </div>
           ) : tasks.length === 0 ? (
-            <div className="border border-dashed border-gray-700 rounded-xl p-12 text-center">
-              <ListTodo className="w-8 h-8 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">
+            <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center bg-surface-2 backdrop-blur-sm">
+              <ListTodo className="w-8 h-8 text-white/30 mx-auto mb-3" />
+              <p className="text-muted-2 text-sm">
                 No tasks yet. Paste a transcript or email and hit{" "}
-                <strong className="text-gray-400">Extract Tasks</strong>.
+                <strong className="text-white/70">Extract Tasks</strong>.
               </p>
             </div>
           ) : (

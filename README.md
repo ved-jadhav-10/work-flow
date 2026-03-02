@@ -1,236 +1,190 @@
-# Workflow AI — Persistent AI Context Layer
+# Workflow — Where ideas bloom under starlight
 
-> **Workflow AI**: A production-ready AI assistant that actually remembers your project context — across documents, code, and conversations.
+> A persistent AI context layer for developers, students, and knowledge workers — built with Next.js 15 and FastAPI.
 
-Workflow AI is an intelligent project management and AI assistance platform that maintains persistent context across all your work. Unlike traditional AI tools that forget previous interactions, Workflow AI builds a comprehensive understanding of your projects, learning materials, code, and tasks — providing context-aware assistance that evolves with your work.
+Workflow is an intelligent project workspace that maintains persistent context across documents, code, and conversations. Unlike traditional AI tools that forget between sessions, Workflow builds a vector-indexed knowledge base from everything you add and uses it to deliver context-aware AI assistance that evolves with your work.
 
-## 🎯 Vision
+## Vision
 
-Most AI coding assistants suffer from **context amnesia** — every conversation starts from scratch. Workflow AI solves this by:
+Most AI assistants suffer from **context amnesia** — every conversation starts from scratch. Workflow solves this with:
 
-- **Persistent Memory**: Documents, code, and tasks feed a unified project context
-- **Cross-Module Intelligence**: AI references your uploaded PDFs when explaining code
-- **Smart Drift Detection**: Automatically flags responses that violate project constraints
-- **Hybrid Inference**: Run on cloud (Gemini) or locally (Ollama) for privacy-first workflows
-- **RAG-Powered Conversations**: Every query is augmented with relevant project knowledge
+- **Persistent Memory** — Documents, code, and tasks feed a unified project context
+- **Cross-Module Intelligence** — AI references your uploaded PDFs when explaining code
+- **Smart Drift Detection** — Flags responses that violate project constraints
+- **Hybrid Inference** — Cloud (Gemini) or local (Ollama), your choice
+- **RAG-Powered Chat** — Every query is augmented with relevant project knowledge
 
-## 🚀 Features
+---
 
-### ✅ Currently Implemented
+## Landing Page
 
-#### 1. **Authentication & User Management** (Phase 2)
+The public landing page (`/`) features a cinematic hero section with:
+
+- **Vibrant background image** with CSS filters (`brightness-110`, `saturate-150`, `contrast-1.15`) and a radial vignette overlay that darkens only behind the heading text while keeping the edges vivid
+- **Canvas-based animated starfield** — an HTML5 `<canvas>` particle system (`StarryBackground` component) with varying star sizes, sinusoidal twinkle, slow drift, and `mix-blend-mode: screen`
+- **Playfair Display** italic accent for the "*ideas bloom*" tagline in gold (`#d4aa70`)
+- Sections: Hero → How It Works → Features (Learning / Developer / Workflow cards) → Context Persistence → Privacy & Drift → CTA → Footer
+
+---
+
+## Features
+
+### Authentication & User Management
 
 - Email/password registration with bcrypt hashing
-- GitHub OAuth integration
-- JWT-based session management (custom React auth context)
-- Protected routes via React Router guards
-- User profile management with avatars
+- GitHub OAuth via NextAuth v5 (Auth.js)
+- Server-side session validation in Next.js middleware
+- Protected routes with automatic redirect to `/login`
 
-#### 2. **Project System** (Phase 3)
+### Project System
 
 - Create and manage multiple projects
 - Define project goals and constraints
 - Track decisions and open questions
 - JSONB-based flexible metadata storage
-- Full CRUD operations with user isolation
+- Full CRUD with user isolation
 
-#### 3. **Complete Database Schema**
+### Database Schema
 
-All tables implemented with PostgreSQL + pgvector:
+PostgreSQL + pgvector (hosted on Neon):
 
-- **Users**: Authentication and profiles
-- **Projects**: Core project metadata
-- **Documents**: PDF storage and analysis
-- **Code Insights**: Code explanations and suggestions
-- **Tasks**: Priority-based task management
-- **Embeddings**: Vector storage (768 dimensions via Gemini)
-- **Chat Messages**: Conversation history with context tracking
+| Table | Purpose |
+|-------|---------|
+| Users | Authentication and profiles |
+| Projects | Core project metadata |
+| Documents | PDF storage and analysis |
+| Code Insights | Code explanations and suggestions |
+| Tasks | Priority-based task management |
+| Embeddings | Vector storage (768-dim via Gemini) |
+| Chat Messages | Conversation history with context |
 
-#### 4. **LLM Abstraction Layer** (Phase 4)
+### LLM Abstraction Layer
 
-- **Multi-Provider Support**: Gemini (primary), Groq (fallback), Ollama (local)
-- **Automatic Fallback**: Switches providers on rate limits/failures
-- **Unified Interface**: Single API for all LLM operations
-- **Latency Tracking**: Performance monitoring per provider
+- **Multi-Provider**: Gemini (primary), Groq (fallback), Ollama (local)
+- **Automatic Fallback**: Switches on rate limits / failures
+- **Unified Interface**: Single API across all providers
+- **Latency Tracking**: Per-provider performance monitoring
 
-#### 5. **PDF Processing Pipeline**
+### PDF Processing Pipeline
 
-- PDF text extraction (PyMuPDF)
-- Table extraction (pdfplumber)
+- Text extraction (PyMuPDF) with table extraction (pdfplumber)
 - Intelligent chunking with overlap
-- Embedding generation (text-embedding-004)
+- Embedding generation (`text-embedding-004`)
 - Appwrite Storage integration
 
-#### 6. **Learning Module** (Phase 5)
+### Learning Module
 
-- **Document Upload**: Drag-and-drop PDF processing
-- **Smart Summarization**: Short / Detailed / Exam-ready modes
-- **Concept Extraction**: Key concepts with importance scores
-- **Implementation Steps**: Actionable step-by-step plans
-- **Vector Storage**: Automatic embedding generation for RAG
+- Drag-and-drop PDF upload with Framer Motion animations
+- Glassmorphic document grid with concept pills
+- Slide-out summary side-panel
+- Smart summarisation: Short / Detailed / Exam-ready modes
+- Key concept extraction with importance scores
+- Implementation step generation
+- Automatic vector embedding for RAG
 
-#### 7. **Developer Productivity Module** (Phase 6)
+### Developer Productivity Module
 
-- **Code Explanation**: Structured analysis with components
-- **Bug Detection**: Identifies issues with severity levels
-- **README Generation**: Markdown documentation from code
-- **Multi-Language Support**: Syntax highlighting and language detection
-- **Code History**: Track previous insights
+- Structured code explanation with component breakdowns
+- Bug detection with severity levels
+- README generation from code
+- Multi-language syntax highlighting
+- Code history tracking
 
-#### 8. **Workflow Automation** (Phase 7)
+### Workflow Automation Module
 
-- **Task Extraction**: Parse meeting transcripts and emails
-- **Priority Classification**: High / Medium / Low with AI reasoning
-- **Task Management**: Update status, change priorities, delete tasks
-- **Source Attribution**: Links tasks back to original text
+- Meeting transcript and email task extraction
+- AI-classified priority (High / Medium / Low)
+- Task status management and re-prioritisation
+- Source attribution back to original text
 
-### 🔮 Future Phases (Roadmap)
+---
 
-#### **Phase 8: Context Persistence Engine & RAG** (In Planning)
+## Architecture
 
-The core differentiator that ties everything together:
+### Tech Stack
 
-- **Unified Context API**: Aggregate data from all modules (docs, code, tasks)
-- **Intelligent Retrieval**: Vector similarity search across all project content
-- **Context-Aware Chat**: Every query augmented with relevant project knowledge
-- **Source Attribution**: Show which documents/code influenced each response
-- **Cross-Module Intelligence**: "How does my code implement concepts from my PDF?"
-- **Context Health Score**: Visibility into knowledge graph completeness
+#### Frontend — Next.js 15 (App Router)
 
-**Key Features:**
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15, React 19, TypeScript 5 |
+| Auth | NextAuth v5 (Auth.js) — GitHub OAuth + Credentials |
+| Styling | Tailwind CSS 4 (PostCSS plugin) |
+| Animations | Framer Motion 12, HTML5 Canvas (starfield) |
+| Fonts | Geist Sans/Mono, Playfair Display (via `next/font`) |
+| HTTP | Axios + server-side fetch |
+| Icons | lucide-react |
+| Syntax | react-syntax-highlighter |
 
-```python
-# Every AI response will be context-aware
-response = query_with_context(
-    project_id="...",
-    query="What are my priorities?",
-    # Automatically retrieves:
-    # - Project goals and constraints
-    # - Relevant document chunks
-    # - Related code insights
-    # - Open tasks by priority
-)
-```
+#### Backend — FastAPI
 
-#### **Phase 9: Drift Detection & Smart Features** (Planned)
-
-Proactive intelligence that keeps your project on track:
-
-- **Constraint Violation Detection**: AI responses that contradict project rules trigger warnings
-- **Technology Stack Monitoring**: Flag mentions of disallowed frameworks/languages
-- **Automatic Query Routing**: Detect intent and route to appropriate module
-- **Decision Tracking**: AI-suggested decisions added to project context
-- **False Positive Management**: Dismiss warnings that don't apply
-
-**Example Drift Detection:**
-
-```
-Project Constraint: "React and TypeScript only"
-User: "Should I use Vue for this component?"
-AI Response: "Vue is a great choice for..."
-
-⚠️ DRIFT WARNING: Response suggests Vue, but project is constrained to React
-Violated Constraint: "React and TypeScript only"
-Actions: [Dismiss] [Add to Decisions]
-```
-
-#### **Phase 10: Hybrid Inference & Production Deployment** (Planned)
-
-Ship-ready platform with privacy-first local inference:
-
-- **Cloud/Local Toggle**: Switch between Gemini and Ollama in settings
-- **Privacy Mode**: Local inference with "data never leaves your machine" badge
-- **Latency Comparison**: See cloud vs local performance in real-time
-- **AMD Ryzen AI Ready**: Optimized for hardware acceleration
-- **Production Landing Page**: Marketing site with demos
-- **Full Deployment Pipeline**: Vercel (frontend) + Render (backend)
-- **Error Handling Sweep**: Comprehensive validation and user feedback
-- **Mobile Responsive**: Full tablet/phone support
-
-**Settings Interface:**
-
-```
-Inference Mode: [Cloud ☁️] [Local 🔒]
-Current Provider: Ollama (Local) - Privacy Mode Active
-Avg Latency: 1.2s (Cloud: 0.4s)
-Note: Local inference keeps all data on your machine
-```
-
-## 🏗️ Architecture
-
-### Technology Stack
-
-#### Frontend (React + Vite)
-
-- **Framework**: React 18+ with Vite build tool
-- **Routing**: React Router DOM v6 (client-side SPA)
-- **Auth**: Custom AuthContext (JWT stored in localStorage, auto-attached to API calls)
-- **UI**: Tailwind CSS 4 via Vite plugin
-- **HTTP Client**: Fetch API with centralized client (api.ts)
-- **Syntax Highlighting**: react-syntax-highlighter
-- **Icons**: lucide-react
-
-#### Backend (FastAPI)
-
-- **Framework**: FastAPI 0.115 (async/await)
-- **Database**: Neon PostgreSQL with pgvector
-- **ORM**: SQLAlchemy 2.0
-- **Auth**: JWT via python-jose + bcrypt
-- **File Storage**: Appwrite Cloud (private bucket, SDK-based)
-- **AI Providers**:
-  - Google Gemini (gemini-2.0-flash, text-embedding-004)
-  - Groq (llama-3.1-70b-versatile)
-  - Ollama (phi3:mini for local inference)
-- **PDF Processing**: PyMuPDF + pdfplumber
-- **Testing**: pytest + pytest-asyncio
+| Layer | Technology |
+|-------|-----------|
+| Framework | FastAPI 0.115 (async) |
+| Database | Neon PostgreSQL 16 + pgvector |
+| ORM | SQLAlchemy 2.0 |
+| Auth | JWT (python-jose) + bcrypt |
+| File Storage | Appwrite Cloud (private bucket) |
+| AI | Gemini (`gemini-2.0-flash`), Groq (`llama-3.1-70b`), Ollama (`phi3:mini`) |
+| PDF | PyMuPDF + pdfplumber |
+| Testing | pytest + pytest-asyncio |
 
 #### Infrastructure
 
-- **Database**: Neon (PostgreSQL 16 + pgvector extension)
-- **File Storage**: Appwrite Cloud (private bucket)
-- **Deployment** (Planned):
-  - Frontend: Any static host (Vercel, Netlify, Cloudflare Pages)
-  - Backend: Render (Dockerized)
-  - Database: Neon (managed)
-  - Storage: Appwrite (managed)
+- **Database**: Neon (managed PostgreSQL + pgvector)
+- **File Storage**: Appwrite Cloud
+- **Frontend Hosting**: Vercel (or any Node.js host)
+- **Backend Hosting**: Render (Dockerised) — see `render.yaml`
 
 ### Project Structure
 
 ```
 work-flow/
-├── client/                    # React + Vite frontend (SPA)
+├── client/                          # Next.js 15 frontend
 │   ├── src/
-│   │   ├── main.tsx          # App entry point
-│   │   ├── App.tsx           # React Router setup
-│   │   ├── pages/            # Page components
-│   │   │   ├── Landing.tsx           # Public landing page
-│   │   │   ├── Login.tsx             # Login page
-│   │   │   ├── Register.tsx          # Registration page
-│   │   │   ├── Dashboard.tsx         # Projects grid
-│   │   │   ├── NewProject.tsx        # Create project form
-│   │   │   ├── ProjectOverview.tsx   # Project detail with tabs
-│   │   │   ├── Learning.tsx          # Document module
-│   │   │   ├── Developer.tsx         # Code module
-│   │   │   ├── Workflow.tsx          # Task module
-│   │   │   ├── Chat.tsx              # AI conversation
-│   │   │   └── Settings.tsx          # Inference settings
+│   │   ├── middleware.ts            # Auth middleware (session check)
+│   │   ├── app/
+│   │   │   ├── layout.tsx           # Root layout (fonts, providers)
+│   │   │   ├── page.tsx             # Landing page (hero, features, CTA)
+│   │   │   ├── globals.css          # Tailwind + custom keyframes
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   ├── api/auth/[...nextauth]/route.ts
+│   │   │   └── dashboard/
+│   │   │       ├── layout.tsx       # Dashboard shell (sidebar)
+│   │   │       ├── page.tsx         # Projects grid
+│   │   │       ├── settings/page.tsx
+│   │   │       └── projects/
+│   │   │           ├── new/page.tsx
+│   │   │           └── [id]/
+│   │   │               ├── layout.tsx
+│   │   │               ├── page.tsx       # Project overview
+│   │   │               ├── chat/page.tsx
+│   │   │               ├── learning/page.tsx
+│   │   │               ├── developer/page.tsx
+│   │   │               └── workflow/page.tsx
 │   │   ├── components/
-│   │   │   ├── ui/               # Reusable UI primitives
-│   │   │   └── layout/           # Sidebar, AuthGuard, layouts
-│   │   ├── context/
-│   │   │   └── AuthContext.tsx   # JWT auth state (React Context)
+│   │   │   ├── StarryBackground.tsx # Canvas particle starfield
+│   │   │   ├── layout/Sidebar.tsx
+│   │   │   └── providers/
+│   │   │       ├── Providers.tsx     # NextAuth SessionProvider
+│   │   │       └── ErrorBoundary.tsx
 │   │   ├── lib/
-│   │   │   └── api.ts            # Centralized API client
-│   │   └── types/
-│   │       └── index.ts          # TypeScript definitions
-│   ├── public/               # Static assets
-│   └── vite.config.ts
+│   │   │   ├── auth.ts              # NextAuth config (GitHub + Credentials)
+│   │   │   ├── api.ts               # Backend API client
+│   │   │   └── inference.ts         # LLM inference helpers
+│   │   └── types/index.ts
+│   ├── public/
+│   │   └── hero-bg.jpg              # Landing page background
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   └── package.json
 │
-├── server/                    # FastAPI backend
-│   ├── main.py               # App entry, CORS, router registration
-│   ├── config.py             # Environment variables (Pydantic)
-│   ├── database.py           # SQLAlchemy setup
-│   ├── models/               # ORM models
+├── server/                          # FastAPI backend
+│   ├── main.py                      # App entry, CORS, routers
+│   ├── config.py                    # Pydantic Settings (.env)
+│   ├── database.py                  # SQLAlchemy engine + session
+│   ├── models/                      # ORM models
 │   │   ├── user.py
 │   │   ├── project.py
 │   │   ├── document.py
@@ -238,327 +192,200 @@ work-flow/
 │   │   ├── task.py
 │   │   ├── embedding.py
 │   │   └── chat_message.py
-│   ├── schemas/              # Pydantic request/response models
+│   ├── schemas/                     # Pydantic request/response
 │   │   ├── auth.py
 │   │   ├── project.py
 │   │   ├── learning.py
-│   │   └── developer.py
-│   ├── routers/              # API endpoints
-│   │   ├── auth.py           # POST /register, /login, GET /me
-│   │   ├── projects.py       # CRUD for projects
-│   │   ├── learning.py       # Document processing
-│   │   ├── developer.py      # Code analysis
-│   │   └── workflow.py       # Task extraction (Phase 7)
-│   ├── services/             # Business logic
-│   │   ├── llm_service.py    # Multi-provider LLM abstraction
-│   │   ├── pdf_service.py    # PDF extraction and chunking
-│   │   ├── embedding_service.py  # Vector generation
-│   │   ├── file_storage.py   # Appwrite Storage wrapper
-│   │   ├── learning_service.py   # Document orchestration
-│   │   ├── developer_service.py  # Code analysis orchestration
-│   │   └── prompts/          # System prompts
+│   │   ├── developer.py
+│   │   ├── chat.py
+│   │   └── workflow.py
+│   ├── routers/                     # API endpoints
+│   │   ├── auth.py
+│   │   ├── projects.py
+│   │   ├── learning.py
+│   │   ├── developer.py
+│   │   ├── workflow.py
+│   │   └── chat.py
+│   ├── services/                    # Business logic
+│   │   ├── llm_service.py
+│   │   ├── pdf_service.py
+│   │   ├── embedding_service.py
+│   │   ├── rag_service.py
+│   │   ├── context_engine.py
+│   │   ├── drift_detector.py
+│   │   ├── file_storage.py
+│   │   ├── learning_service.py
+│   │   ├── developer_service.py
+│   │   ├── workflow_service.py
+│   │   └── prompts/
+│   │       ├── chat_prompts.py
 │   │       ├── learning_prompts.py
-│   │       └── developer_prompts.py
-│   ├── middleware/
-│   │   └── auth.py           # JWT validation dependency
-│   ├── migrations/           # SQL migration files
+│   │       ├── developer_prompts.py
+│   │       └── workflow_prompts.py
+│   ├── middleware/auth.py           # JWT validation dependency
+│   ├── migrations/
 │   │   ├── 001_create_users.sql
-│   │   └── 002_create_project_tables.sql
+│   │   ├── 002_create_project_tables.sql
+│   │   └── 003_add_drift_and_routing.sql
 │   ├── tests/
-│   │   ├── test_llm_service.py
-│   │   ├── test_pdf_service.py
-│   │   └── test_embedding_service.py
+│   ├── Dockerfile
 │   └── requirements.txt
 │
-├── plan.md                   # 10-phase execution plan
-└── package.json              # Root workspace config
+├── render.yaml                      # Render deployment config
+├── plan.md                          # 10-phase execution plan
+└── package.json                     # Root workspace
 ```
 
-## 🚀 Getting Started
+---
+
+## Getting Started
 
 ### Prerequisites
 
 - **Node.js** 20+ and npm
 - **Python** 3.11+ and pip
-- **Neon Account** (free tier PostgreSQL with pgvector)
-- **Appwrite Account** (free tier for file storage)
-- **API Keys**:
-  - Google AI Studio (Gemini API)
-  - Groq API (optional, for fallback)
-  - GitHub OAuth App (for social login)
+- **Neon** account (free-tier PostgreSQL with pgvector)
+- **Appwrite** account (free-tier file storage)
+- **API Keys**: Google AI Studio (Gemini), Groq (optional), GitHub OAuth App
 
-### 1. Clone and Install
+### 1. Clone & Install
 
 ```bash
-# Clone the repository
 git clone <your-repo-url>
 cd work-flow
 
-# Install frontend dependencies
+# Frontend
 cd client
 npm install
 
-# Install backend dependencies
+# Backend
 cd ../server
 python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\Activate
+.\venv\Scripts\Activate   # macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Environment Setup
+### 2. Environment Variables
 
-Create `server/.env` (or use root `.env`):
+**`server/.env`**
 
-```bash
-# ── Database (Neon PostgreSQL) ───────────────
-DATABASE_URL=postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+```env
+DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
 
-# ── Appwrite (File Storage) ──────────────────
 APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
-APPWRITE_PROJECT_ID=your-appwrite-project-id
-APPWRITE_API_KEY=your-appwrite-api-key
-APPWRITE_BUCKET_ID=your-bucket-id
+APPWRITE_PROJECT_ID=...
+APPWRITE_API_KEY=...
+APPWRITE_BUCKET_ID=...
 
-# ── Google Gemini API ─────────────────────────
-GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=...
+GROQ_API_KEY=...
 
-# ── Groq API (Fallback) ──────────────────────
-GROQ_API_KEY=your-groq-api-key
-
-# ── Auth ──────────────────────────────────────
 JWT_SECRET=generate-a-random-secret
-GITHUB_CLIENT_ID=your-github-oauth-client-id
-GITHUB_CLIENT_SECRET=your-github-oauth-secret
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
 
-# ── Ollama (Local Inference — optional) ──────
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=phi3:mini
 ```
 
-Create `client/.env`:
+**`client/.env.local`**
 
-```bash
-VITE_API_URL=http://localhost:8000
+```env
+BACKEND_URL=http://localhost:8000
+AUTH_SECRET=generate-a-random-secret
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
 ```
 
 ### 3. Database Setup
 
-Run migrations against your Neon PostgreSQL database:
-
-1. Go to your **Neon Dashboard** → SQL Editor (or use `psql` with your `DATABASE_URL`)
-2. **Enable pgvector**:
+1. Enable pgvector in your Neon SQL Editor:
    ```sql
    CREATE EXTENSION IF NOT EXISTS vector;
    ```
-3. Run `server/migrations/001_create_users.sql`
-4. Run `server/migrations/002_create_project_tables.sql`
+2. Run the migration files in order:
+   - `server/migrations/001_create_users.sql`
+   - `server/migrations/002_create_project_tables.sql`
+   - `server/migrations/003_add_drift_and_routing.sql`
 
-### 4. Start Development Servers
-
-**Terminal 1 - Backend:**
+### 4. Run Development Servers
 
 ```bash
+# Terminal 1 — Backend
 cd server
-python -m uvicorn main:app --reload --port 8000
-```
+uvicorn main:app --reload --port 8000
 
-**Terminal 2 - Frontend:**
-
-```bash
+# Terminal 2 — Frontend
 cd client
 npm run dev
 ```
 
-Visit:
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API Docs | http://localhost:8000/docs |
+| Health Check | http://localhost:8000/api/health |
 
-- **Frontend**: http://localhost:5173
-- **Backend API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/api/health
+---
 
-## 📖 Usage
+## Usage
 
-### 1. Authentication
+1. **Register** — email/password or GitHub OAuth at `/register`
+2. **Create a project** — set name, goal, and constraints from the dashboard
+3. **Learning** — upload PDFs, generate summaries, extract concepts
+4. **Developer** — paste code for explanations, bug detection, README generation
+5. **Workflow** — paste transcripts to extract prioritised tasks
+6. **Chat** — context-aware AI assistant referencing all project content
 
-- Register with email/password or sign in with GitHub
-- Access the dashboard at `/dashboard`
+---
 
-### 2. Create a Project
-
-- Click "New Project" from the dashboard
-- Set project name, goal, and constraints
-- Add decisions and open questions as you work
-
-### 3. Learning Module
-
-- Navigate to your project → "Learning" tab
-- Upload PDF documents (study materials, documentation)
-- Generate summaries (Short, Detailed, or Exam-ready)
-- Extract key concepts with importance scores
-- Get implementation steps for complex topics
-
-### 4. Developer Module
-
-- Go to "Developer" tab
-- Paste code snippets
-- Get structured explanations with component breakdowns
-- Debug: identify bugs, edge cases, and improvements
-- Generate README files from code
-
-### 5. Workflow Module
-
-- Go to "Workflow" tab
-- Paste meeting transcripts or email threads
-- Extract tasks with AI-assigned priorities
-- Manage task status (pending/done)
-- Update priorities as needs change
-
-### 6. Coming Soon: Context-Aware Chat (Phase 8)
-
-- Chat tab will provide AI assistance that references ALL your project content
-- Ask: "How does my code implement concepts from the PDF I uploaded?"
-- AI automatically retrieves relevant chunks from documents, code, and tasks
-- See which sources influenced each response
-
-## 🧪 Testing
-
-Run backend tests:
+## Testing
 
 ```bash
 cd server
 pytest
 ```
 
-Test coverage includes:
+Covers: LLM provider fallback, PDF extraction/chunking, embedding generation, vector similarity search.
 
-- LLM service with provider fallback
-- PDF extraction and chunking
-- Embedding generation
-- Vector similarity search
+---
 
-## 📊 Current Status
+## Status
 
-| Phase | Feature              | Status      |
-| ----- | -------------------- | ----------- |
-| 0     | Environment Setup    | ✅ Complete |
-| 1     | Project Scaffold     | ✅ Complete |
-| 2     | Authentication       | ✅ Complete |
-| 3     | Project System       | ✅ Complete |
-| 4     | LLM & PDF Services   | ✅ Complete |
-| 5     | Learning Module      | ✅ Complete |
-| 6     | Developer Module     | ✅ Complete |
-| 7     | Workflow Module      | ✅ Complete |
-| 8     | Context Engine & RAG | 🔜 Next     |
-| 9     | Drift Detection      | 📋 Planned  |
-| 10    | Deployment & Polish  | 📋 Planned  |
+| Phase | Feature | Status |
+|-------|---------|--------|
+| 0 | Environment Setup | ✅ Complete |
+| 1 | Project Scaffold | ✅ Complete |
+| 2 | Authentication (NextAuth v5) | ✅ Complete |
+| 3 | Project System | ✅ Complete |
+| 4 | LLM & PDF Services | ✅ Complete |
+| 5 | Learning Module | ✅ Complete |
+| 6 | Developer Module | ✅ Complete |
+| 7 | Workflow Module | ✅ Complete |
+| 8 | Context Engine & RAG | 🔜 Next |
+| 9 | Drift Detection | 📋 Planned |
+| 10 | Deployment & Polish | 📋 Planned |
 
-**Current Phase**: Phases 1-7 fully implemented. Phase 8 (Context Engine) is the next major milestone.
+---
 
-## 🎯 What Makes This Different?
-
-### 1. **True Persistence**
-
-Unlike ChatGPT or Claude, Workflow AI doesn't forget. Every document, code snippet, and task becomes part of your project's knowledge graph.
-
-### 2. **Cross-Module Intelligence**
-
-The Learning Module knows about your code. The Developer Module references your documents. The Workflow Module understands your project goals.
-
-### 3. **Constraint-Aware AI**
-
-Define "React only" or "Python 3.11+" — the AI respects and enforces your technical decisions.
-
-### 4. **Hybrid Inference** (Coming in Phase 10)
-
-Cloud performance when you need it. Local privacy when you want it. Your choice, same interface.
-
-### 5. **Built for Real Workflows**
-
-Not a chat toy. Designed for students managing coursework, developers building projects, and teams coordinating work.
-
-## 🛠️ Development
-
-### Code Quality
-
-- **Frontend**: TypeScript strict mode, ESLint, Prettier (coming)
-- **Backend**: Type hints, Black formatting (coming), Pylint
-- **Testing**: pytest for backend, Vitest for frontend (planned)
-
-### Git Workflow
-
-```bash
-# Create feature branch
-git checkout -b feature/context-engine
-
-# Make changes, commit
-git add .
-git commit -m "feat: implement RAG pipeline"
-
-# Push and create PR
-git push origin feature/context-engine
-```
-
-### Environment Variables
-
-Never commit secrets! Use `.env.example` as a template.
-
-## 🚢 Deployment (Phase 10)
-
-### Frontend (Static Host)
-
-```bash
-# Build production bundle
-cd client
-npm run build
-# Deploy the dist/ folder to Vercel, Netlify, or Cloudflare Pages
-```
-
-Set `VITE_API_URL` environment variable to your production backend URL.
-
-### Backend (Render)
-
-1. Create `Dockerfile` in `server/`
-2. Add `render.yaml` at root
-3. Connect GitHub repo to Render
-4. Set environment variables
-5. Deploy
-
-### Post-Deployment Checklist
-
-- [ ] Update `VITE_API_URL` to production backend URL
-- [ ] Update CORS in FastAPI to allow production frontend domain
-- [ ] Update GitHub OAuth redirect URI to production URL
-- [ ] Test all features in production
-- [ ] Set up monitoring (Sentry, LogRocket, etc.)
-
-## 🤝 Contributing
-
-This project follows a **phase-based development model**. Each phase builds on the previous one, ensuring stability.
-
-### Current Development Focus
-
-**Phase 8: Context Persistence Engine & RAG**
-
-Want to contribute? Check `plan.md` for detailed implementation specs.
-
-## 📋 Roadmap
+## Roadmap
 
 ### Q1 2026
 
-- ✅ Core authentication and project management
-- ✅ Learning, Developer, and Workflow modules
-- 🔜 Context Persistence Engine (Phase 8)
-- 🔜 RAG-powered conversations
+- ✅ Core auth, project management, and all three intelligence modules
+- ✅ Next.js 15 migration with NextAuth v5
+- ✅ Cinematic landing page with canvas starfield
+- 🔜 Context Persistence Engine & RAG-powered chat
 
 ### Q2 2026
 
 - Drift detection and constraint enforcement
 - Smart query routing
-- Hybrid inference (cloud/local toggle)
-- Production deployment
+- Hybrid inference (cloud / local toggle)
+- Production deployment (Vercel + Render)
 
 ### Q3 2026
 
-- Mobile app (React Native)
 - Team collaboration features
 - Advanced analytics dashboard
 - Plugin system for custom modules
@@ -567,31 +394,52 @@ Want to contribute? Check `plan.md` for detailed implementation specs.
 
 - Self-hosted option (Docker Compose)
 - Enterprise features (SSO, audit logs)
-- AMD Ryzen AI hardware acceleration
-- Fine-tuned models for specific domains
-
-## 📄 License
-
-MIT License — see `LICENSE` file for details
-
-## 🙏 Acknowledgments
-
-- **React** & **Vite** for the blazing-fast frontend tooling
-- **FastAPI** for the best Python web framework
-- **Neon** for managed PostgreSQL with pgvector
-- **Appwrite** for managed file storage
-- **Google** for Gemini API
-- **Groq** for fast LLM inference
-- **Ollama** for local LLM runtime
-
-## 📞 Support
-
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Use GitHub Discussions for questions
-- **Email**: [your-email] (for security issues only)
+- Fine-tuned domain-specific models
 
 ---
 
-**Built with ❤️ for developers, students, and knowledge workers who deserve AI that actually remembers.**
+## Deployment
 
-_Project Status: Active Development | Current Phase: 7/10 Complete_
+### Frontend — Vercel
+
+```bash
+cd client
+npm run build   # produces .next/
+# Deploy via Vercel CLI or Git integration
+```
+
+Set `BACKEND_URL`, `AUTH_SECRET`, and OAuth env vars in the Vercel dashboard.
+
+### Backend — Render
+
+A `render.yaml` is included at the repo root. Connect the GitHub repo to Render, set the environment variables listed above, and deploy.
+
+### Post-Deploy Checklist
+
+- [ ] Set `BACKEND_URL` to production backend URL
+- [ ] Update CORS origins in FastAPI `main.py`
+- [ ] Update GitHub OAuth redirect URI
+- [ ] Verify all features in production
+- [ ] Set up monitoring (Sentry, etc.)
+
+---
+
+## Acknowledgements
+
+- **Next.js** & **React** for the frontend framework
+- **FastAPI** for the async Python backend
+- **Neon** for managed PostgreSQL with pgvector
+- **Appwrite** for managed file storage
+- **Google Gemini**, **Groq**, and **Ollama** for AI inference
+- **Framer Motion** for animations
+- **Tailwind CSS** for utility-first styling
+
+---
+
+## License
+
+MIT — see `LICENSE` for details.
+
+---
+
+*Where ideas bloom under starlight.*

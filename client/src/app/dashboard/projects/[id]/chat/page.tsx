@@ -30,7 +30,7 @@ import type { ChatMessage, ContextReference, DriftWarning } from "@/types";
 
 export default function ChatPage() {
   const params = useParams();
-  const projectId = params.id as string;
+  const projectId = (params?.id ?? "") as string;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -139,7 +139,7 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-400">
+      <div className="flex items-center justify-center h-full text-muted">
         <Loader2 className="w-6 h-6 animate-spin mr-2" />
         Loading chat…
       </div>
@@ -149,11 +149,11 @@ export default function ChatPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] text-white">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-800">
-        <MessageSquare className="w-5 h-5 text-indigo-400" />
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-border backdrop-blur-sm">
+        <MessageSquare className="w-5 h-5 text-accent" />
         <div>
           <h1 className="text-lg font-semibold">AI Chat</h1>
-          <p className="text-gray-500 text-xs">
+          <p className="text-muted-2 text-xs">
             Context-aware assistant — powered by your project data
           </p>
         </div>
@@ -161,11 +161,11 @@ export default function ChatPage() {
 
       {/* Error banner */}
       {error && (
-        <div className="mx-6 mt-3 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
+        <div className="mx-6 mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-300 text-sm">
           {error}
           <button
             onClick={() => setError("")}
-            className="ml-2 text-red-400 hover:text-red-200"
+            className="ml-2 text-red-300 hover:text-red-50"
           >
             ✕
           </button>
@@ -183,21 +183,21 @@ export default function ChatPage() {
         {/* Typing indicator */}
         {sending && (
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-indigo-600/20 flex items-center justify-center shrink-0">
-              <Bot className="w-4 h-4 text-indigo-400" />
+            <div className="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center shrink-0 backdrop-blur-sm">
+              <Bot className="w-4 h-4 text-accent" />
             </div>
-            <div className="bg-gray-800/60 border border-gray-700 rounded-2xl rounded-tl-sm px-4 py-3">
+            <div className="bg-surface-2 border border-border rounded-2xl rounded-tl-sm px-4 py-3 backdrop-blur-sm">
               <div className="flex items-center gap-1">
                 <div
-                  className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-accent rounded-full animate-bounce"
                   style={{ animationDelay: "0ms" }}
                 />
                 <div
-                  className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-accent rounded-full animate-bounce"
                   style={{ animationDelay: "150ms" }}
                 />
                 <div
-                  className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-accent rounded-full animate-bounce"
                   style={{ animationDelay: "300ms" }}
                 />
               </div>
@@ -209,7 +209,7 @@ export default function ChatPage() {
       </div>
 
       {/* Input bar */}
-      <div className="border-t border-gray-800 px-6 py-4">
+      <div className="border-t border-border px-6 py-4 backdrop-blur-sm">
         <div className="flex items-end gap-3 max-w-4xl mx-auto">
           <textarea
             ref={inputRef}
@@ -219,7 +219,7 @@ export default function ChatPage() {
             placeholder="Ask about your project…"
             disabled={sending}
             rows={1}
-            className="flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none disabled:opacity-50 text-sm"
+            className="flex-1 px-4 py-3 bg-surface-2 border border-border rounded-2xl text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors resize-none disabled:opacity-50 text-sm"
             style={{ maxHeight: "120px" }}
             onInput={(e) => {
               const target = e.target as HTMLTextAreaElement;
@@ -230,7 +230,7 @@ export default function ChatPage() {
           <button
             onClick={handleSend}
             disabled={!input.trim() || sending}
-            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors shrink-0"
+            className="px-4 py-3 bg-white/10 border border-white/20 hover:bg-white/[0.17] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-2xl transition-colors shrink-0 backdrop-blur-sm"
           >
             {sending ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -239,7 +239,7 @@ export default function ChatPage() {
             )}
           </button>
         </div>
-        <p className="text-center text-gray-600 text-xs mt-2">
+        <p className="text-center text-muted-2 text-xs mt-2">
           Shift + Enter for new line · Responses use your project context
         </p>
       </div>
@@ -253,16 +253,16 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center py-16">
       <div className="w-16 h-16 rounded-full bg-indigo-600/10 flex items-center justify-center mb-4">
-        <MessageSquare className="w-8 h-8 text-indigo-400" />
+        <MessageSquare className="w-8 h-8 text-accent" />
       </div>
       <h2 className="text-xl font-semibold text-white mb-2">
         Start a conversation
       </h2>
-      <p className="text-gray-400 text-sm max-w-md mb-6">
+      <p className="text-muted text-sm max-w-md mb-6">
         Ask questions about your project, uploaded documents, code insights, or
         tasks. The AI uses your full project context to give relevant answers.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-2">
         <SuggestionChip text="What are my current priorities?" />
         <SuggestionChip text="Summarize what I've learned so far" />
         <SuggestionChip text="How does my code relate to my documents?" />
@@ -274,7 +274,7 @@ function EmptyState() {
 
 function SuggestionChip({ text }: { text: string }) {
   return (
-    <div className="px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg">
+    <div className="px-3 py-2 bg-surface-2 border border-border rounded-xl backdrop-blur-sm">
       {text}
     </div>
   );
@@ -292,13 +292,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       {/* Avatar */}
       <div
         className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-          isUser ? "bg-gray-700" : "bg-indigo-600/20"
+          isUser ? "bg-white/10 border border-white/15" : "bg-white/10 border border-white/15"
         }`}
       >
         {isUser ? (
-          <User className="w-4 h-4 text-gray-300" />
+          <User className="w-4 h-4 text-white/70" />
         ) : (
-          <Bot className="w-4 h-4 text-indigo-400" />
+          <Bot className="w-4 h-4 text-accent" />
         )}
       </div>
 
@@ -307,8 +307,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         <div
           className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
             isUser
-              ? "bg-indigo-600 text-white rounded-tr-sm"
-              : "bg-gray-800/60 border border-gray-700 text-gray-100 rounded-tl-sm"
+              ? "bg-white/10 border border-white/15 text-white rounded-tr-sm backdrop-blur-sm"
+              : "bg-surface-2 border border-border text-white/90 rounded-tl-sm backdrop-blur-sm"
           }`}
         >
           {isUser ? (
@@ -322,7 +322,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         {!isUser && (
           <div className="mt-1.5 flex items-center gap-3 flex-wrap">
             {message.provider && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-800 border border-gray-700 rounded-full text-[10px] text-gray-400">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-2 border border-border rounded-full text-[10px] text-white/70 backdrop-blur-sm">
                 <Cpu className="w-3 h-3" />
                 {message.provider}
                 {message.latency_ms != null && (
@@ -369,7 +369,7 @@ function MarkdownContent({ content }: { content: string }) {
         elements.push(
           <pre
             key={`code-${i}`}
-            className="bg-gray-900 rounded-lg p-3 my-2 overflow-x-auto text-xs font-mono text-gray-300"
+            className="bg-surface border border-border rounded-xl p-3 my-2 overflow-x-auto text-xs font-mono text-white/80 backdrop-blur-sm"
           >
             <code>{codeLines.join("\n")}</code>
           </pre>
@@ -407,14 +407,14 @@ function MarkdownContent({ content }: { content: string }) {
       );
     } else if (line.match(/^[-*]\s/)) {
       elements.push(
-        <li key={i} className="ml-4 list-disc text-gray-200">
+        <li key={i} className="ml-4 list-disc text-white/90">
           <InlineFormat text={line.slice(2)} />
         </li>
       );
     } else if (line.match(/^\d+\.\s/)) {
       const text = line.replace(/^\d+\.\s/, "");
       elements.push(
-        <li key={i} className="ml-4 list-decimal text-gray-200">
+        <li key={i} className="ml-4 list-decimal text-white/90">
           <InlineFormat text={text} />
         </li>
       );
@@ -422,7 +422,7 @@ function MarkdownContent({ content }: { content: string }) {
       elements.push(<div key={i} className="h-2" />);
     } else {
       elements.push(
-        <p key={i} className="text-gray-200">
+        <p key={i} className="text-white/90">
           <InlineFormat text={line} />
         </p>
       );
@@ -433,7 +433,7 @@ function MarkdownContent({ content }: { content: string }) {
     elements.push(
       <pre
         key="code-end"
-        className="bg-gray-900 rounded-lg p-3 my-2 overflow-x-auto text-xs font-mono text-gray-300"
+        className="bg-surface border border-border rounded-xl p-3 my-2 overflow-x-auto text-xs font-mono text-white/80 backdrop-blur-sm"
       >
         <code>{codeLines.join("\n")}</code>
       </pre>
@@ -459,7 +459,7 @@ function InlineFormat({ text }: { text: string }) {
           return (
             <code
               key={i}
-              className="px-1.5 py-0.5 bg-gray-900 rounded text-indigo-300 text-xs font-mono"
+              className="px-1.5 py-0.5 bg-surface border border-border rounded text-accent text-xs font-mono"
             >
               {part.slice(1, -1)}
             </code>
@@ -471,7 +471,7 @@ function InlineFormat({ text }: { text: string }) {
           !part.startsWith("**")
         ) {
           return (
-            <em key={i} className="italic text-gray-300">
+            <em key={i} className="italic text-white/80">
               {part.slice(1, -1)}
             </em>
           );
@@ -638,7 +638,7 @@ function ContextSection({ refs }: { refs: ContextReference[] }) {
       case "task":
         return <ListTodo className="w-3 h-3 text-amber-400" />;
       default:
-        return <FileText className="w-3 h-3 text-gray-400" />;
+        return <FileText className="w-3 h-3 text-white/50" />;
     }
   };
 
@@ -646,7 +646,7 @@ function ContextSection({ refs }: { refs: ContextReference[] }) {
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="inline-flex items-center gap-1 text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+        className="inline-flex items-center gap-1 text-[10px] text-muted-2 hover:text-white/80 transition-colors"
       >
         {expanded ? (
           <ChevronDown className="w-3 h-3" />
@@ -661,14 +661,14 @@ function ContextSection({ refs }: { refs: ContextReference[] }) {
           {refs.map((ref, i) => (
             <div
               key={i}
-              className="flex items-start gap-2 px-2.5 py-1.5 bg-gray-900/60 border border-gray-800 rounded-lg text-[11px]"
+              className="flex items-start gap-2 px-2.5 py-1.5 bg-surface-2 border border-border rounded-xl text-[11px] backdrop-blur-sm"
             >
               {sourceIcon(ref.source_type)}
               <div className="min-w-0">
-                <span className="text-gray-400 capitalize font-medium">
+                <span className="text-white/80 capitalize font-medium">
                   {ref.source_type}
                 </span>
-                <p className="text-gray-500 truncate">{ref.chunk_preview}</p>
+                <p className="text-muted-2 truncate">{ref.chunk_preview}</p>
               </div>
             </div>
           ))}

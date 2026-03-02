@@ -1,10 +1,14 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Try server/.env first, then fall back to root .env
 _env_file = Path(__file__).parent / ".env"
 if not _env_file.exists():
     _env_file = Path(__file__).parent.parent / ".env"
+
+# Pre-load into os.environ so pydantic-settings can always find the values
+load_dotenv(dotenv_path=str(_env_file), override=False)
 
 
 class Settings(BaseSettings):
@@ -38,7 +42,7 @@ class Settings(BaseSettings):
 
     # CORS — stored as comma-separated string to avoid pydantic-settings JSON parsing
     # e.g. "https://app.vercel.app" or "https://a.com,https://b.com"
-    backend_cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
+    backend_cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005"
 
     def get_cors_origins(self) -> list[str]:
         """Parse comma-separated origins (also accepts a JSON array string)."""

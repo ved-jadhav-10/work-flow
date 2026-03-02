@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { projectsApi } from "@/lib/api";
+import GlassCard from "@/components/ui/GlassCard";
+import GlassButton from "@/components/ui/GlassButton";
+import GlassInput from "@/components/ui/GlassInput";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -52,36 +55,36 @@ export default function NewProjectPage() {
       {/* Back link */}
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Projects
       </Link>
 
       <h1 className="text-2xl font-bold mb-1">Create New Project</h1>
-      <p className="text-gray-400 text-sm mb-8">
+      <p className="text-muted text-sm mb-8">
         A project groups your documents, code insights, tasks, and chat history
         under a shared AI context.
       </p>
 
       {error && (
-        <div className="mb-6 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
+        <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <GlassCard className="p-6 sm:p-7">
+        <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name */}
         <div>
           <label className="block text-sm font-medium mb-2">
             Project Name <span className="text-red-400">*</span>
           </label>
-          <input
+          <GlassInput
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Machine Learning Course Notes"
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
             required
           />
         </div>
@@ -94,7 +97,7 @@ export default function NewProjectPage() {
             onChange={(e) => setGoal(e.target.value)}
             placeholder="What are you trying to achieve with this project?"
             rows={3}
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+            className="w-full rounded-xl px-4 py-2.5 bg-surface-2 border border-border text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors resize-none"
           />
         </div>
 
@@ -103,12 +106,12 @@ export default function NewProjectPage() {
           <label className="block text-sm font-medium mb-2">
             Constraints / Guidelines
           </label>
-          <p className="text-xs text-gray-500 mb-3">
+          <p className="text-xs text-muted-2 mb-3">
             Rules the AI should respect (e.g. &quot;Use Python 3.11 only&quot;,
             &quot;Follow APA citation format&quot;)
           </p>
           <div className="flex gap-2 mb-3">
-            <input
+            <GlassInput
               type="text"
               value={constraintInput}
               onChange={(e) => setConstraintInput(e.target.value)}
@@ -119,12 +122,11 @@ export default function NewProjectPage() {
                 }
               }}
               placeholder="Add a constraint and press Enter"
-              className="flex-1 px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
             />
             <button
               type="button"
               onClick={addConstraint}
-              className="px-3 py-2.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 transition-colors"
+              className="px-3 py-2.5 bg-surface-2 hover:bg-surface-3 rounded-xl text-white/80 border border-border transition-colors"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -134,13 +136,13 @@ export default function NewProjectPage() {
               {constraints.map((c, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-sm text-gray-300"
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-surface-2 border border-border rounded-full text-sm text-white/80"
                 >
                   {c}
                   <button
                     type="button"
                     onClick={() => removeConstraint(i)}
-                    className="hover:text-red-400 transition-colors"
+                    className="hover:text-red-300 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -151,10 +153,11 @@ export default function NewProjectPage() {
         </div>
 
         {/* Submit */}
-        <button
+        <GlassButton
           type="submit"
           disabled={loading || !name.trim()}
-          className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+          variant="primary"
+          className="rounded-xl px-6 py-2.5"
         >
           {loading ? (
             <>
@@ -167,8 +170,9 @@ export default function NewProjectPage() {
               Create Project
             </>
           )}
-        </button>
-      </form>
+        </GlassButton>
+        </form>
+      </GlassCard>
     </div>
   );
 }

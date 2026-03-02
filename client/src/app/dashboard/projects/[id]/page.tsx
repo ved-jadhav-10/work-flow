@@ -17,11 +17,13 @@ import {
 import Link from "next/link";
 import { projectsApi } from "@/lib/api";
 import type { Project } from "@/types";
+import GlassCard from "@/components/ui/GlassCard";
+import GlassButton from "@/components/ui/GlassButton";
 
 export default function ProjectOverviewPage() {
   const params = useParams();
   const router = useRouter();
-  const projectId = params.id as string;
+  const projectId = (params?.id ?? "") as string;
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ export default function ProjectOverviewPage() {
     return (
       <div className="p-8 text-white">
         <p className="text-red-400">{error || "Project not found"}</p>
-        <Link href="/dashboard" className="text-indigo-400 hover:underline text-sm mt-2 block">
+        <Link href="/dashboard" className="text-accent hover:underline text-sm mt-2 block">
           Back to Projects
         </Link>
       </div>
@@ -151,14 +153,14 @@ export default function ProjectOverviewPage() {
       {/* Back */}
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         All Projects
       </Link>
 
       {error && (
-        <div className="mb-6 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
+        <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
           {error}
         </div>
       )}
@@ -170,20 +172,21 @@ export default function ProjectOverviewPage() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full text-2xl font-bold bg-transparent border-b border-transparent hover:border-gray-700 focus:border-indigo-500 focus:outline-none pb-1 transition-colors"
+            className="w-full text-2xl font-bold bg-transparent border-b border-transparent hover:border-white/15 focus:border-accent/60 focus:outline-none pb-1 transition-colors"
           />
-          <p className="text-gray-500 text-xs mt-2">
+          <p className="text-muted-2 text-xs mt-2">
             Created {new Date(project.created_at).toLocaleDateString()}
           </p>
         </div>
-        <button
+        <GlassButton
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors"
+          variant="primary"
+          className="rounded-xl px-4 py-2"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save
-        </button>
+        </GlassButton>
       </div>
 
       {/* Quick links */}
@@ -192,11 +195,11 @@ export default function ProjectOverviewPage() {
           <Link
             key={link.href}
             href={link.href}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-indigo-600/50 transition-colors"
+            className="bg-surface border border-border rounded-2xl p-4 hover:border-white/20 transition-colors backdrop-blur-sm"
           >
-            <link.icon className="w-5 h-5 text-indigo-400 mb-2" />
+            <link.icon className="w-5 h-5 text-accent mb-2" />
             <p className="text-sm font-medium">{link.label}</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-2">
               {link.count !== null ? `${link.count} items` : link.desc}
             </p>
           </Link>
@@ -204,37 +207,37 @@ export default function ProjectOverviewPage() {
       </div>
 
       {/* Context health bar */}
-      <div className="mb-8 p-4 bg-gray-900 border border-gray-800 rounded-xl">
+      <GlassCard className="mb-8 p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Brain className="w-4 h-4 text-indigo-400" />
-          <h3 className="text-sm font-medium text-gray-200">AI Context Health</h3>
+          <Brain className="w-4 h-4 text-accent" />
+          <h3 className="text-sm font-medium text-white/90">AI Context Health</h3>
         </div>
-        <p className="text-xs text-gray-400 mb-3">
+        <p className="text-xs text-muted mb-3">
           Your AI assistant draws from all project data below to give context-aware answers.
         </p>
         <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-            <FileText className="w-4 h-4 text-blue-400 mx-auto mb-1" />
+          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
+            <FileText className="w-4 h-4 text-accent mx-auto mb-1" />
             <p className="text-lg font-semibold text-white">{project.document_count ?? 0}</p>
-            <p className="text-[10px] text-gray-500">Documents</p>
+            <p className="text-[10px] text-muted-2">Documents</p>
           </div>
-          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-            <Code2 className="w-4 h-4 text-green-400 mx-auto mb-1" />
+          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
+            <Code2 className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
             <p className="text-lg font-semibold text-white">{project.insight_count ?? 0}</p>
-            <p className="text-[10px] text-gray-500">Code Insights</p>
+            <p className="text-[10px] text-muted-2">Code Insights</p>
           </div>
-          <div className="text-center p-2 bg-gray-800/50 rounded-lg">
-            <ListTodo className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
+            <ListTodo className="w-4 h-4 text-gold mx-auto mb-1" />
             <p className="text-lg font-semibold text-white">{project.task_count ?? 0}</p>
-            <p className="text-[10px] text-gray-500">Tasks</p>
+            <p className="text-[10px] text-muted-2">Tasks</p>
           </div>
         </div>
         {((project.document_count ?? 0) + (project.insight_count ?? 0) + (project.task_count ?? 0)) === 0 && (
-          <p className="text-xs text-gray-500 mt-3 text-center">
+          <p className="text-xs text-muted-2 mt-3 text-center">
             Upload documents, analyze code, or extract tasks to enrich your AI context.
           </p>
         )}
-      </div>
+      </GlassCard>
 
       {/* Goal */}
       <section className="mb-6">
@@ -243,7 +246,7 @@ export default function ProjectOverviewPage() {
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
           rows={3}
-          className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+          className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors resize-none"
           placeholder="What is this project about?"
         />
       </section>
@@ -318,12 +321,12 @@ function TagSection({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
+          className="flex-1 px-4 py-2 bg-surface-2 border border-border rounded-xl text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors text-sm"
         />
         <button
           type="button"
           onClick={onAdd}
-          className="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 transition-colors"
+          className="px-3 py-2 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-white/80 transition-colors"
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -333,10 +336,10 @@ function TagSection({
           {items.map((item, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-sm text-gray-300"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-surface-2 border border-border rounded-full text-sm text-white/80"
             >
               {item}
-              <button onClick={() => onRemove(i)} className="hover:text-red-400 transition-colors">
+              <button onClick={() => onRemove(i)} className="hover:text-red-300 transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>

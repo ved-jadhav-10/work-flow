@@ -19,8 +19,10 @@ import {
   Clock,
   History,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { developerApi } from "@/lib/api";
+import GlassCard from "@/components/ui/GlassCard";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 
@@ -124,7 +126,7 @@ function Section({
 
 export default function DeveloperPage() {
   const params = useParams();
-  const projectId = params.id as string;
+  const projectId = (params?.id ?? "") as string;
 
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("Python");
@@ -234,6 +236,16 @@ export default function DeveloperPage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  async function handleDeleteInsight(id: string) {
+    try {
+      await developerApi.deleteInsight(projectId, id);
+      setHistory((h) => h.filter((item) => item.id !== id));
+      if ((result as any)?.id === id) setResult(null);
+    } catch (e: any) {
+      setError(e.message || "Delete failed");
+    }
+  }
+
   const anyLoading = loadingExplain || loadingDebug || loadingReadme;
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -242,19 +254,19 @@ export default function DeveloperPage() {
     <div className="p-8 text-white max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
-        <Code2 className="w-6 h-6 text-indigo-400" />
+        <Code2 className="w-6 h-6 text-accent" />
         <h1 className="text-2xl font-bold">Developer Tools</h1>
       </div>
-      <p className="text-gray-400 text-sm mb-6">
+      <p className="text-muted text-sm mb-6">
         Paste code to get AI-powered explanations, debugging, and README generation.
       </p>
 
       {error && (
-        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-3 mb-6 text-sm">
+        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-300 rounded-2xl px-4 py-3 mb-6 text-sm">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
           <button
-            className="ml-auto text-red-300 hover:text-red-100"
+            className="ml-auto text-red-200 hover:text-red-50"
             onClick={() => setError("")}
           >
             ✕
@@ -265,16 +277,16 @@ export default function DeveloperPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Left: History ──────────────────────────────────────────── */}
         <div className="lg:col-span-1 space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-300">
+          <div className="flex items-center gap-2 text-sm font-medium text-white/80">
             <History className="w-4 h-4" /> History
           </div>
 
           {loadingHistory ? (
-            <div className="flex items-center gap-2 text-gray-500 text-sm py-4">
+            <div className="flex items-center gap-2 text-muted-2 text-sm py-4">
               <Loader2 className="w-4 h-4 animate-spin" /> Loading…
             </div>
           ) : history.length === 0 ? (
-            <p className="text-gray-600 text-sm py-4 text-center">
+            <p className="text-muted-2 text-sm py-4 text-center">
               No analyses yet — run one on the right.
             </p>
           ) : (
@@ -282,14 +294,21 @@ export default function DeveloperPage() {
               {history.map((h) => (
                 <div
                   key={h.id}
-                  className="bg-gray-800/50 border border-gray-700 hover:border-gray-500 rounded-lg p-3"
+                  className="group bg-surface-2 border border-border hover:border-white/20 rounded-2xl p-3 backdrop-blur-sm"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <InsightTypeBadge type={h.insight_type} />
-                    <span className="text-xs text-gray-500">{h.language}</span>
+                    <span className="text-xs text-muted-2">{h.language}</span>
+                    <button
+                      onClick={() => handleDeleteInsight(h.id)}
+                      className="ml-auto opacity-0 group-hover:opacity-100 text-white/40 hover:text-red-300 transition-all"
+                      title="Delete insight"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-300 truncate">{h.overview || "—"}</p>
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs text-white/80 truncate">{h.overview || "—"}</p>
+                  <p className="text-xs text-muted-2 mt-1">
                     {new Date(h.created_at).toLocaleString()}
                   </p>
                 </div>
@@ -301,12 +320,12 @@ export default function DeveloperPage() {
         {/* ── Right: Input + Results ──────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-5">
           {/* Code input */}
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
+          <GlassCard className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-4">
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="bg-gray-900 border border-gray-700 text-sm rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-indigo-500"
+                className="bg-surface-2 border border-border text-sm rounded-xl px-3 py-2 text-white/90 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
               >
                 {LANGUAGES.map((l) => (
                   <option key={l} value={l}>
@@ -315,7 +334,7 @@ export default function DeveloperPage() {
                 ))}
               </select>
               <span
-                className={`text-xs ${isLong ? "text-yellow-400" : "text-gray-500"}`}
+                className={`text-xs ${isLong ? "text-yellow-300" : "text-muted-2"}`}
               >
                 {lineCount} line{lineCount !== 1 ? "s" : ""}
                 {isLong && " · first 600 will be analysed"}
@@ -327,7 +346,7 @@ export default function DeveloperPage() {
               onChange={(e) => setCode(e.target.value)}
               placeholder={`Paste your ${language} code here…`}
               spellCheck={false}
-              className="w-full h-72 bg-gray-900/80 border border-gray-700 rounded-lg p-4 text-sm font-mono text-gray-200 resize-y focus:outline-none focus:border-indigo-500 placeholder-gray-600"
+              className="w-full h-72 bg-surface-2 border border-border rounded-2xl p-4 text-sm font-mono text-white/90 resize-y focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 placeholder:text-muted-2"
             />
 
             <div className="flex flex-wrap items-center gap-3">
@@ -376,13 +395,13 @@ export default function DeveloperPage() {
                     setResult(null);
                     setCode("");
                   }}
-                  className="ml-auto flex items-center gap-1 px-3 py-2 text-xs text-gray-400 hover:text-gray-200 border border-gray-700 hover:border-gray-500 rounded-lg transition-colors"
+                  className="ml-auto flex items-center gap-1 px-3 py-2 text-xs text-white/70 hover:text-white border border-border hover:border-white/20 rounded-xl transition-colors"
                 >
                   <Plus className="w-3 h-3" /> New
                 </button>
               )}
             </div>
-          </div>
+          </GlassCard>
 
           {/* Loading placeholder */}
           {anyLoading && !result && (
@@ -616,13 +635,13 @@ export default function DeveloperPage() {
 
           {/* Empty state */}
           {!result && !anyLoading && (
-            <div className="border border-dashed border-gray-700 rounded-xl p-12 text-center text-gray-500">
+            <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center text-muted-2 bg-surface-2 backdrop-blur-sm">
               <Code2 className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p>
                 Paste code above and click{" "}
-                <strong className="text-gray-400">Explain</strong>,{" "}
-                <strong className="text-gray-400">Debug</strong>, or{" "}
-                <strong className="text-gray-400">Generate README</strong>.
+                <strong className="text-white/70">Explain</strong>,{" "}
+                <strong className="text-white/70">Debug</strong>, or{" "}
+                <strong className="text-white/70">Generate README</strong>.
               </p>
             </div>
           )}

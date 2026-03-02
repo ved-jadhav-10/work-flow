@@ -1,317 +1,478 @@
 import Link from "next/link";
+import React from "react";
 import {
   BookOpen,
   Code2,
   ListTodo,
   Brain,
   ArrowRight,
-  CheckCircle2,
-  Zap,
   Lock,
   GitBranch,
+  Sparkles,
 } from "lucide-react";
+import AppBackground from "@/components/layout/AppBackground";
 
+/* ── Page ──────────────────────────────────────────────────────────────────── */
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gray-950 text-white overflow-x-hidden">
+    <AppBackground variant="hero" className="overflow-x-hidden">
 
-      {/* ── Nav ──────────────────────────────────────────────────────────── */}
-      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
+      {/* ══ HERO ══════════════════════════════════════════════════════════ */}
+      <section className="relative h-screen min-h-[740px] flex flex-col overflow-hidden">
+
+        {/* Background image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/hero-bg.jpeg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center bottom",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+
+        {/* Deep vignette for text legibility */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 36%, rgba(4,8,20,0.72) 0%, rgba(4,8,20,0.28) 58%, transparent 100%)",
+          }}
+        />
+
+        {/* Top fade */}
+        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#060d1f]/70 to-transparent" />
+        {/* Bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060d1f] via-[#060d1f]/70 to-transparent" />
+
+        {/* Warm gold glow behind text */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "radial-gradient(ellipse 40% 30% at 50% 44%, rgba(212,170,112,0.08) 0%, transparent 70%)",
+          }}
+        />
+
+        {/* ── Nav ── */}
+        <nav className="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
+          <div className="flex items-center gap-1.5 select-none">
+            <span className="text-lg font-semibold tracking-tight text-white">Workflow</span>
+            <span
+              className="w-1.5 h-1.5 rounded-full mt-0.5"
+              style={{ background: "#d4aa70", boxShadow: "0 0 6px rgba(212,170,112,0.8)" }}
+            />
           </div>
-          <span className="font-semibold text-lg">Workflow</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/register"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg font-medium transition-colors"
-          >
-            Get Started
-          </Link>
-        </div>
-      </nav>
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="max-w-4xl mx-auto px-6 pt-20 pb-24 text-center">
-        <span className="inline-block px-3 py-1 text-xs font-medium bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30 mb-6">
-          Persistent AI Context Layer
-        </span>
-        <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight mb-6">
-          CognifyOS
-        </h1>
-        <p className="text-xl sm:text-2xl text-gray-400 leading-relaxed max-w-2xl mx-auto mb-4">
-          Your AI that actually remembers.
-        </p>
-        <p className="text-gray-500 text-base max-w-xl mx-auto mb-10">
-          Stop re-explaining your project to every AI tool. Workflow keeps
-          persistent context across your documents, code, and tasks — and uses
-          it to give you answers that are actually relevant.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-medium transition-colors text-sm"
-          >
-            Start for free
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/15 text-white rounded-lg font-medium transition-colors border border-white/10 text-sm"
-          >
-            Sign in
-          </Link>
+          <div className="hidden md:flex items-center gap-8 text-[13px] text-white/55 font-medium">
+            {[
+              { label: "How it works", href: "#how-it-works" },
+              { label: "Features",     href: "#features"     },
+              { label: "Privacy",      href: "#privacy"      },
+            ].map(({ label, href }) => (
+              <a key={label} href={href}
+                className="hover:text-white/90 transition-colors duration-200 tracking-wide">{label}</a>
+            ))}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2">
+            <Link href="/login"
+              className="px-4 py-2 text-[13px] text-white/60 hover:text-white transition-colors duration-200 font-medium">
+              Sign in
+            </Link>
+            <Link href="/register"
+              className="px-5 py-2 text-[13px] font-medium rounded-full transition-all duration-200"
+              style={{
+                background: "rgba(212,170,112,0.12)",
+                border: "1px solid rgba(212,170,112,0.30)",
+                color: "#d4aa70",
+              }}>
+              Get started
+            </Link>
+          </div>
+        </nav>
+
+        {/* ── Hero copy ── */}
+        <div className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 pb-28">
+          {/* Tag pill */}
+          <div
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-widest uppercase mb-8"
+            style={{
+              background: "rgba(212,170,112,0.08)",
+              border: "1px solid rgba(212,170,112,0.22)",
+              color: "#d4aa70",
+            }}>
+            <Sparkles className="w-3 h-3" /> AI-powered workspace
+          </div>
+
+          <h1
+            className="font-light leading-[1.08] max-w-2xl mx-auto mb-6 tracking-[-0.02em]"
+            style={{ fontSize: "clamp(2.8rem, 6vw, 5.2rem)" }}>
+            <span className="text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.6)]">
+              Where{" "}
+            </span>
+            <em
+              style={{
+                fontFamily: "var(--font-playfair), Georgia, serif",
+                fontStyle: "italic",
+                background: "linear-gradient(135deg, #d4aa70 0%, #f0d098 50%, #c49a5a 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                filter: "drop-shadow(0 2px 12px rgba(212,170,112,0.35))",
+              }}>
+              ideas bloom
+            </em>
+            <span className="text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.6)]">
+              {" "}under starlight.
+            </span>
+          </h1>
+
+          <p className="text-white/55 max-w-sm mx-auto mb-10 text-[14px] leading-[1.75] tracking-wide">
+            Tools for thinkers, dreamers, and makers —
+            AI that holds your full context, always.
+          </p>
+
+          <div className="flex items-center gap-3">
+            <Link href="/register"
+              className="px-7 py-3 rounded-full text-[13px] font-semibold text-[#060d1f] transition-all duration-200 hover:scale-[1.03]"
+              style={{
+                background: "linear-gradient(135deg, #d4aa70 0%, #f0c97a 100%)",
+                boxShadow: "0 4px 24px rgba(212,170,112,0.35)",
+              }}>
+              Start Creating
+            </Link>
+            <Link href="#how-it-works"
+              className="px-7 py-3 rounded-full text-[13px] font-medium text-white/75 hover:text-white transition-all duration-200"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+              }}>
+              See how it works
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-2">How it works</h2>
-          <p className="text-gray-400 text-sm">Three steps to a smarter AI workspace</p>
+      {/* ══ HOW IT WORKS ══════════════════════════════════════════════════ */}
+      <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-28">
+        {/* Section label */}
+        <div className="flex items-center gap-3 mb-14 justify-center">
+          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
+          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: "#d4aa70" }}>How it works</span>
+          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <div className="text-center mb-14">
+          <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-3">
+            Three steps to a smarter workspace
+          </h2>
+          <p className="text-white/40 text-sm">From raw idea to AI-augmented clarity</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden"
+          style={{ background: "rgba(255,255,255,0.06)", boxShadow: "0 0 0 1px rgba(255,255,255,0.06)" }}>
           {[
             {
               step: "01",
               title: "Create a Project",
-              desc: "Define your goal and constraints once. Workflow remembers them permanently.",
-              accent: "text-indigo-400",
+              desc: "Define your goal and constraints once. Workflow remembers everything permanently.",
+              color: "#d4aa70",
             },
             {
               step: "02",
               title: "Add Your Content",
               desc: "Upload PDFs, paste code snippets, extract tasks from meeting transcripts.",
-              accent: "text-violet-400",
+              color: "#a389c8",
             },
             {
               step: "03",
-              title: "AI Remembers Everything",
-              desc: "Ask anything. The AI searches your full context — documents, code, tasks — to give grounded answers.",
-              accent: "text-fuchsia-400",
+              title: "AI Remembers All",
+              desc: "Ask anything. The AI searches your full context to give grounded, accurate answers.",
+              color: "#60a5fa",
             },
-          ].map(({ step, title, desc, accent }) => (
+          ].map(({ step, title, desc, color }, i) => (
             <div
               key={step}
-              className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6"
-            >
-              <span className={`text-3xl font-black opacity-20 ${accent}`}>{step}</span>
-              <h3 className="mt-2 font-semibold text-white">{title}</h3>
-              <p className="mt-1 text-gray-400 text-sm leading-relaxed">{desc}</p>
+              className="relative px-8 py-10 flex flex-col gap-4"
+              style={{ background: "rgba(6,13,31,0.80)" }}>
+              {/* Step number */}
+              <span
+                className="text-[3rem] font-black leading-none select-none"
+                style={{ color, opacity: 0.18 }}>{step}</span>
+              {/* Accent line */}
+              <div className="w-8 h-[2px] rounded-full" style={{ background: color, opacity: 0.6 }} />
+              <h3 className="font-semibold text-white text-[15px]">{title}</h3>
+              <p className="text-white/40 text-[13px] leading-relaxed">{desc}</p>
+              {/* Connector arrow (not on last) */}
+              {i < 2 && (
+                <div className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10
+                                w-6 h-6 rounded-full items-center justify-center"
+                  style={{ background: "#060d1f", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <ArrowRight className="w-3 h-3 text-white/30" />
+                </div>
+              )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Feature sections ─────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 pb-24 space-y-12">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-2">Everything you need</h2>
-          <p className="text-gray-400 text-sm">Three intelligence modules, one persistent context</p>
+      {/* ══ FEATURES ══════════════════════════════════════════════════════ */}
+      <section id="features" className="max-w-5xl mx-auto px-6 pb-28">
+        {/* Section label */}
+        <div className="flex items-center gap-3 mb-14 justify-center">
+          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
+          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: "#d4aa70" }}>Features</span>
+          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
         </div>
 
-        <FeatureCard
-          icon={<BookOpen className="w-5 h-5 text-blue-400" />}
-          iconBg="bg-blue-950/50 border-blue-800/40"
-          label="Learning Intelligence"
-          title="Turn documents into structured knowledge"
-          description="Upload PDFs, lecture notes, or any text. Generate exam-ready summaries, extract key concepts with definitions, and build step-by-step implementation guides — all persisted to your project context."
-          bullets={[
-            "Short, detailed, or exam-ready summaries",
-            "Key concept extraction with analogies",
-            "Implementation step generation",
-            "RAG retrieval across all uploaded documents",
-          ]}
-        />
-
-        <FeatureCard
-          icon={<Code2 className="w-5 h-5 text-green-400" />}
-          iconBg="bg-green-950/50 border-green-800/40"
-          label="Developer Productivity"
-          title="Understand and improve your code"
-          description="Paste any code snippet to get a full architectural explanation, identify bugs and security issues, and auto-generate README documentation. Every insight is stored and cross-referenced with your documents."
-          bullets={[
-            "Deep code explanation with component breakdown",
-            "Bug detection and fix suggestions",
-            "Automatic README generation",
-            "Code x document cross-context querying",
-          ]}
-          reversed
-        />
-
-        <FeatureCard
-          icon={<ListTodo className="w-5 h-5 text-amber-400" />}
-          iconBg="bg-amber-950/50 border-amber-800/40"
-          label="Workflow Automation"
-          title="Extract tasks from any communication"
-          description="Paste a meeting transcript or email thread and let AI extract structured action items with priority classification. Manage and track tasks, then query them in the context-aware chat."
-          bullets={[
-            "Transcript and email task extraction",
-            "High / medium / low priority classification",
-            "Assignee and deadline hints",
-            "Task-aware AI prioritisation advice",
-          ]}
-        />
-      </section>
-
-      {/* ── Differentiator ───────────────────────────────────────────────── */}
-      <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="bg-linear-to-br from-indigo-950/60 to-gray-900 border border-indigo-800/40 rounded-2xl p-8 sm:p-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-600/30 flex items-center justify-center">
-              <Brain className="w-5 h-5 text-indigo-400" />
-            </div>
-            <span className="text-indigo-300 font-semibold text-sm">Context Persistence</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-            The AI that knows your project as well as you do
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-3">
+            Three modules, one brain
           </h2>
-          <p className="text-gray-400 leading-relaxed mb-6">
-            Every other AI tool starts from zero. Workflow builds a vector-indexed knowledge base
-            from everything you add — documents, code insights, tasks, decisions, constraints —
-            and uses it to give contextually accurate answers. Ask a question and it retrieves the
-            most relevant chunks across all your content, then generates a grounded response.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              "Persistent vector embeddings (pgvector)",
-              "Cross-module context aggregation",
-              "Smart drift detection",
-              "Constraint violation alerts",
-              "Hybrid cloud + local inference",
-              "Zero context loss between sessions",
-            ].map((f) => (
-              <div key={f} className="flex items-center gap-2 text-sm text-gray-300">
-                <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-                {f}
+          <p className="text-white/40 text-sm">Each module shares the same persistent context</p>
+        </div>
+
+        <div className="space-y-4">
+          <FeatureRow
+            icon={<BookOpen className="w-4 h-4" />}
+            iconColor="#60a5fa"
+            label="Learning Intelligence"
+            title="Turn documents into structured knowledge"
+            description="Upload PDFs, lecture notes, or any text. Generate exam-ready summaries, extract key concepts, and build step-by-step guides — all persisted to your project context."
+            bullets={["Short, detailed, or exam-ready summaries","Key concept extraction","Implementation step generation","RAG retrieval across all documents"]}
+          />
+          <FeatureRow
+            icon={<Code2 className="w-4 h-4" />}
+            iconColor="#a389c8"
+            label="Developer Productivity"
+            title="Understand and improve your code"
+            description="Paste any snippet for a full architectural breakdown, bug detection, and auto-generated README docs. Every insight is cross-referenced with your project documents."
+            bullets={["Deep code explanation","Bug detection and fix suggestions","Automatic README generation","Code × document cross-context querying"]}
+          />
+          <FeatureRow
+            icon={<ListTodo className="w-4 h-4" />}
+            iconColor="#d4aa70"
+            label="Workflow Automation"
+            title="Extract tasks from any communication"
+            description="Paste a meeting transcript or email thread and let AI extract action items with priority classification. Query tasks in the context-aware chat."
+            bullets={["Transcript and email task extraction","Priority classification","Assignee and deadline hints","Task-aware AI advice"]}
+          />
+        </div>
+      </section>
+
+      {/* ══ CONTEXT PERSISTENCE ═══════════════════════════════════════════ */}
+      <section className="max-w-5xl mx-auto px-6 pb-28">
+        <div
+          className="relative rounded-3xl p-10 sm:p-14 overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, rgba(10,18,38,0.95) 0%, rgba(6,13,31,0.95) 100%)",
+            border: "1px solid rgba(212,170,112,0.15)",
+            boxShadow: "0 0 80px rgba(212,170,112,0.06) inset",
+          }}>
+          {/* Corner glow */}
+          <div
+            className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(212,170,112,0.08) 0%, transparent 70%)" }}
+          />
+
+          <div className="relative z-10 flex flex-col sm:flex-row gap-12 items-start">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-6">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{ background: "rgba(212,170,112,0.12)", border: "1px solid rgba(212,170,112,0.25)" }}>
+                  <Brain className="w-5 h-5" style={{ color: "#d4aa70" }} />
+                </div>
+                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{ color: "#d4aa70" }}>Context Persistence</span>
               </div>
-            ))}
+              <h2 className="text-2xl sm:text-3xl font-light text-white tracking-tight mb-4 leading-snug">
+                The AI that knows your project<br className="hidden sm:block" /> as well as you do
+              </h2>
+              <p className="text-white/45 text-[13px] leading-relaxed max-w-sm">
+                Every other AI tool starts from zero. Workflow builds a vector-indexed knowledge base from everything you add and uses it to give contextually accurate answers.
+              </p>
+            </div>
+
+            <div className="flex-1 w-full grid grid-cols-1 gap-2">
+              {[
+                "Persistent vector embeddings (pgvector)",
+                "Cross-module context aggregation",
+                "Smart drift detection",
+                "Constraint violation alerts",
+                "Hybrid cloud + local inference",
+                "Zero context loss between sessions",
+              ].map((f) => (
+                <div
+                  key={f}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] text-white/65"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#d4aa70", opacity: 0.7 }} />
+                  {f}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Privacy / Hybrid ─────────────────────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <div className="w-9 h-9 rounded-xl bg-emerald-950/60 border border-emerald-800/40 flex items-center justify-center mb-4">
-              <Lock className="w-5 h-5 text-emerald-400" />
+      {/* ══ PRIVACY / DRIFT ═══════════════════════════════════════════════ */}
+      <section id="privacy" className="max-w-5xl mx-auto px-6 pb-28">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[
+            {
+              icon: <Lock className="w-5 h-5" />,
+              color: "#6ee7b7",
+              bg: "rgba(110,231,183,0.08)",
+              border: "rgba(110,231,183,0.18)",
+              title: "Privacy Mode",
+              desc: "Toggle to local inference via Ollama. All AI processing runs on your machine — no data sent to external servers.",
+            },
+            {
+              icon: <GitBranch className="w-5 h-5" />,
+              color: "#fbbf24",
+              bg: "rgba(251,191,36,0.08)",
+              border: "rgba(251,191,36,0.18)",
+              title: "Drift Detection",
+              desc: 'Set project constraints (e.g. "React and TypeScript only"). If the AI ever suggests something that violates them, a real-time warning fires.',
+            },
+          ].map(({ icon, color, bg, border, title, desc }) => (
+            <div
+              key={title}
+              className="rounded-2xl p-7"
+              style={{
+                background: "rgba(6,13,31,0.80)",
+                border: `1px solid ${border}`,
+              }}>
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
+                style={{ background: bg, border: `1px solid ${border}`, color }}>
+                {icon}
+              </div>
+              <h3 className="font-semibold text-white mb-2 text-[15px]">{title}</h3>
+              <p className="text-white/40 text-[13px] leading-relaxed">{desc}</p>
             </div>
-            <h3 className="font-semibold text-white mb-2">Privacy Mode</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Toggle to local inference via Ollama. All AI processing runs on your
-              machine — no data sent to external servers. Production-ready for AMD Ryzen AI
-              acceleration.
-            </p>
-          </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <div className="w-9 h-9 rounded-xl bg-orange-950/60 border border-orange-800/40 flex items-center justify-center mb-4">
-              <GitBranch className="w-5 h-5 text-orange-400" />
+          ))}
+        </div>
+      </section>
+
+      {/* ══ CTA ═══════════════════════════════════════════════════════════ */}
+      <section className="max-w-2xl mx-auto px-6 pb-32 text-center">
+        <div
+          className="rounded-3xl py-14 px-8 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, rgba(10,18,38,0.95) 0%, rgba(6,13,31,0.95) 100%)",
+            border: "1px solid rgba(212,170,112,0.15)",
+          }}>
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(212,170,112,0.07) 0%, transparent 70%)",
+            }}
+          />
+          <div className="relative z-10">
+            <div
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold tracking-widest uppercase mb-6"
+              style={{ background: "rgba(212,170,112,0.08)", border: "1px solid rgba(212,170,112,0.22)", color: "#d4aa70" }}>
+              <Sparkles className="w-2.5 h-2.5" /> Free to start
             </div>
-            <h3 className="font-semibold text-white mb-2">Drift Detection</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Set project constraints (e.g. "React and TypeScript only"). If the AI ever
-              suggests something that violates them, a real-time warning fires — with the
-              option to mark it as a decision.
+            <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-4">
+              Ready to build?
+            </h2>
+            <p className="text-white/40 mb-9 text-sm leading-relaxed">
+              Create your first project in under a minute.<br />No credit card required.
             </p>
+            <Link href="/register"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-[13px] font-semibold text-[#060d1f] transition-all duration-200 hover:scale-[1.03]"
+              style={{
+                background: "linear-gradient(135deg, #d4aa70 0%, #f0c97a 100%)",
+                boxShadow: "0 4px 28px rgba(212,170,112,0.30)",
+              }}>
+              Get started for free <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <section className="max-w-xl mx-auto px-6 pb-28 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
-        <p className="text-gray-400 mb-8 text-sm leading-relaxed">
-          Create your first project in under a minute. No credit card required.
-        </p>
-        <Link
-          href="/register"
-          className="inline-flex items-center gap-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-colors text-sm"
-        >
-          Get started for free <ArrowRight className="w-4 h-4" />
-        </Link>
-      </section>
-
-      {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-gray-800 px-6 py-6 text-center text-xs text-gray-600">
-        Workflow — Persistent AI Context Layer
+      {/* ══ FOOTER ════════════════════════════════════════════════════════ */}
+      <footer className="px-6 py-9" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5 select-none">
+            <span className="text-[12px] text-white/25 font-medium tracking-wide">Workflow</span>
+            <span
+              className="w-1 h-1 rounded-full"
+              style={{ background: "#d4aa70", opacity: 0.5 }}
+            />
+            <span className="text-[12px] text-white/20">Where ideas bloom under starlight</span>
+          </div>
+          <div className="flex items-center gap-6 text-[12px] text-white/25">
+            <Link href="/login"     className="hover:text-white/60 transition-colors">Sign in</Link>
+            <Link href="/register"  className="hover:text-white/60 transition-colors">Get started</Link>
+            <a href="#how-it-works" className="hover:text-white/60 transition-colors">How it works</a>
+            <a href="#features"     className="hover:text-white/60 transition-colors">Features</a>
+          </div>
+        </div>
       </footer>
-    </main>
+    </AppBackground>
   );
 }
 
-/* ── Feature card component ─────────────────────────────────────────────────── */
-
-function FeatureCard({
-  icon,
-  iconBg,
-  label,
-  title,
-  description,
-  bullets,
-  reversed = false,
+/* ── Feature row ─────────────────────────────────────────────────────────────
+   Horizontal accordion-style card — icon + label + text on left, bullet
+   pills on right.                                                             */
+function FeatureRow({
+  icon, iconColor, label, title, description, bullets,
 }: {
   icon: React.ReactNode;
-  iconBg: string;
+  iconColor: string;
   label: string;
   title: string;
   description: string;
   bullets: string[];
-  reversed?: boolean;
 }) {
   return (
     <div
-      className={`flex flex-col sm:flex-row gap-8 items-start ${
-        reversed ? "sm:flex-row-reverse" : ""
-      }`}
-    >
-      {/* Text */}
-      <div className="flex-1 space-y-4">
-        <div className="flex items-center gap-2">
+      className="rounded-2xl p-7 sm:p-8 flex flex-col sm:flex-row gap-8 items-start transition-all duration-300 hover:border-white/10"
+      style={{
+        background: "rgba(6,13,31,0.75)",
+        border: "1px solid rgba(255,255,255,0.06)",
+      }}>
+
+      {/* Left — text */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2.5 mb-4">
           <div
-            className={`w-8 h-8 rounded-lg border flex items-center justify-center ${iconBg}`}
-          >
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{
+              background: `${iconColor}14`,
+              border: `1px solid ${iconColor}30`,
+              color: iconColor,
+            }}>
             {icon}
           </div>
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <span
+            className="text-[10px] font-semibold tracking-[0.16em] uppercase"
+            style={{ color: iconColor, opacity: 0.85 }}>
             {label}
           </span>
         </div>
-        <h3 className="text-xl font-bold text-white">{title}</h3>
-        <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
-        <ul className="space-y-2">
-          {bullets.map((b) => (
-            <li key={b} className="flex items-start gap-2 text-sm text-gray-300">
-              <CheckCircle2 className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
-              {b}
-            </li>
-          ))}
-        </ul>
+        <h3 className="text-[17px] font-semibold text-white mb-2 leading-snug">{title}</h3>
+        <p className="text-white/40 text-[13px] leading-relaxed">{description}</p>
       </div>
 
-      {/* Visual card */}
-      <div className="flex-1 w-full bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-2.5 min-w-0">
-        {bullets.map((b, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 px-3 py-2.5 bg-gray-950/60 border border-gray-800 rounded-lg text-sm"
-          >
-            <div className="w-5 h-5 rounded-full bg-indigo-600/20 border border-indigo-700/40 flex items-center justify-center shrink-0">
-              <span className="text-[9px] font-bold text-indigo-400">{i + 1}</span>
-            </div>
-            <span className="text-gray-400 text-xs">{b}</span>
-          </div>
+      {/* Right — bullets as pill tags */}
+      <div className="flex-1 flex flex-wrap gap-2 content-start pt-1">
+        {bullets.map((b) => (
+          <span
+            key={b}
+            className="px-3 py-1.5 rounded-full text-[11px] font-medium text-white/55"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}>
+            {b}
+          </span>
         ))}
       </div>
     </div>
   );
 }
-

@@ -33,6 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               email: credentials.email,
               password: credentials.password,
             }),
+            signal: AbortSignal.timeout(8000),
           });
 
           if (!res.ok) {
@@ -73,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const res = await fetch(`${API_URL}/api/auth/oauth`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            signal: AbortSignal.timeout(5000),
             body: JSON.stringify({
               provider: "github",
               email: token.email,

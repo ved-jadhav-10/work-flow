@@ -1,26 +1,78 @@
 @import "tailwindcss";
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
+
+html {
+  scroll-behavior: smooth;
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core hero palette */
+  --background: #060d1f; /* deep navy */
+  --foreground: #f5f5f5;
+
+  /* Glass surfaces (match landing sections) */
+  --surface: rgba(10, 18, 38, 0.70);   /* like bg-[#0a1226]/70 */
+  --surface-2: rgba(255, 255, 255, 0.03);
+  --surface-3: rgba(255, 255, 255, 0.06);
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Text */
+  --muted: rgba(148, 163, 184, 0.78); /* slate-400-ish */
+  --muted-2: rgba(148, 163, 184, 0.60);
+
+  /* Accents */
+  --accent: #60a5fa; /* blue-400 */
+  --gold: #d4aa70;   /* hero highlight */
+
+  /* ── Starlight Focus Design System ────────────────────────── */
+  --space-900: #060B19;       /* deepest background */
+  --space-800: #0F172A;       /* glass card surfaces */
+  --starlight: #FFD700;       /* gold glow / primary accent */
+  --starlight-hover: #FDE047; /* lighter gold for hover */
+  --nebula: #38BDF8;          /* cyan glow / secondary accent */
+  --nebula-hover: #7DD3FC;    /* lighter cyan for hover */
+  --content-main: #F8FAFC;    /* bright body text */
+  --content-muted: #94A3B8;   /* subdued / helper text */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-accent: var(--accent);
+  --color-gold: var(--gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
+  --font-playfair: var(--font-playfair);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ── Starlight Focus tokens (mirrors tailwind.config.ts) ─── */
+  --color-space-900:        var(--space-900);
+  --color-space-800:        var(--space-800);
+  --color-starlight:        var(--starlight);
+  --color-starlight-hover:  var(--starlight-hover);
+  --color-nebula:           var(--nebula);
+  --color-nebula-hover:     var(--nebula-hover);
+  --color-content-main:     var(--content-main);
+  --color-content-muted:    var(--content-muted);
+  --font-serif:             var(--font-playfair), serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes sway {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
 }
