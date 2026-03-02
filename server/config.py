@@ -1,7 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import field_validator
 from pathlib import Path
-import json
 
 # Try server/.env first, then fall back to root .env
 _env_file = Path(__file__).parent / ".env"
@@ -38,26 +36,17 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "phi3:mini"
 
-    # CORS
-    backend_cors_origins: list[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-    ]
+    # CORS — stored as comma-separated string to avoid pydantic-settings JSON parsing
+    # e.g. "https://app.vercel.app" or "https://a.com,https://b.com"
+    backend_cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
 
-    @field_validator("backend_cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: object) -> list[str]:
-        if isinstance(v, list):
-            return v
-        if isinstance(v, str):
-            v = v.strip()
-            # JSON array: ["https://...","https://..."]
-            if v.startswith("["):
-                return json.loads(v)
-            # Comma-separated: https://a.com,https://b.com
-            return [origin.strip() for origin in v.split(",") if origin.strip()]
-        return v
+    def get_cors_origins(self) -> list[str]:
+        """Parse comma-separated origins (also accepts a JSON array string)."""
+        import json as _json
+        v = self.backend_cors_origins.strip()
+        if v.startswith("["):
+            return _json.loads(v)
+        return [o.strip() for o in v.split(",") if o.strip()]
 
 
 settings = Settings()
