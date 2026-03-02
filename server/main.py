@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from contextlib import asynccontextmanager
 import logging
 
@@ -44,6 +46,45 @@ app.add_middleware(
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "service": "Workflow API"}
+
+
+# ── Global exception handlers ─────────────────────────────────────────────────
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail, "status_code": exc.status_code},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    errors = exc.errors()
+    messages = [
+        f"{' → '.join(str(l) for l in e['loc'])}: {e['msg']}"
+        for e in errors
+    ]
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation error",
+            "errors": messages,
+            "status_code": 422,
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request, exc):
+    logger.exception("Unhandled exception: %s", exc)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "An unexpected error occurred. Please try again.",
+            "status_code": 500,
+        },
+    )
 
 
 # ── File download proxy (Appwrite Storage) ───────────────────────────────────

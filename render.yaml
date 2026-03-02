@@ -1,0 +1,43 @@
+# Render deployment configuration for the Workflow AI backend.
+# Place this file at the repo root or in the server/ directory.
+# https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: workflow-ai-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    plan: free          # change to starter/standard for production
+    envVars:
+      # ── Database ───────────────────────────────────────────────────────
+      - key: DATABASE_URL
+        sync: false     # set manually in Render dashboard
+
+      # ── Appwrite ───────────────────────────────────────────────────────
+      - key: APPWRITE_ENDPOINT
+        value: https://cloud.appwrite.io/v1
+      - key: APPWRITE_PROJECT_ID
+        sync: false
+      - key: APPWRITE_API_KEY
+        sync: false
+      - key: APPWRITE_BUCKET_ID
+        sync: false
+
+      # ── AI providers ───────────────────────────────────────────────────
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+      # ── Auth ───────────────────────────────────────────────────────────
+      - key: JWT_SECRET
+        generateValue: true   # Render auto-generates a secure random string
+
+      # ── CORS — add your production frontend URL here ───────────────────
+      - key: BACKEND_CORS_ORIGINS
+        value: '["https://your-frontend.vercel.app","http://localhost:3000"]'
+
+      # ── Ollama (not available on cloud, only used locally) ─────────────
+      - key: OLLAMA_BASE_URL
+        value: http://localhost:11434

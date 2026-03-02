@@ -284,7 +284,36 @@ async def generate_steps(
     return StepsResponse(steps=steps)
 
 
-# ── Response builder ──────────────────────────────────────────────────────────
+# ── DELETE /{doc_id} ──────────────────────────────────────────────────────────
+
+@router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_document(
+    project_id: str,
+    doc_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a document: removes Appwrite file, embeddings, and DB record."""
+    _get_project_or_403(project_id, current_user, db)
+    doc = _get_document_or_404(str(doc_id), project_id, db)
+
+    # 1. Delete from Appwrite Storage (best-effort — don't fail if already gone)
+    if doc.file_url:
+        try:
+            await file_storage.delete_file(doc.file_url)
+        except Exception:
+            logger.warning("Could not delete Appwrite file %s — continuing", doc.file_url)
+
+    # 2. Delete associated embeddings
+    db.query(Embedding).filter(
+        Embedding.source_type == "document",
+        Embedding.source_id == doc.id,
+    ).delete(synchronize_session=False)
+
+    # 3. Delete DB record (cascade handles any child rows)
+    db.delete(doc)
+    db.commit()
+    logger.info("Deleted document %s from project %s", doc_id, project_id)
 
 def _doc_response(doc: Document) -> DocumentResponse:
     """Convert ORM Document to Pydantic response, enriching key_concepts."""

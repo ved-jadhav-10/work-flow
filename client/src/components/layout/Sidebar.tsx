@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -12,7 +13,10 @@ import {
   Settings,
   LogOut,
   Zap,
+  Lock,
 } from "lucide-react";
+
+const INFERENCE_MODE_KEY = "inference_mode";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Projects", icon: LayoutDashboard, exact: true },
@@ -33,6 +37,15 @@ interface SidebarProps {
 export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [isLocalMode, setIsLocalMode] = useState(false);
+
+  useEffect(() => {
+    const read = () =>
+      setIsLocalMode(localStorage.getItem(INFERENCE_MODE_KEY) === "local");
+    read();
+    window.addEventListener("inferenceModeChanged", read);
+    return () => window.removeEventListener("inferenceModeChanged", read);
+  }, []);
 
   // Auto-detect projectId from URL: /dashboard/projects/<uuid>/...
   const projectId = propProjectId ?? (() => {
@@ -103,6 +116,13 @@ export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-3 border-t border-gray-800 space-y-1">
+        {/* Privacy Mode badge */}
+        {isLocalMode && (
+          <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
+            <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="text-[11px] font-medium text-emerald-400">Privacy Mode</span>
+          </div>
+        )}
         <Link
           href="/dashboard/settings"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"

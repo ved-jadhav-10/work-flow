@@ -45,6 +45,16 @@ async function request<T>(
   return res.json();
 }
 
+// ── Inference mode ───────────────────────────────────────────────────────────
+// Reads from localStorage (set by Settings page). Falls back to 'cloud'.
+
+const INFERENCE_MODE_KEY = "inference_mode";
+
+function _getInferenceMode(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return localStorage.getItem(INFERENCE_MODE_KEY) ?? undefined;
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
 export const authApi = {
@@ -114,6 +124,9 @@ export const learningApi = {
     request(`/api/projects/${projectId}/documents/${docId}/steps`, {
       method: "POST",
     }),
+
+  deleteDocument: (projectId: string, docId: string) =>
+    request(`/api/projects/${projectId}/documents/${docId}`, { method: "DELETE" }),
 };
 
 // ── Developer ─────────────────────────────────────────────────────────────────
@@ -139,6 +152,9 @@ export const developerApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  deleteInsight: (projectId: string, insightId: string) =>
+    request(`/api/projects/${projectId}/code/${insightId}`, { method: "DELETE" }),
 };
 
 // ── Workflow ──────────────────────────────────────────────────────────────────
@@ -173,7 +189,7 @@ export const chatApi = {
     request(`/api/projects/${projectId}/chat`, {
       method: "POST",
       body: JSON.stringify({ message }),
-    }, mode),
+    }, mode ?? _getInferenceMode()),
 };
 
 // ── Health ────────────────────────────────────────────────────────────────────

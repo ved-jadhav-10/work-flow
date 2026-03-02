@@ -14,4 +14,6 @@ class ChatMessage(Base):
     role = Column(String, nullable=False)        # user | assistant
     content = Column(Text, nullable=False)
     context_used = Column(JSONB, default=list)
+    drift_warnings = Column(JSONB, default=list)   # list[DriftWarning]
+    routed_module = Column(String, nullable=True)  # learning | developer | workflow | rag
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

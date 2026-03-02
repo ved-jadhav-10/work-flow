@@ -17,6 +17,13 @@ class ContextReference(BaseModel):
     chunk_preview: str
 
 
+class DriftWarning(BaseModel):
+    type: str          # technology_mismatch | architecture_change | language_violation | other
+    severity: str      # high | medium | low
+    description: str
+    constraint_violated: str
+
+
 # ── Requests ──────────────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
@@ -31,6 +38,8 @@ class ChatMessageResponse(BaseModel):
     role: str
     content: str
     context_used: list[ContextReference] = Field(default_factory=list)
+    drift_warnings: list[DriftWarning] = Field(default_factory=list)
+    routed_module: Optional[str] = None
     provider: Optional[str] = None
     latency_ms: Optional[float] = None
     created_at: datetime
@@ -46,6 +55,8 @@ class ChatResponse(BaseModel):
     """Response payload for POST /chat."""
     answer: str
     context_used: list[ContextReference] = Field(default_factory=list)
+    drift_warnings: list[DriftWarning] = Field(default_factory=list)
+    routed_module: str = "rag"
     provider: str
     latency_ms: float
     message_id: UUID

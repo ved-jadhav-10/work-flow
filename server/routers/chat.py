@@ -21,6 +21,7 @@ from schemas.chat import (
     ChatHistoryResponse,
     ChatMessageResponse,
     ContextReference,
+    DriftWarning,
 )
 from services import rag_service
 
@@ -80,6 +81,10 @@ async def send_message(
         context_used=[
             ContextReference(**ref) for ref in result["context_used"]
         ],
+        drift_warnings=[
+            DriftWarning(**w) for w in result.get("drift_warnings", [])
+        ],
+        routed_module=result.get("routed_module", "rag"),
         provider=result["provider"],
         latency_ms=result["latency_ms"],
         message_id=result["message_id"],

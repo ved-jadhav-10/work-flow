@@ -275,3 +275,33 @@ def list_insights(
         ))
 
     return CodeInsightListResponse(insights=items)
+
+
+# ── DELETE /{insight_id} ──────────────────────────────────────────────────────
+
+@router.delete("/{insight_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_insight(
+    project_id: str,
+    insight_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a code insight and its associated embeddings."""
+    _get_project_or_404(project_id, current_user, db)
+
+    insight = db.query(CodeInsight).filter(
+        CodeInsight.id == insight_id,
+        CodeInsight.project_id == project_id,
+    ).first()
+    if not insight:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Code insight not found")
+
+    # Delete associated embeddings
+    db.query(Embedding).filter(
+        Embedding.source_type == "code",
+        Embedding.source_id == insight.id,
+    ).delete(synchronize_session=False)
+
+    db.delete(insight)
+    db.commit()
+    logger.info("Deleted code insight %s from project %s", insight_id, project_id)

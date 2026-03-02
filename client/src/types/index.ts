@@ -119,6 +119,7 @@ export interface ChatMessage {
   content: string;
   context_used?: ContextReference[];
   drift_warnings?: DriftWarning[];
+  routed_module?: string;   // learning | developer | workflow | rag
   provider?: string;
   latency_ms?: number;
   created_at: string;

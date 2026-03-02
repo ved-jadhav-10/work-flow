@@ -1,4 +1,5 @@
 import Sidebar from "@/components/layout/Sidebar";
+import ErrorBoundary from "@/components/providers/ErrorBoundary";
 
 export default function DashboardLayout({
   children,
@@ -9,7 +10,7 @@ export default function DashboardLayout({
     <div className="flex min-h-screen bg-gray-950">
       <Sidebar />
       <main className="flex-1 overflow-auto">
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
     </div>
   );
