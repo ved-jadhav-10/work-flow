@@ -21,9 +21,9 @@ Most AI coding assistants suffer from **context amnesia** — every conversation
 #### 1. **Authentication & User Management** (Phase 2)
 
 - Email/password registration with bcrypt hashing
-- Google OAuth integration via NextAuth.js
-- JWT-based session management
-- Protected routes and middleware
+- GitHub OAuth integration
+- JWT-based session management (custom React auth context)
+- Protected routes via React Router guards
 - User profile management with avatars
 
 #### 2. **Project System** (Phase 3)
@@ -59,7 +59,7 @@ All tables implemented with PostgreSQL + pgvector:
 - Table extraction (pdfplumber)
 - Intelligent chunking with overlap
 - Embedding generation (text-embedding-004)
-- Supabase Storage integration
+- Appwrite Storage integration
 
 #### 6. **Learning Module** (Phase 5)
 
@@ -160,22 +160,23 @@ Note: Local inference keeps all data on your machine
 
 ### Technology Stack
 
-#### Frontend (Next.js 15)
+#### Frontend (React + Vite)
 
-- **Framework**: Next.js 15 with App Router
-- **Auth**: NextAuth.js v5 (Google OAuth + Credentials)
-- **UI**: Tailwind CSS 4 with custom design system
-- **State**: Server Components + Client Components pattern
-- **HTTP Client**: Axios with interceptors
+- **Framework**: React 18+ with Vite build tool
+- **Routing**: React Router DOM v6 (client-side SPA)
+- **Auth**: Custom AuthContext (JWT stored in localStorage, auto-attached to API calls)
+- **UI**: Tailwind CSS 4 via Vite plugin
+- **HTTP Client**: Fetch API with centralized client (api.ts)
 - **Syntax Highlighting**: react-syntax-highlighter
 - **Icons**: lucide-react
 
 #### Backend (FastAPI)
 
 - **Framework**: FastAPI 0.115 (async/await)
-- **Database**: Supabase PostgreSQL with pgvector
-- **ORM**: SQLAlchemy 2.0 with async support
+- **Database**: Neon PostgreSQL with pgvector
+- **ORM**: SQLAlchemy 2.0
 - **Auth**: JWT via python-jose + bcrypt
+- **File Storage**: Appwrite Cloud (private bucket, SDK-based)
 - **AI Providers**:
   - Google Gemini (gemini-2.0-flash, text-embedding-004)
   - Groq (llama-3.1-70b-versatile)
@@ -185,43 +186,45 @@ Note: Local inference keeps all data on your machine
 
 #### Infrastructure
 
-- **Database**: Supabase (PostgreSQL 15 + pgvector extension)
-- **Storage**: Supabase Storage (PDF files)
+- **Database**: Neon (PostgreSQL 16 + pgvector extension)
+- **File Storage**: Appwrite Cloud (private bucket)
 - **Deployment** (Planned):
-  - Frontend: Vercel
+  - Frontend: Any static host (Vercel, Netlify, Cloudflare Pages)
   - Backend: Render (Dockerized)
-  - Database: Supabase (managed)
+  - Database: Neon (managed)
+  - Storage: Appwrite (managed)
 
 ### Project Structure
 
 ```
 work-flow/
-├── client/                    # Next.js frontend
+├── client/                    # React + Vite frontend (SPA)
 │   ├── src/
-│   │   ├── app/              # App Router pages
-│   │   │   ├── api/auth/     # NextAuth.js routes
-│   │   │   ├── dashboard/    # Protected dashboard
-│   │   │   │   ├── projects/
-│   │   │   │   │   ├── [id]/
-│   │   │   │   │   │   ├── page.tsx           # Project overview
-│   │   │   │   │   │   ├── learning/          # Document module
-│   │   │   │   │   │   ├── developer/         # Code module
-│   │   │   │   │   │   ├── workflow/          # Task module
-│   │   │   │   │   │   └── chat/              # AI conversation (Phase 8)
-│   │   │   │   │   └── new/                   # Create project
-│   │   │   ├── login/
-│   │   │   └── register/
+│   │   ├── main.tsx          # App entry point
+│   │   ├── App.tsx           # React Router setup
+│   │   ├── pages/            # Page components
+│   │   │   ├── Landing.tsx           # Public landing page
+│   │   │   ├── Login.tsx             # Login page
+│   │   │   ├── Register.tsx          # Registration page
+│   │   │   ├── Dashboard.tsx         # Projects grid
+│   │   │   ├── NewProject.tsx        # Create project form
+│   │   │   ├── ProjectOverview.tsx   # Project detail with tabs
+│   │   │   ├── Learning.tsx          # Document module
+│   │   │   ├── Developer.tsx         # Code module
+│   │   │   ├── Workflow.tsx          # Task module
+│   │   │   ├── Chat.tsx              # AI conversation
+│   │   │   └── Settings.tsx          # Inference settings
 │   │   ├── components/
-│   │   │   ├── layout/       # Sidebar, navigation
-│   │   │   └── providers/    # Context providers
+│   │   │   ├── ui/               # Reusable UI primitives
+│   │   │   └── layout/           # Sidebar, AuthGuard, layouts
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx   # JWT auth state (React Context)
 │   │   ├── lib/
-│   │   │   ├── auth.ts       # NextAuth config
-│   │   │   ├── supabase.ts   # Supabase client
-│   │   │   └── api.ts        # Axios instance
+│   │   │   └── api.ts            # Centralized API client
 │   │   └── types/
-│   │       └── index.ts      # TypeScript definitions
+│   │       └── index.ts          # TypeScript definitions
 │   ├── public/               # Static assets
-│   └── next.config.ts
+│   └── vite.config.ts
 │
 ├── server/                    # FastAPI backend
 │   ├── main.py               # App entry, CORS, router registration
@@ -250,7 +253,7 @@ work-flow/
 │   │   ├── llm_service.py    # Multi-provider LLM abstraction
 │   │   ├── pdf_service.py    # PDF extraction and chunking
 │   │   ├── embedding_service.py  # Vector generation
-│   │   ├── file_storage.py   # Supabase Storage wrapper
+│   │   ├── file_storage.py   # Appwrite Storage wrapper
 │   │   ├── learning_service.py   # Document orchestration
 │   │   ├── developer_service.py  # Code analysis orchestration
 │   │   └── prompts/          # System prompts
@@ -268,7 +271,7 @@ work-flow/
 │   └── requirements.txt
 │
 ├── plan.md                   # 10-phase execution plan
-└── package.json              # Root dependencies (next-auth)
+└── package.json              # Root workspace config
 ```
 
 ## 🚀 Getting Started
@@ -277,11 +280,12 @@ work-flow/
 
 - **Node.js** 20+ and npm
 - **Python** 3.11+ and pip
-- **Supabase Account** (free tier)
+- **Neon Account** (free tier PostgreSQL with pgvector)
+- **Appwrite Account** (free tier for file storage)
 - **API Keys**:
   - Google AI Studio (Gemini API)
   - Groq API (optional, for fallback)
-  - Google OAuth Client ID/Secret (for social login)
+  - GitHub OAuth App (for social login)
 
 ### 1. Clone and Install
 
@@ -306,11 +310,14 @@ pip install -r requirements.txt
 Create `server/.env` (or use root `.env`):
 
 ```bash
-# ── Supabase ──────────────────────────────────
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_DB_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+# ── Database (Neon PostgreSQL) ───────────────
+DATABASE_URL=postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+
+# ── Appwrite (File Storage) ──────────────────
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+APPWRITE_PROJECT_ID=your-appwrite-project-id
+APPWRITE_API_KEY=your-appwrite-api-key
+APPWRITE_BUCKET_ID=your-bucket-id
 
 # ── Google Gemini API ─────────────────────────
 GEMINI_API_KEY=your-gemini-api-key
@@ -318,43 +325,27 @@ GEMINI_API_KEY=your-gemini-api-key
 # ── Groq API (Fallback) ──────────────────────
 GROQ_API_KEY=your-groq-api-key
 
-# ── NextAuth.js ───────────────────────────────
-NEXTAUTH_SECRET=generate-a-random-secret
-NEXTAUTH_URL=http://localhost:3000
+# ── Auth ──────────────────────────────────────
+JWT_SECRET=generate-a-random-secret
 GITHUB_CLIENT_ID=your-github-oauth-client-id
 GITHUB_CLIENT_SECRET=your-github-oauth-secret
-
-# ── Backend ───────────────────────────────────
-JWT_SECRET=generate-another-random-secret
-BACKEND_URL=http://localhost:8000
-
-# ── Frontend (public) ─────────────────────────
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 # ── Ollama (Local Inference — optional) ──────
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=phi3:mini
 ```
 
-Update `client/.env`:
+Create `client/.env`:
 
 ```bash
-NEXTAUTH_SECRET=same-as-server
-NEXTAUTH_URL=http://localhost:3000
-GITHUB_CLIENT_ID=your-github-oauth-client-id
-GITHUB_CLIENT_SECRET=your-github-oauth-secret
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+VITE_API_URL=http://localhost:8000
 ```
 
 ### 3. Database Setup
 
-Run migrations in Supabase SQL Editor:
+Run migrations against your Neon PostgreSQL database:
 
-1. Go to your Supabase Dashboard → SQL Editor
+1. Go to your **Neon Dashboard** → SQL Editor (or use `psql` with your `DATABASE_URL`)
 2. **Enable pgvector**:
    ```sql
    CREATE EXTENSION IF NOT EXISTS vector;
@@ -380,7 +371,7 @@ npm run dev
 
 Visit:
 
-- **Frontend**: http://localhost:3000
+- **Frontend**: http://localhost:5173
 - **Backend API Docs**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/api/health
 
@@ -388,7 +379,7 @@ Visit:
 
 ### 1. Authentication
 
-- Register with email/password or sign in with Google
+- Register with email/password or sign in with GitHub
 - Access the dashboard at `/dashboard`
 
 ### 2. Create a Project
@@ -512,18 +503,16 @@ Never commit secrets! Use `.env.example` as a template.
 
 ## 🚢 Deployment (Phase 10)
 
-### Frontend (Vercel)
+### Frontend (Static Host)
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
+# Build production bundle
 cd client
-vercel --prod
+npm run build
+# Deploy the dist/ folder to Vercel, Netlify, or Cloudflare Pages
 ```
 
-Set environment variables in Vercel dashboard.
+Set `VITE_API_URL` environment variable to your production backend URL.
 
 ### Backend (Render)
 
@@ -535,10 +524,9 @@ Set environment variables in Vercel dashboard.
 
 ### Post-Deployment Checklist
 
-- [ ] Update `NEXT_PUBLIC_API_URL` to production backend URL
+- [ ] Update `VITE_API_URL` to production backend URL
 - [ ] Update CORS in FastAPI to allow production frontend domain
-- [ ] Update Google OAuth redirect URI to production URL
-- [ ] Update `NEXTAUTH_URL` to production frontend URL
+- [ ] Update GitHub OAuth redirect URI to production URL
 - [ ] Test all features in production
 - [ ] Set up monitoring (Sentry, LogRocket, etc.)
 
@@ -566,7 +554,7 @@ Want to contribute? Check `plan.md` for detailed implementation specs.
 - Drift detection and constraint enforcement
 - Smart query routing
 - Hybrid inference (cloud/local toggle)
-- Production deployment on Vercel + Render
+- Production deployment
 
 ### Q3 2026
 
@@ -588,9 +576,10 @@ MIT License — see `LICENSE` file for details
 
 ## 🙏 Acknowledgments
 
-- **Next.js** team for the incredible framework
+- **React** & **Vite** for the blazing-fast frontend tooling
 - **FastAPI** for the best Python web framework
-- **Supabase** for managed PostgreSQL + Storage
+- **Neon** for managed PostgreSQL with pgvector
+- **Appwrite** for managed file storage
 - **Google** for Gemini API
 - **Groq** for fast LLM inference
 - **Ollama** for local LLM runtime
