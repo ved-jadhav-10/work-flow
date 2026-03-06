@@ -293,15 +293,11 @@ export default function LearningPage() {
             <div>
               <h1
                 className="text-3xl font-semibold tracking-tight text-white"
-                style={{
-                  fontFamily: "var(--font-playfair), Georgia, serif",
-                }}
               >
                 Knowledge Base
               </h1>
               <p
                 className="text-sm text-gray-500 mt-0.5"
-                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 Upload documents — let AI extract summaries, concepts &amp;
                 implementation steps.
@@ -825,7 +821,6 @@ function PanelSection({
         {icon}
         <h3
           className="text-sm font-semibold text-white"
-          style={{ fontFamily: "Inter, system-ui, sans-serif" }}
         >
           {title}
         </h3>

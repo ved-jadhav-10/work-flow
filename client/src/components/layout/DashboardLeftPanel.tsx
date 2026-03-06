@@ -105,14 +105,13 @@ export default function DashboardLeftPanel() {
               background: "linear-gradient(135deg,#FFD700,#f59e0b)",
               color: "#060B19",
               boxShadow: "0 0 28px rgba(255,215,0,0.32)",
-              fontFamily: "var(--font-playfair), serif",
               animation: "floatY 5s ease-in-out infinite",
             }}
           >
             {userInitial}
           </div>
           <div>
-            <p className="text-[14px] font-semibold text-white" style={{ fontFamily: "var(--font-playfair), serif" }}>
+            <p className="text-[14px] font-semibold text-white">
               {userName}
             </p>
             <p className="text-[11px] truncate max-w-[200px]" style={{ color: "rgba(148,163,184,0.65)" }}>
@@ -140,7 +139,7 @@ export default function DashboardLeftPanel() {
         <Glass className="p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-[12px] font-semibold text-white" style={{ fontFamily: "var(--font-playfair), serif" }}>
+              <p className="text-[12px] font-semibold text-white">
                 Context Health
               </p>
               <p className="text-[10px] mt-0.5" style={{ color: "rgba(148,163,184,0.60)" }}>Data ingestion this week</p>
@@ -185,7 +184,7 @@ export default function DashboardLeftPanel() {
 
         {/* Recent AI Decisions */}
         <Glass className="p-5 flex flex-col gap-0.5">
-          <p className="text-[12px] font-semibold text-white mb-3" style={{ fontFamily: "var(--font-playfair), serif" }}>
+          <p className="text-[12px] font-semibold text-white mb-3">
             Recent AI Decisions
           </p>
           {RECENT_AI.map(({ label, icon: Icon, accent, time }) => (

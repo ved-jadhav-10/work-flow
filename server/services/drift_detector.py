@@ -182,6 +182,7 @@ If there are no violations, return {"has_violations": false, "violations": []}."
 async def _llm_based_check(
     constraints: list[str],
     llm_response: str,
+    mode: str = "cloud",
 ) -> list[dict[str, Any]]:
     """
     Ask the LLM to perform a semantic constraint-violation check.
@@ -198,7 +199,7 @@ async def _llm_based_check(
         "Respond using the specified JSON format."
     )
 
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     try:
         raw, _, _ = await llm.generate(
             prompt=prompt,
@@ -229,6 +230,7 @@ async def check_drift(
     project_id: str,
     llm_response: str,
     db: Session,
+    mode: str = "cloud",
 ) -> list[dict[str, Any]]:
     """
     Run both rule-based and LLM-based drift detection.
@@ -246,7 +248,7 @@ async def check_drift(
     rule_warnings = _rule_based_check(constraints, llm_response)
 
     # ── Layer 2: LLM-based ────────────────────────────────────────────────
-    llm_warnings = await _llm_based_check(constraints, llm_response)
+    llm_warnings = await _llm_based_check(constraints, llm_response, mode=mode)
 
     # Merge — deduplicate by description prefix (first 60 chars)
     seen: set[str] = {w["description"][:60] for w in rule_warnings}

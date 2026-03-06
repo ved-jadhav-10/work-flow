@@ -43,9 +43,9 @@ def _parse_json_array(raw: str) -> list[dict[str, Any]]:
     return data
 
 
-async def _llm_json_array(prompt: str, system_prompt: str) -> list[dict[str, Any]]:
+async def _llm_json_array(prompt: str, system_prompt: str, mode: str = "cloud") -> list[dict[str, Any]]:
     """Call LLM, parse JSON array. Retry once on malformed JSON."""
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     text, provider, _ = await llm.generate(prompt, system_prompt)
     try:
         return _parse_json_array(text)
@@ -57,7 +57,7 @@ async def _llm_json_array(prompt: str, system_prompt: str) -> list[dict[str, Any
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-async def extract_tasks(text: str, source_type: str) -> dict[str, Any]:
+async def extract_tasks(text: str, source_type: str, mode: str = "cloud") -> dict[str, Any]:
     """
     Extract actionable tasks from a transcript or email thread.
 
@@ -74,7 +74,7 @@ async def extract_tasks(text: str, source_type: str) -> dict[str, Any]:
         f"Source type: {source_type}\n\n"
         f"--- TEXT START ---\n{text}\n--- TEXT END ---"
     )
-    raw_tasks = await _llm_json_array(prompt, EXTRACT_TASKS)
+    raw_tasks = await _llm_json_array(prompt, EXTRACT_TASKS, mode)
 
     # Normalise and validate each task entry
     tasks: list[dict[str, Any]] = []

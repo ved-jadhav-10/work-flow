@@ -244,7 +244,7 @@ export default function DashboardPage() {
               style={{ background: "rgba(6,11,25,0.65)", borderColor: "rgba(255,255,255,0.07)" }}
             >
               <div>
-                <h1 className="text-[28px] font-bold tracking-tight leading-snug" style={{ fontFamily: "var(--font-playfair), serif" }}>
+                <h1 className="text-[28px] font-bold tracking-tight leading-snug">
                   <span className="text-slate-50 drop-shadow-md">Project Cosmos Overview</span>
                 </h1>
                 <p className="text-[12px] mt-0.5" style={{ color: "rgba(148,163,184,0.75)" }}>
@@ -262,7 +262,6 @@ export default function DashboardPage() {
                   href="/dashboard/projects/new"
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold transition-all bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 active:scale-[0.97]"
                   style={{
-                    fontFamily: "var(--font-playfair), serif",
                     color: "#FFD700",
                   }}
                 >
@@ -303,7 +302,7 @@ export default function DashboardPage() {
             <div>
               <p
                 className="text-[11px] font-semibold tracking-[0.16em] uppercase mb-5"
-                style={{ fontFamily: "var(--font-playfair), serif", background: "linear-gradient(90deg,#FFD700,#38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+                style={{ background: "linear-gradient(90deg,#FFD700,#38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
               >
                 Intelligence Modules
               </p>
@@ -327,7 +326,7 @@ export default function DashboardPage() {
                         </div>
                         <div>
                           <p className="text-xs font-semibold tracking-widest uppercase opacity-90" style={{ color: mod.accent }}>{mod.label}</p>
-                          <h3 className="text-[14px] font-semibold leading-tight text-white" style={{ fontFamily: "var(--font-playfair), serif" }}>{mod.title}</h3>
+                          <h3 className="text-[14px] font-semibold leading-tight text-white">{mod.title}</h3>
                         </div>
                       </div>
                       <span
@@ -363,7 +362,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between mb-5">
                 <p
                   className="text-[11px] font-semibold tracking-[0.16em] uppercase"
-                  style={{ fontFamily: "var(--font-playfair), serif", background: "linear-gradient(90deg,#FFD700,#38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+                  style={{ background: "linear-gradient(90deg,#FFD700,#38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
                 >
                   {loading ? "Loading…" : projects.length === 0 ? "No Projects" : `Your Projects (${projects.length})`}
                 </p>
@@ -384,7 +383,7 @@ export default function DashboardPage() {
                   >
                     <Sparkles className="w-6 h-6" style={{ color: "#38BDF8", animation: "starSpin 6s linear infinite" }} />
                   </div>
-                  <p className="font-semibold text-base text-white mb-1" style={{ fontFamily: "var(--font-playfair), serif" }}>
+                  <p className="font-semibold text-base text-white mb-1">
                     No projects yet
                   </p>
                   <p className="text-[12px] mb-6 max-w-[240px] mx-auto leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>
@@ -393,7 +392,7 @@ export default function DashboardPage() {
                   <Link
                     href="/dashboard/projects/new"
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[13px] font-semibold transition-all bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 active:scale-[0.97]"
-                    style={{ fontFamily: "var(--font-playfair), serif", color: "#FFD700" }}
+                    style={{ color: "#FFD700" }}
                   >
                     <Sparkles className="w-3.5 h-3.5" style={{ animation: "starSpin 3s linear infinite" }} />
                     Start Creating

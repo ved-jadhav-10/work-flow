@@ -9,7 +9,7 @@ export default function SettingsLayout({
   return (
     <div className="flex h-full w-full">
       <Sidebar />
-      <div className="flex-1 overflow-hidden relative z-10">
+      <div className="flex-1 overflow-y-auto relative z-10">
         <ErrorBoundary>{children}</ErrorBoundary>
       </div>
     </div>

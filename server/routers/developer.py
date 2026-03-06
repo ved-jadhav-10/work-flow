@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -73,13 +73,14 @@ async def explain_code(
     body: ExplainRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     """Explain a code snippet — overview, components, patterns, complexity."""
     project = _get_project_or_404(project_id, current_user, db)
     _validate_code(body.code)
 
     try:
-        result = await developer_service.explain(body.code, body.language)
+        result = await developer_service.explain(body.code, body.language, mode=x_inference_mode)
     except Exception as exc:
         raise _llm_error(exc, "explain")
 
@@ -142,13 +143,14 @@ async def debug_code(
     body: DebugRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     """Identify bugs, edge cases, and inefficiencies in a code snippet."""
     project = _get_project_or_404(project_id, current_user, db)
     _validate_code(body.code)
 
     try:
-        result = await developer_service.debug(body.code, body.language)
+        result = await developer_service.debug(body.code, body.language, mode=x_inference_mode)
     except Exception as exc:
         raise _llm_error(exc, "debug")
 
@@ -212,6 +214,7 @@ async def generate_readme(
     body: ReadmeRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     """Generate a professional README.md for the provided code."""
     project = _get_project_or_404(project_id, current_user, db)
@@ -219,7 +222,7 @@ async def generate_readme(
 
     try:
         result = await developer_service.generate_readme(
-            body.code, body.language, body.project_name
+            body.code, body.language, body.project_name, mode=x_inference_mode
         )
     except Exception as exc:
         raise _llm_error(exc, "generate_readme")

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -75,6 +75,7 @@ async def extract_tasks(
     body: ExtractTasksRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     """Extract actionable tasks from a meeting transcript or email thread."""
     if not body.text.strip():
@@ -85,7 +86,7 @@ async def extract_tasks(
     project = _get_project_or_404(project_id, current_user, db)
 
     try:
-        result = await workflow_service.extract_tasks(body.text, body.source_type)
+        result = await workflow_service.extract_tasks(body.text, body.source_type, mode=x_inference_mode)
     except Exception as exc:
         raise _llm_error(exc)
 

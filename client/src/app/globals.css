@@ -50,9 +50,7 @@ html {
   --color-muted-2: var(--muted-2);
   --color-accent: var(--accent);
   --color-gold: var(--gold);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-playfair: var(--font-playfair);
+  --font-sans: var(--font-jakarta);
 
   /* ── Starlight Focus tokens (mirrors tailwind.config.ts) ─── */
   --color-space-900:        var(--space-900);
@@ -63,13 +61,13 @@ html {
   --color-nebula-hover:     var(--nebula-hover);
   --color-content-main:     var(--content-main);
   --color-content-muted:    var(--content-muted);
-  --font-serif:             var(--font-playfair), serif;
+
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
 }
 
 @keyframes sway {

@@ -68,6 +68,7 @@ async def query_with_context(
     user_query: str,
     user_id: str,
     db: Session,
+    mode: str = "cloud",
 ) -> dict[str, Any]:
     """
     Full RAG pipeline:
@@ -90,7 +91,7 @@ async def query_with_context(
     )
 
     # ── 3. Call the LLM ──────────────────────────────────────────────────
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     answer, provider, latency_ms = await llm.generate(
         prompt=augmented_prompt,
         system_prompt=CHAT_SYSTEM_PROMPT,
@@ -99,7 +100,7 @@ async def query_with_context(
     )
 
     # ── 4. Drift detection ────────────────────────────────────────────────
-    drift_warnings = await check_drift(project_id, answer, db)
+    drift_warnings = await check_drift(project_id, answer, db, mode=mode)
 
     # ── 5. Persist messages ──────────────────────────────────────────────
     # User message

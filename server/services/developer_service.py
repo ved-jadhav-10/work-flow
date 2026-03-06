@@ -54,9 +54,9 @@ def _parse_json(raw: str) -> dict[str, Any]:
     return json.loads(_clean_json(raw))
 
 
-async def _llm_json(prompt: str, system_prompt: str) -> dict[str, Any]:
+async def _llm_json(prompt: str, system_prompt: str, mode: str = "cloud") -> dict[str, Any]:
     """Call LLM, parse JSON. Retry once with strict suffix on malformed JSON."""
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     text, provider, _ = await llm.generate(prompt, system_prompt)
     try:
         return _parse_json(text)
@@ -68,14 +68,14 @@ async def _llm_json(prompt: str, system_prompt: str) -> dict[str, Any]:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-async def explain(code: str, language: str) -> dict[str, Any]:
+async def explain(code: str, language: str, mode: str = "cloud") -> dict[str, Any]:
     """
     Return a dict with keys: overview, components, patterns, complexity, truncated.
     Also returns serialised storage fields: explanation_json, components_list, suggestions_list.
     """
     code, truncated = _truncate_code(code)
     prompt = f"Language: {language}\n\n```{language}\n{code}\n```"
-    data = await _llm_json(prompt, EXPLAIN_CODE)
+    data = await _llm_json(prompt, EXPLAIN_CODE, mode)
 
     overview = data.get("overview", "")
     components = data.get("components", [])
@@ -105,13 +105,13 @@ async def explain(code: str, language: str) -> dict[str, Any]:
     }
 
 
-async def debug(code: str, language: str) -> dict[str, Any]:
+async def debug(code: str, language: str, mode: str = "cloud") -> dict[str, Any]:
     """
     Return a dict with keys: bugs, edge_cases, inefficiencies, truncated.
     """
     code, truncated = _truncate_code(code)
     prompt = f"Language: {language}\n\n```{language}\n{code}\n```"
-    data = await _llm_json(prompt, DEBUG_CODE)
+    data = await _llm_json(prompt, DEBUG_CODE, mode)
 
     bugs = data.get("bugs", [])
     edge_cases = data.get("edge_cases", [])
@@ -143,14 +143,14 @@ async def debug(code: str, language: str) -> dict[str, Any]:
     }
 
 
-async def generate_readme(code: str, language: str, project_name: str | None) -> dict[str, Any]:
+async def generate_readme(code: str, language: str, project_name: str | None, mode: str = "cloud") -> dict[str, Any]:
     """
     Return a dict with keys: readme, truncated.
     """
     code, truncated = _truncate_code(code)
     name_hint = f"Project name: {project_name}\n\n" if project_name else ""
     prompt = f"{name_hint}Language: {language}\n\n```{language}\n{code}\n```"
-    data = await _llm_json(prompt, GENERATE_README)
+    data = await _llm_json(prompt, GENERATE_README, mode)
 
     readme = data.get("readme", "")
     overview = (readme.splitlines()[0].lstrip("# ") or "README")[:120]

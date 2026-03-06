@@ -19,9 +19,9 @@ async function getBackendToken(): Promise<string | null> {
 async function request<T>(
   path: string,
   options: RequestInit = {},
-  inferenceMode?: string
 ): Promise<T> {
   const token = await getBackendToken();
+  const inferenceMode = _getInferenceMode();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -96,12 +96,18 @@ export const learningApi = {
 
   uploadDocument: async (projectId: string, file: File) => {
     const token = await getBackendToken();
+    const inferenceMode = _getInferenceMode();
     const formData = new FormData();
     formData.append("file", file);
 
+    const headers: Record<string, string> = {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(inferenceMode ? { "X-Inference-Mode": inferenceMode } : {}),
+    };
+
     const res = await fetch(`${API_BASE}/api/projects/${projectId}/documents/upload`, {
       method: "POST",
-      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers,
       body: formData,
     });
 
@@ -189,11 +195,11 @@ export const chatApi = {
   history: (projectId: string) =>
     request(`/api/projects/${projectId}/chat/history`),
 
-  send: (projectId: string, message: string, mode?: string) =>
+  send: (projectId: string, message: string) =>
     request(`/api/projects/${projectId}/chat`, {
       method: "POST",
       body: JSON.stringify({ message }),
-    }, mode ?? _getInferenceMode()),
+    }),
 };
 
 // ── Health ────────────────────────────────────────────────────────────────────

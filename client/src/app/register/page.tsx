@@ -118,7 +118,7 @@ export default function RegisterPage() {
           <h1 className="text-4xl font-bold text-white leading-tight">
             Get Started<br />with Us
           </h1>
-          <p className="text-white/45 text-[13px] leading-relaxed max-w-[200px]">
+          <p className="text-white/65 text-[13px] leading-relaxed max-w-[200px]">
             Complete these easy steps to register your account.
           </p>
         </div>
@@ -140,14 +140,14 @@ export default function RegisterPage() {
                 style={
                   n === 1
                     ? { background: "#0d1a3a", color: "#d4aa70" }
-                    : { background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.35)" }
+                    : { background: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.55)" }
                 }
               >
                 {n}
               </div>
               <span
                 className="text-[11px] font-medium leading-snug"
-                style={{ color: n === 1 ? "#0b0f1a" : "rgba(255,255,255,0.35)" }}
+                style={{ color: n === 1 ? "#0b0f1a" : "rgba(255,255,255,0.55)" }}
               >
                 {label}
               </span>
@@ -163,7 +163,7 @@ export default function RegisterPage() {
           {/* Heading */}
           <div className="text-center space-y-1.5">
             <h2 className="text-[22px] font-semibold text-white tracking-tight">Sign Up Account</h2>
-            <p className="text-white/40 text-[13px]">Enter your personal data to create your account.</p>
+            <p className="text-white/60 text-[13px]">Enter your personal data to create your account.</p>
           </div>
 
           {/* OAuth buttons */}
@@ -201,7 +201,7 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
-            <span className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.30)" }}>Or</span>
+            <span className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.50)" }}>Or</span>
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
           </div>
 
@@ -248,7 +248,7 @@ export default function RegisterPage() {
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-[11px] mt-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
+              <p className="text-[11px] mt-1.5" style={{ color: "rgba(255,255,255,0.45)" }}>
                 Must be at least 8 characters.
               </p>
             </Field>
@@ -269,7 +269,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="text-center text-[12px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-center text-[12px]" style={{ color: "rgba(255,255,255,0.55)" }}>
             Already have an account?{" "}
             <Link href="/login" className="font-semibold text-white/70 hover:text-white transition-colors underline underline-offset-2">
               Log in
@@ -285,7 +285,7 @@ export default function RegisterPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+      <label className="block text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.65)" }}>
         {label}
       </label>
       {children}
@@ -297,7 +297,7 @@ function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInput
   return (
     <input
       {...props}
-      className={`w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder:text-white/20 outline-none transition-all focus:border-white/25 ${className}`}
+      className={`w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder:text-white/35 outline-none transition-all focus:border-white/25 ${className}`}
       style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
     />
   );

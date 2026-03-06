@@ -83,7 +83,7 @@ function LoginContent() {
           <h1 className="text-4xl font-bold text-white leading-tight">
             Welcome<br />Back
           </h1>
-          <p className="text-white/45 text-[13px] leading-relaxed max-w-[210px]">
+          <p className="text-white/65 text-[13px] leading-relaxed max-w-[210px]">
             Sign in to pick up right where you left off.
           </p>
         </div>
@@ -111,7 +111,7 @@ function LoginContent() {
 
           <div className="text-center space-y-1.5">
             <h2 className="text-[22px] font-semibold text-white tracking-tight">Sign In</h2>
-            <p className="text-white/40 text-[13px]">Enter your credentials to access your account.</p>
+            <p className="text-white/60 text-[13px]">Enter your credentials to access your account.</p>
           </div>
 
           {/* OAuth */}
@@ -149,7 +149,7 @@ function LoginContent() {
           {/* Divider */}
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
-            <span className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.30)" }}>Or</span>
+            <span className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.50)" }}>Or</span>
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
           </div>
 
@@ -196,7 +196,7 @@ function LoginContent() {
             </button>
           </form>
 
-          <p className="text-center text-[12px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-center text-[12px]" style={{ color: "rgba(255,255,255,0.55)" }}>
             Don&apos;t have an account?{" "}
             <Link href="/register" className="font-semibold text-white/70 hover:text-white transition-colors underline underline-offset-2">
               Sign up
@@ -220,7 +220,7 @@ export default function LoginPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+      <label className="block text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.65)" }}>
         {label}
       </label>
       {children}
@@ -232,7 +232,7 @@ function Input({ className = "", ...props }: React.InputHTMLAttributes<HTMLInput
   return (
     <input
       {...props}
-      className={`w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder:text-white/20 outline-none transition-all focus:border-white/25 ${className}`}
+      className={`w-full px-3.5 py-2.5 rounded-xl text-[13px] text-white placeholder:text-white/35 outline-none transition-all focus:border-white/25 ${className}`}
       style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
     />
   );

@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from fastapi import APIRouter, Depends, Header, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -177,6 +177,7 @@ async def summarize_document(
     body: SummarizeRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     _get_project_or_403(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
@@ -185,7 +186,7 @@ async def summarize_document(
         raise HTTPException(status_code=400, detail="Document has no text to summarise")
 
     try:
-        summary = await learning_service.summarise(doc.raw_text, body.level)
+        summary = await learning_service.summarise(doc.raw_text, body.level, mode=x_inference_mode)
     except (RuntimeError, Exception) as exc:
         logger.exception("Summarise failed for doc %s", doc_id)
         raise HTTPException(status_code=503, detail=f"LLM service unavailable: {exc}")
@@ -215,6 +216,7 @@ async def extract_concepts(
     doc_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     _get_project_or_403(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
@@ -223,7 +225,7 @@ async def extract_concepts(
         raise HTTPException(status_code=400, detail="Document has no text to analyse")
 
     try:
-        concepts = await learning_service.extract_concepts(doc.raw_text)
+        concepts = await learning_service.extract_concepts(doc.raw_text, mode=x_inference_mode)
     except (RuntimeError, Exception) as exc:
         logger.exception("Concept extraction failed for doc %s", doc_id)
         raise HTTPException(status_code=503, detail=f"LLM service unavailable: {exc}")
@@ -254,6 +256,7 @@ async def generate_steps(
     doc_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     _get_project_or_403(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
@@ -262,7 +265,7 @@ async def generate_steps(
         raise HTTPException(status_code=400, detail="Document has no text to analyse")
 
     try:
-        steps = await learning_service.generate_steps(doc.raw_text)
+        steps = await learning_service.generate_steps(doc.raw_text, mode=x_inference_mode)
     except (RuntimeError, Exception) as exc:
         logger.exception("Step generation failed for doc %s", doc_id)
         raise HTTPException(status_code=503, detail=f"LLM service unavailable: {exc}")

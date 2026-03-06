@@ -71,8 +71,8 @@ export default function ChatPage() {
 
   // ── Send message ────────────────────────────────────────────────────────
 
-  async function handleSend() {
-    const text = input.trim();
+  async function handleSend(overrideText?: string) {
+    const text = (overrideText ?? input).trim();
     if (!text || sending) return;
 
     // Optimistic: show user message immediately
@@ -174,7 +174,7 @@ export default function ChatPage() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-        {messages.length === 0 && !sending && <EmptyState />}
+        {messages.length === 0 && !sending && <EmptyState onSend={handleSend} />}
 
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
@@ -228,7 +228,7 @@ export default function ChatPage() {
             }}
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || sending}
             className="px-4 py-3 bg-white/10 border border-white/20 hover:bg-white/[0.17] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-2xl transition-colors shrink-0 backdrop-blur-sm"
           >
@@ -249,7 +249,7 @@ export default function ChatPage() {
 
 /* ── Empty state ──────────────────────────────────────────────────────────── */
 
-function EmptyState() {
+function EmptyState({ onSend }: { onSend: (text: string) => void }) {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center py-16">
       <div className="w-16 h-16 rounded-full bg-indigo-600/10 flex items-center justify-center mb-4">
@@ -263,20 +263,24 @@ function EmptyState() {
         tasks. The AI uses your full project context to give relevant answers.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-2">
-        <SuggestionChip text="What are my current priorities?" />
-        <SuggestionChip text="Summarize what I've learned so far" />
-        <SuggestionChip text="How does my code relate to my documents?" />
-        <SuggestionChip text="Are there any constraint violations?" />
+        <SuggestionChip text="What are my current priorities?" onSend={onSend} />
+        <SuggestionChip text="Summarize what I've learned so far" onSend={onSend} />
+        <SuggestionChip text="How does my code relate to my documents?" onSend={onSend} />
+        <SuggestionChip text="Are there any constraint violations?" onSend={onSend} />
       </div>
     </div>
   );
 }
 
-function SuggestionChip({ text }: { text: string }) {
+function SuggestionChip({ text, onSend }: { text: string; onSend: (text: string) => void }) {
   return (
-    <div className="px-3 py-2 bg-surface-2 border border-border rounded-xl backdrop-blur-sm">
+    <button
+      type="button"
+      onClick={() => onSend(text)}
+      className="px-3 py-2 bg-surface-2 border border-border rounded-xl backdrop-blur-sm hover:bg-white/10 hover:border-accent/40 transition-colors cursor-pointer text-left"
+    >
       {text}
-    </div>
+    </button>
   );
 }
 

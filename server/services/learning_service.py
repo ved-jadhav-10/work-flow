@@ -70,10 +70,10 @@ async def _llm_json(
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-async def summarise(raw_text: str, level: str) -> str:
+async def summarise(raw_text: str, level: str, mode: str = "cloud") -> str:
     """Return a summary string for the given level."""
     system_prompt = _SUMMARY_PROMPTS.get(level, SUMMARIZE_SHORT)
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
 
     # Trim very long texts to ~12 000 words to stay within context window
     words = raw_text.split()
@@ -84,9 +84,9 @@ async def summarise(raw_text: str, level: str) -> str:
     return data.get("summary", str(data))
 
 
-async def extract_concepts(raw_text: str) -> list[dict]:
+async def extract_concepts(raw_text: str, mode: str = "cloud") -> list[dict]:
     """Return a list of concept dicts."""
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     words = raw_text.split()
     if len(words) > 12_000:
         raw_text = " ".join(words[:12_000])
@@ -95,9 +95,9 @@ async def extract_concepts(raw_text: str) -> list[dict]:
     return data.get("concepts", [])
 
 
-async def generate_steps(raw_text: str) -> list[str]:
+async def generate_steps(raw_text: str, mode: str = "cloud") -> list[str]:
     """Return a list of implementation step strings."""
-    llm = get_llm_service()
+    llm = get_llm_service(mode)
     words = raw_text.split()
     if len(words) > 12_000:
         raw_text = " ".join(words[:12_000])

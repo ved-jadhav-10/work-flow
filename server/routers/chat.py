@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -62,6 +62,7 @@ async def send_message(
     body: ChatRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
 ):
     """Send a message and receive a context-augmented AI response."""
     project = _get_project_or_404(project_id, current_user, db)
@@ -72,6 +73,7 @@ async def send_message(
             user_query=body.message,
             user_id=str(current_user.id),
             db=db,
+            mode=x_inference_mode,
         )
     except Exception as exc:
         raise _llm_error(exc)

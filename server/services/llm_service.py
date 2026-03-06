@@ -15,6 +15,7 @@ from typing import Optional
 import httpx
 from google import genai
 from google.genai import types as genai_types
+from google.genai.errors import ClientError as GeminiClientError
 from groq import Groq, APIStatusError as GroqAPIStatusError
 
 from config import settings
@@ -48,6 +49,7 @@ class GeminiProvider(LLMProvider):
     def __init__(self, api_key: str, model: str = "gemini-2.0-flash"):
         self.model = model
         self.client = genai.Client(api_key=api_key)
+        self._key_set = bool(api_key)
 
     async def generate(
         self,
@@ -56,6 +58,7 @@ class GeminiProvider(LLMProvider):
         temperature: float = 0.3,
         max_tokens: int = 4096,
     ) -> str:
+        logger.debug("Gemini: calling model=%s key_set=%s prompt_len=%d", self.model, self._key_set, len(prompt))
         config = genai_types.GenerateContentConfig(
             temperature=temperature,
             max_output_tokens=max_tokens,
@@ -76,9 +79,10 @@ class GeminiProvider(LLMProvider):
 class GroqProvider(LLMProvider):
     name = "groq"
 
-    def __init__(self, api_key: str, model: str = "llama-3.1-70b-versatile"):
+    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
         self.model = model
         self.client = Groq(api_key=api_key)
+        self._key_set = bool(api_key)
 
     async def generate(
         self,
@@ -87,6 +91,7 @@ class GroqProvider(LLMProvider):
         temperature: float = 0.3,
         max_tokens: int = 4096,
     ) -> str:
+        logger.debug("Groq: calling model=%s key_set=%s prompt_len=%d", self.model, self._key_set, len(prompt))
         messages: list[dict] = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -117,6 +122,7 @@ class OllamaProvider(LLMProvider):
         temperature: float = 0.3,
         max_tokens: int = 4096,
     ) -> str:
+        logger.debug("Ollama: calling model=%s url=%s prompt_len=%d", self.model, self.base_url, len(prompt))
         full_prompt = f"{system_prompt}\n\n{prompt}" if system_prompt else prompt
         payload = {
             "model": self.model,
@@ -147,6 +153,7 @@ class LLMService:
         max_tokens: int = 4096,
     ) -> tuple[str, str, float]:
         """Return (text, provider_name, latency_ms)."""
+        errors: list[str] = []
         for provider in [self.primary, self.fallback]:
             if provider is None:
                 continue
@@ -161,31 +168,35 @@ class LLMService:
                     len(text.split()),
                 )
                 return text, provider.name, latency
-            except (httpx.HTTPStatusError, GroqAPIStatusError) as exc:
+            except (httpx.HTTPStatusError, GroqAPIStatusError, GeminiClientError) as exc:
                 status = getattr(exc, "status_code", None) or getattr(getattr(exc, "response", None), "status_code", None)
+                detail = f"provider={provider.name} status={status} error={exc}"
+                errors.append(detail)
                 logger.warning(
-                    "LLM FAIL provider=%s status=%s — trying fallback",
-                    provider.name,
-                    status,
+                    "LLM FAIL %s — trying fallback",
+                    detail,
                 )
-                # Always allow fallback on 429 and 400 (model may be deprecated).
-                # For other errors from the primary, bubble up immediately.
                 if status not in (429, 400) and provider == self.primary:
                     raise
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
+                detail = f"provider={provider.name} error={type(exc).__name__}: {exc}"
+                errors.append(detail)
                 logger.warning(
-                    "LLM FAIL provider=%s error=%s — trying fallback",
-                    provider.name,
-                    type(exc).__name__,
+                    "LLM FAIL %s — trying fallback",
+                    detail,
                 )
             except Exception as exc:
-                logger.warning(
-                    "LLM FAIL provider=%s error=%s — trying fallback",
-                    provider.name,
-                    exc,
+                detail = f"provider={provider.name} error={type(exc).__name__}: {exc}"
+                errors.append(detail)
+                logger.error(
+                    "LLM FAIL %s — trying fallback",
+                    detail,
+                    exc_info=True,
                 )
 
-        raise RuntimeError("All LLM providers failed")
+        error_summary = "; ".join(errors) if errors else "no providers configured"
+        logger.error("All LLM providers failed: %s", error_summary)
+        raise RuntimeError(f"All LLM providers failed — {error_summary}")
 
 
 # ── Factory ───────────────────────────────────────────────────────────────────
@@ -197,13 +208,23 @@ def get_llm_service(mode: str = "cloud") -> LLMService:
       "local"  → Ollama only
       "groq"   → Groq primary, Gemini fallback
     """
+    logger.info("Creating LLM service: mode=%s", mode)
+
+    if not settings.gemini_api_key:
+        logger.warning("GEMINI_API_KEY is empty or not set")
+    if not settings.groq_api_key:
+        logger.warning("GROQ_API_KEY is empty or not set")
+
     gemini = GeminiProvider(api_key=settings.gemini_api_key)
     groq = GroqProvider(api_key=settings.groq_api_key)
     ollama = OllamaProvider(base_url=settings.ollama_base_url, model=settings.ollama_model)
 
     if mode == "local":
+        logger.info("LLM mode=local → Ollama (model=%s, url=%s)", settings.ollama_model, settings.ollama_base_url)
         return LLMService(primary=ollama)
     elif mode == "groq":
+        logger.info("LLM mode=groq → Groq primary, Gemini fallback")
         return LLMService(primary=groq, fallback=gemini)
     else:  # "cloud" (default)
+        logger.info("LLM mode=cloud → Gemini primary, Groq fallback")
         return LLMService(primary=gemini, fallback=groq)

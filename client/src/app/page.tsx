@@ -34,7 +34,7 @@ export default function LandingPage() {
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8 text-[13px] text-white/55 font-medium">
+          <div className="hidden md:flex items-center gap-8 text-[13px] text-white/70 font-medium">
             {[
               { label: "How it works", href: "#how-it-works" },
               { label: "Features",     href: "#features"     },
@@ -120,7 +120,6 @@ export default function LandingPage() {
             </span>
             <em
               style={{
-                fontFamily: "var(--font-playfair), Georgia, serif",
                 fontStyle: "italic",
                 background: "linear-gradient(135deg, #d4aa70 0%, #f0d098 50%, #c49a5a 100%)",
                 WebkitBackgroundClip: "text",
@@ -135,7 +134,7 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          <p className="text-white/55 max-w-sm mx-auto mb-10 text-[14px] leading-[1.75] tracking-wide">
+          <p className="text-white/70 max-w-sm mx-auto mb-10 text-[14px] leading-[1.75] tracking-wide">
             Tools for thinkers, dreamers, and makers —
             AI that holds your full context, always.
           </p>
@@ -174,7 +173,7 @@ export default function LandingPage() {
           <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-3">
             Three steps to a smarter workspace
           </h2>
-          <p className="text-white/40 text-sm">From raw idea to AI-augmented clarity</p>
+          <p className="text-white/60 text-sm">From raw idea to AI-augmented clarity</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-px rounded-2xl overflow-hidden"
@@ -210,7 +209,7 @@ export default function LandingPage() {
               {/* Accent line */}
               <div className="w-8 h-[2px] rounded-full" style={{ background: color, opacity: 0.6 }} />
               <h3 className="font-semibold text-white text-[15px]">{title}</h3>
-              <p className="text-white/40 text-[13px] leading-relaxed">{desc}</p>
+              <p className="text-white/60 text-[13px] leading-relaxed">{desc}</p>
               {/* Connector arrow (not on last) */}
               {i < 2 && (
                 <div className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10
@@ -237,7 +236,7 @@ export default function LandingPage() {
           <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-3">
             Three modules, one brain
           </h2>
-          <p className="text-white/40 text-sm">Each module shares the same persistent context</p>
+          <p className="text-white/60 text-sm">Each module shares the same persistent context</p>
         </div>
 
         <div className="space-y-4">
@@ -296,7 +295,7 @@ export default function LandingPage() {
               <h2 className="text-2xl sm:text-3xl font-light text-white tracking-tight mb-4 leading-snug">
                 The AI that knows your project<br className="hidden sm:block" /> as well as you do
               </h2>
-              <p className="text-white/45 text-[13px] leading-relaxed max-w-sm">
+              <p className="text-white/60 text-[13px] leading-relaxed max-w-sm">
                 Every other AI tool starts from zero. Workflow builds a vector-indexed knowledge base from everything you add and uses it to give contextually accurate answers.
               </p>
             </div>
@@ -312,7 +311,7 @@ export default function LandingPage() {
               ].map((f) => (
                 <div
                   key={f}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] text-white/65"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] text-white/75"
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                   <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#d4aa70", opacity: 0.7 }} />
                   {f}
@@ -357,7 +356,7 @@ export default function LandingPage() {
                 {icon}
               </div>
               <h3 className="font-semibold text-white mb-2 text-[15px]">{title}</h3>
-              <p className="text-white/40 text-[13px] leading-relaxed">{desc}</p>
+              <p className="text-white/60 text-[13px] leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
@@ -386,7 +385,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-4">
               Ready to build?
             </h2>
-            <p className="text-white/40 mb-9 text-sm leading-relaxed">
+            <p className="text-white/60 mb-9 text-sm leading-relaxed">
               Create your first project in under a minute.<br />No credit card required.
             </p>
             <Link href="/register"
@@ -405,14 +404,14 @@ export default function LandingPage() {
       <footer className="px-6 py-9" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-1.5 select-none">
-            <span className="text-[12px] text-white/25 font-medium tracking-wide">Workflow</span>
+            <span className="text-[12px] text-white/40 font-medium tracking-wide">Workflow</span>
             <span
               className="w-1 h-1 rounded-full"
               style={{ background: "#d4aa70", opacity: 0.5 }}
             />
-            <span className="text-[12px] text-white/20">Where ideas bloom under starlight</span>
+            <span className="text-[12px] text-white/35">Where ideas bloom under starlight</span>
           </div>
-          <div className="flex items-center gap-6 text-[12px] text-white/25">
+          <div className="flex items-center gap-6 text-[12px] text-white/40">
             <Link href="/login"     className="hover:text-white/60 transition-colors">Sign in</Link>
             <Link href="/register"  className="hover:text-white/60 transition-colors">Get started</Link>
             <a href="#how-it-works" className="hover:text-white/60 transition-colors">How it works</a>
@@ -464,7 +463,7 @@ function FeatureRow({
           </span>
         </div>
         <h3 className="text-[17px] font-semibold text-white mb-2 leading-snug">{title}</h3>
-        <p className="text-white/40 text-[13px] leading-relaxed">{description}</p>
+        <p className="text-white/60 text-[13px] leading-relaxed">{description}</p>
       </div>
 
       {/* Right — bullets as pill tags */}
@@ -472,7 +471,7 @@ function FeatureRow({
         {bullets.map((b) => (
           <span
             key={b}
-            className="px-3 py-1.5 rounded-full text-[11px] font-medium text-white/55"
+            className="px-3 py-1.5 rounded-full text-[11px] font-medium text-white/70"
             style={{
               background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.08)",

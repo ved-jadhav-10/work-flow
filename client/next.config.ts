@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
       { source: "/api/auth/me",       destination: `${BACKEND}/api/auth/me` },
       // All other backend routes
       { source: "/api/projects/:path*", destination: `${BACKEND}/api/projects/:path*` },
+      { source: "/api/files/:path*",    destination: `${BACKEND}/api/files/:path*` },
       { source: "/api/health",          destination: `${BACKEND}/api/health` },
     ];
   },
