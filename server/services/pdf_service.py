@@ -10,9 +10,6 @@ import io
 import logging
 import math
 
-import fitz  # PyMuPDF
-import pdfplumber
-
 logger = logging.getLogger(__name__)
 
 MAX_PAGES_WARN = 100
@@ -26,6 +23,7 @@ async def extract_text(file_bytes: bytes, filename: str = "document.pdf") -> str
     Raises ValueError for encrypted / unreadable PDFs.
     """
     try:
+        import fitz  # PyMuPDF — lazy import for faster startup
         doc = fitz.open(stream=file_bytes, filetype="pdf")
     except Exception as exc:
         raise ValueError(f"Cannot open PDF '{filename}': {exc}") from exc
@@ -62,6 +60,7 @@ async def extract_tables(file_bytes: bytes) -> list[str]:
     """
     tables_md: list[str] = []
     try:
+        import pdfplumber  # lazy import for faster startup
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             for page in pdf.pages:
                 for table in page.extract_tables():

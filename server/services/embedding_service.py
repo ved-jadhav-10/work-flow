@@ -7,7 +7,6 @@ from __future__ import annotations
 import logging
 from uuid import UUID
 
-from google import genai
 from sqlalchemy.orm import Session
 from sqlalchemy import text as sql_text
 
@@ -18,12 +17,13 @@ logger = logging.getLogger(__name__)
 EMBEDDING_MODEL = "text-embedding-004"
 EMBEDDING_DIM = 768
 
-_client: genai.Client | None = None
+_client = None
 
 
-def _get_client() -> genai.Client:
+def _get_client():
     global _client
     if _client is None:
+        from google import genai
         _client = genai.Client(api_key=settings.gemini_api_key)
     return _client
 

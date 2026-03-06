@@ -13,10 +13,6 @@ import time
 from typing import Optional
 
 import httpx
-from google import genai
-from google.genai import types as genai_types
-from google.genai.errors import ClientError as GeminiClientError
-from groq import Groq, APIStatusError as GroqAPIStatusError
 
 from config import settings
 
@@ -47,6 +43,7 @@ class GeminiProvider(LLMProvider):
     name = "gemini"
 
     def __init__(self, api_key: str, model: str = "gemini-2.0-flash"):
+        from google import genai
         self.model = model
         self.client = genai.Client(api_key=api_key)
         self._key_set = bool(api_key)
@@ -59,6 +56,7 @@ class GeminiProvider(LLMProvider):
         max_tokens: int = 4096,
     ) -> str:
         logger.debug("Gemini: calling model=%s key_set=%s prompt_len=%d", self.model, self._key_set, len(prompt))
+        from google.genai import types as genai_types
         config = genai_types.GenerateContentConfig(
             temperature=temperature,
             max_output_tokens=max_tokens,
@@ -80,6 +78,7 @@ class GroqProvider(LLMProvider):
     name = "groq"
 
     def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
+        from groq import Groq
         self.model = model
         self.client = Groq(api_key=api_key)
         self._key_set = bool(api_key)
@@ -168,31 +167,26 @@ class LLMService:
                     len(text.split()),
                 )
                 return text, provider.name, latency
-            except (httpx.HTTPStatusError, GroqAPIStatusError, GeminiClientError) as exc:
-                status = getattr(exc, "status_code", None) or getattr(getattr(exc, "response", None), "status_code", None)
-                detail = f"provider={provider.name} status={status} error={exc}"
-                errors.append(detail)
-                logger.warning(
-                    "LLM FAIL %s — trying fallback",
-                    detail,
-                )
-                if status not in (429, 400) and provider == self.primary:
-                    raise
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
                 detail = f"provider={provider.name} error={type(exc).__name__}: {exc}"
                 errors.append(detail)
-                logger.warning(
-                    "LLM FAIL %s — trying fallback",
-                    detail,
-                )
+                logger.warning("LLM FAIL %s — trying fallback", detail)
             except Exception as exc:
-                detail = f"provider={provider.name} error={type(exc).__name__}: {exc}"
-                errors.append(detail)
-                logger.error(
-                    "LLM FAIL %s — trying fallback",
-                    detail,
-                    exc_info=True,
-                )
+                # Lazily resolve provider-specific error types
+                from google.genai.errors import ClientError as GeminiClientError
+                from groq import APIStatusError as GroqAPIStatusError
+                api_errors = (httpx.HTTPStatusError, GroqAPIStatusError, GeminiClientError)
+                if isinstance(exc, api_errors):
+                    status = getattr(exc, "status_code", None) or getattr(getattr(exc, "response", None), "status_code", None)
+                    detail = f"provider={provider.name} status={status} error={exc}"
+                    errors.append(detail)
+                    logger.warning("LLM FAIL %s — trying fallback", detail)
+                    if status not in (429, 400) and provider == self.primary:
+                        raise
+                else:
+                    detail = f"provider={provider.name} error={type(exc).__name__}: {exc}"
+                    errors.append(detail)
+                    logger.error("LLM FAIL %s — trying fallback", detail, exc_info=True)
 
         error_summary = "; ".join(errors) if errors else "no providers configured"
         logger.error("All LLM providers failed: %s", error_summary)
