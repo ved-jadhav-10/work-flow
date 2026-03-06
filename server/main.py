@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from config import settings
-from database import check_db_connection
+from database import check_db_connection_async
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Run startup/shutdown logic."""
-    logger.info("🚀 Workflow API starting up…")
-    check_db_connection()
+    logger.info("Workflow API starting up…")
+    await check_db_connection_async()
     yield
     logger.info("Workflow API shutting down.")
 

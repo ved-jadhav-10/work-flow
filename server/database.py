@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import settings
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +35,18 @@ def check_db_connection() -> bool:
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        logger.info("✅ Connected to Neon PostgreSQL")
+        logger.info("Connected to Neon PostgreSQL")
         return True
     except Exception as e:
         logger.warning(
-            f"⚠️  Database connection failed: {e}\n"
+            f"Database connection failed: {e}\n"
             "    Check DATABASE_URL format: "
             "postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require\n"
             "    Server will still start — DB calls will fail until this is fixed."
         )
         return False
+
+
+async def check_db_connection_async() -> bool:
+    """Non-blocking DB check — runs the synchronous query in a thread."""
+    return await asyncio.to_thread(check_db_connection)
