@@ -1,240 +1,169 @@
 # Workflow — Where ideas bloom under starlight
 
-> A persistent AI context layer for developers, students, and knowledge workers — built with Next.js 15 and FastAPI.
+> **A persistent AI context layer for developers, students, and knowledge workers.**
 
-Workflow is an intelligent project workspace that maintains persistent context across documents, code, and conversations. Unlike traditional AI tools that forget between sessions, Workflow builds a vector-indexed knowledge base from everything you add and uses it to deliver context-aware AI assistance that evolves with your work.
+Every AI tool today suffers from the same critical flaw: **context amnesia**. Ask ChatGPT to review your code at 2 PM and it has no memory of the PDF research you uploaded that morning. Switch to a coding assistant and your project constraints vanish. Each conversation starts from zero.
 
-## Vision
-
-Most AI assistants suffer from **context amnesia** — every conversation starts from scratch. Workflow solves this with:
-
-- **Persistent Memory** — Documents, code, and tasks feed a unified project context
-- **Cross-Module Intelligence** — AI references your uploaded PDFs when explaining code
-- **Smart Drift Detection** — Flags responses that violate project constraints
-- **Hybrid Inference** — Cloud (Gemini) or local (Ollama), your choice
-- **RAG-Powered Chat** — Every query is augmented with relevant project knowledge
+**Workflow fixes this.** It builds a vector-indexed knowledge base from every document, code snippet, and task in your project — then uses that accumulated context to deliver AI assistance that actually *understands* your work. Upload a research paper, then ask the chat a question weeks later — it remembers. Write code that contradicts your project constraints — it warns you.
 
 ---
 
-## Landing Page
+## Why Workflow Matters
 
-The public landing page (`/`) features a cinematic hero section with:
-
-- **Vibrant background image** with CSS filters (`brightness-110`, `saturate-150`, `contrast-1.15`) and a radial vignette overlay that darkens only behind the heading text while keeping the edges vivid
-- **Canvas-based animated starfield** — an HTML5 `<canvas>` particle system (`StarryBackground` component) with varying star sizes, sinusoidal twinkle, slow drift, and `mix-blend-mode: screen`
-- **Playfair Display** italic accent for the "*ideas bloom*" tagline in gold (`#d4aa70`)
-- Sections: Hero → How It Works → Features (Learning / Developer / Workflow cards) → Context Persistence → Privacy & Drift → CTA → Footer
+| Problem | Workflow's Solution |
+|---------|-------------------|
+| AI tools forget between sessions | **Persistent context** — every upload feeds a unified, searchable knowledge base |
+| Switching tools means losing context | **Cross-module intelligence** — the AI references your PDFs when explaining code, and your code when extracting tasks |
+| AI gives advice that contradicts your project rules | **Drift detection** — two-layer constraint enforcement flags violations in real time |
+| Vendor lock-in to a single AI provider | **Multi-provider abstraction** — Gemini, Groq, or Ollama (local/private), switchable per request |
+| No visibility into AI reasoning | **Source attribution** — every AI response cites which documents, code, or tasks it drew from |
 
 ---
 
 ## Features
 
-### Authentication & User Management
+### RAG-Powered Chat with Persistent Memory
+The core differentiator. Every chat query is augmented with relevant project knowledge retrieved via vector similarity search (pgvector, 768-dimensional Gemini embeddings). Smart query routing classifies questions to the appropriate module (learning, developer, workflow, or general RAG). Every response includes source citations and module routing badges.
 
-- Email/password registration with bcrypt hashing
-- GitHub OAuth via NextAuth v5 (Auth.js)
-- Server-side session validation in Next.js middleware
-- Protected routes with automatic redirect to `/login`
+### Drift Detection & Constraint Enforcement
+A two-layer system ensures AI responses stay within project boundaries:
+- **Rule-based layer** — taxonomy matching against 120+ technologies across 13 categories
+- **LLM-based layer** — semantic analysis of responses against user-defined project constraints
 
-### Project System
+Violations surface as inline warnings with severity levels and the exact constraint violated. Users can "Accept" deviations to evolve project decisions over time.
 
-- Create and manage multiple projects
-- Define project goals and constraints
-- Track decisions and open questions
-- JSONB-based flexible metadata storage
-- Full CRUD with user isolation
-
-### Database Schema
-
-PostgreSQL + pgvector (hosted on Neon):
-
-| Table | Purpose |
-|-------|---------|
-| Users | Authentication and profiles |
-| Projects | Core project metadata |
-| Documents | PDF storage and analysis |
-| Code Insights | Code explanations and suggestions |
-| Tasks | Priority-based task management |
-| Embeddings | Vector storage (768-dim via Gemini) |
-| Chat Messages | Conversation history with context |
-
-### LLM Abstraction Layer
-
-- **Multi-Provider**: Gemini (primary), Groq (fallback), Ollama (local)
-- **Automatic Fallback**: Switches on rate limits / failures
-- **Unified Interface**: Single API across all providers
-- **Latency Tracking**: Per-provider performance monitoring
-
-### PDF Processing Pipeline
-
-- Text extraction (PyMuPDF) with table extraction (pdfplumber)
-- Intelligent chunking with overlap
-- Embedding generation (`text-embedding-004`)
-- Appwrite Storage integration
-
-### Learning Module
-
-- Drag-and-drop PDF upload with Framer Motion animations
-- Glassmorphic document grid with concept pills
-- Slide-out summary side-panel
-- Smart summarisation: Short / Detailed / Exam-ready modes
-- Key concept extraction with importance scores
-- Implementation step generation
-- Automatic vector embedding for RAG
+### Learning Module — PDF Intelligence
+Drag-and-drop PDF uploads with automatic text extraction (PyMuPDF), table extraction (pdfplumber), intelligent chunking, and vector embedding. AI-powered capabilities:
+- **Smart Summarisation** — Short, Detailed, or Exam-ready summaries
+- **Concept Extraction** — Key concepts with importance scores
+- **Implementation Steps** — Actionable next steps generated from document content
 
 ### Developer Productivity Module
+Paste any code snippet (16 languages supported) for:
+- **Structured Explanation** — Component breakdowns with architecture analysis
+- **Bug Detection** — Issues identified with severity levels and fix suggestions
+- **README Generation** — Auto-generated documentation from code
 
-- Structured code explanation with component breakdowns
-- Bug detection with severity levels
-- README generation from code
-- Multi-language syntax highlighting
-- Code history tracking
+All insights are stored, embedded, and recalled during future chat conversations.
 
 ### Workflow Automation Module
+Paste meeting transcripts or emails to automatically extract:
+- Prioritised tasks (High / Medium / Low)
+- Status tracking with inline editing
+- Source attribution back to the original text
 
-- Meeting transcript and email task extraction
-- AI-classified priority (High / Medium / Low)
-- Task status management and re-prioritisation
-- Source attribution back to original text
+### Multi-Provider LLM Abstraction
+A unified inference layer that supports three providers with automatic failover:
+
+| Provider | Model | Use Case |
+|----------|-------|----------|
+| **Google Gemini** | `gemini-2.0-flash` | Primary cloud inference |
+| **Groq** | `llama-3.1-70b-versatile` | Fast fallback on rate limits |
+| **Ollama** | `phi3:mini` | Fully local/private inference |
+
+The system automatically switches providers on rate limits, timeouts, or connection failures — with per-provider latency tracking.
+
+### Authentication & Project Isolation
+- Email/password with bcrypt + GitHub OAuth via NextAuth v5
+- JWT-based API authentication with server-side session validation
+- Complete project isolation — every resource is scoped to its owner
+
+---
+
+## Tech Stack
+
+### Frontend
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Next.js | 15 (App Router) | React framework with SSR, middleware, API routes |
+| React | 19 | UI library with React Compiler support |
+| TypeScript | 5 | Type safety |
+| Tailwind CSS | 4 | Utility-first styling with custom Starlight Focus design system |
+| NextAuth (Auth.js) | v5 beta | Authentication (GitHub OAuth + Credentials) |
+| Framer Motion | 12 | Animations (page transitions, drag-and-drop) |
+| HTML5 Canvas | — | Custom animated starfield particle system |
+
+### Backend
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| FastAPI | 0.115 | Async Python REST API framework |
+| SQLAlchemy | 2.0 | ORM with full model definitions |
+| PostgreSQL + pgvector | 16 | Relational DB + 768-dim vector similarity search |
+| Google Gemini SDK | latest | Primary LLM + embeddings (`text-embedding-004`) |
+| Groq SDK | 0.11 | Fallback LLM provider |
+| PyMuPDF + pdfplumber | — | PDF text + table extraction pipeline |
+| Appwrite | 15.2 | Private file storage (cloud bucket) |
+| python-jose + bcrypt | — | JWT authentication + password hashing |
+
+### Infrastructure
+
+| Component | Service |
+|-----------|---------|
+| Database | Neon (managed PostgreSQL with pgvector) |
+| File Storage | Appwrite Cloud (private bucket) |
+| Frontend Hosting | Vercel |
+| Backend Hosting | Render (Dockerised — `render.yaml` included) |
 
 ---
 
 ## Architecture
 
-### Tech Stack
-
-#### Frontend — Next.js 15 (App Router)
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 15, React 19, TypeScript 5 |
-| Auth | NextAuth v5 (Auth.js) — GitHub OAuth + Credentials |
-| Styling | Tailwind CSS 4 (PostCSS plugin) |
-| Animations | Framer Motion 12, HTML5 Canvas (starfield) |
-| Fonts | Geist Sans/Mono, Playfair Display (via `next/font`) |
-| HTTP | Axios + server-side fetch |
-| Icons | lucide-react |
-| Syntax | react-syntax-highlighter |
-
-#### Backend — FastAPI
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | FastAPI 0.115 (async) |
-| Database | Neon PostgreSQL 16 + pgvector |
-| ORM | SQLAlchemy 2.0 |
-| Auth | JWT (python-jose) + bcrypt |
-| File Storage | Appwrite Cloud (private bucket) |
-| AI | Gemini (`gemini-2.0-flash`), Groq (`llama-3.1-70b`), Ollama (`phi3:mini`) |
-| PDF | PyMuPDF + pdfplumber |
-| Testing | pytest + pytest-asyncio |
-
-#### Infrastructure
-
-- **Database**: Neon (managed PostgreSQL + pgvector)
-- **File Storage**: Appwrite Cloud
-- **Frontend Hosting**: Vercel (or any Node.js host)
-- **Backend Hosting**: Render (Dockerised) — see `render.yaml`
-
-### Project Structure
-
 ```
-work-flow/
-├── client/                          # Next.js 15 frontend
-│   ├── src/
-│   │   ├── middleware.ts            # Auth middleware (session check)
-│   │   ├── app/
-│   │   │   ├── layout.tsx           # Root layout (fonts, providers)
-│   │   │   ├── page.tsx             # Landing page (hero, features, CTA)
-│   │   │   ├── globals.css          # Tailwind + custom keyframes
-│   │   │   ├── login/page.tsx
-│   │   │   ├── register/page.tsx
-│   │   │   ├── api/auth/[...nextauth]/route.ts
-│   │   │   └── dashboard/
-│   │   │       ├── layout.tsx       # Dashboard shell (sidebar)
-│   │   │       ├── page.tsx         # Projects grid
-│   │   │       ├── settings/page.tsx
-│   │   │       └── projects/
-│   │   │           ├── new/page.tsx
-│   │   │           └── [id]/
-│   │   │               ├── layout.tsx
-│   │   │               ├── page.tsx       # Project overview
-│   │   │               ├── chat/page.tsx
-│   │   │               ├── learning/page.tsx
-│   │   │               ├── developer/page.tsx
-│   │   │               └── workflow/page.tsx
-│   │   ├── components/
-│   │   │   ├── StarryBackground.tsx # Canvas particle starfield
-│   │   │   ├── layout/Sidebar.tsx
-│   │   │   └── providers/
-│   │   │       ├── Providers.tsx     # NextAuth SessionProvider
-│   │   │       └── ErrorBoundary.tsx
-│   │   ├── lib/
-│   │   │   ├── auth.ts              # NextAuth config (GitHub + Credentials)
-│   │   │   ├── api.ts               # Backend API client
-│   │   │   └── inference.ts         # LLM inference helpers
-│   │   └── types/index.ts
-│   ├── public/
-│   │   └── hero-bg.jpg              # Landing page background
-│   ├── next.config.ts
-│   ├── tsconfig.json
-│   └── package.json
-│
-├── server/                          # FastAPI backend
-│   ├── main.py                      # App entry, CORS, routers
-│   ├── config.py                    # Pydantic Settings (.env)
-│   ├── database.py                  # SQLAlchemy engine + session
-│   ├── models/                      # ORM models
-│   │   ├── user.py
-│   │   ├── project.py
-│   │   ├── document.py
-│   │   ├── code_insight.py
-│   │   ├── task.py
-│   │   ├── embedding.py
-│   │   └── chat_message.py
-│   ├── schemas/                     # Pydantic request/response
-│   │   ├── auth.py
-│   │   ├── project.py
-│   │   ├── learning.py
-│   │   ├── developer.py
-│   │   ├── chat.py
-│   │   └── workflow.py
-│   ├── routers/                     # API endpoints
-│   │   ├── auth.py
-│   │   ├── projects.py
-│   │   ├── learning.py
-│   │   ├── developer.py
-│   │   ├── workflow.py
-│   │   └── chat.py
-│   ├── services/                    # Business logic
-│   │   ├── llm_service.py
-│   │   ├── pdf_service.py
-│   │   ├── embedding_service.py
-│   │   ├── rag_service.py
-│   │   ├── context_engine.py
-│   │   ├── drift_detector.py
-│   │   ├── file_storage.py
-│   │   ├── learning_service.py
-│   │   ├── developer_service.py
-│   │   ├── workflow_service.py
-│   │   └── prompts/
-│   │       ├── chat_prompts.py
-│   │       ├── learning_prompts.py
-│   │       ├── developer_prompts.py
-│   │       └── workflow_prompts.py
-│   ├── middleware/auth.py           # JWT validation dependency
-│   ├── migrations/
-│   │   ├── 001_create_users.sql
-│   │   ├── 002_create_project_tables.sql
-│   │   └── 003_add_drift_and_routing.sql
-│   ├── tests/
-│   ├── Dockerfile
-│   └── requirements.txt
-│
-├── render.yaml                      # Render deployment config
-├── plan.md                          # 10-phase execution plan
-└── package.json                     # Root workspace
+┌────────────────────────────────────────────────────────────────────┐
+│                        Next.js 15 Frontend                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐  │
+│  │ Learning │ │Developer │ │ Workflow │ │   Chat   │ │  Auth  │  │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘ └───┬────┘  │
+│       │             │            │             │           │       │
+│       └─────────────┴────────────┴─────────────┴───────────┘       │
+│                    API Proxy (next.config.ts rewrites)             │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               │ HTTPS
+┌──────────────────────────────┴─────────────────────────────────────┐
+│                        FastAPI Backend                             │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    Router Layer (6 routers)                 │   │
+│  │   auth · projects · learning · developer · workflow · chat │   │
+│  └──────────────────────────┬──────────────────────────────────┘   │
+│  ┌──────────────────────────┴──────────────────────────────────┐   │
+│  │                   Service Layer (11 services)               │   │
+│  │  ┌─────────────┐ ┌──────────────┐ ┌────────────────────┐   │   │
+│  │  │ LLM Service │ │Context Engine│ │  Drift Detector    │   │   │
+│  │  │ (3 providers│ │ (RAG + vector│ │  (rule + LLM-based │   │   │
+│  │  │  + fallback)│ │  retrieval)  │ │   constraint check)│   │   │
+│  │  └─────────────┘ └──────────────┘ └────────────────────┘   │   │
+│  │  ┌───────────┐ ┌───────────┐ ┌──────────┐ ┌────────────┐  │   │
+│  │  │PDF Service│ │ Embedding │ │   RAG    │ │File Storage│  │   │
+│  │  │(extract + │ │ (Gemini   │ │ (vector  │ │ (Appwrite) │  │   │
+│  │  │ chunk)    │ │  768-dim) │ │  search) │ │            │  │   │
+│  │  └───────────┘ └───────────┘ └──────────┘ └────────────┘  │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                               │                                    │
+│              ┌────────────────┼────────────────┐                   │
+│              ▼                ▼                 ▼                   │
+│     ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐        │
+│     │   Neon DB     │ │   Appwrite   │ │  Gemini / Groq   │        │
+│     │ PostgreSQL +  │ │  Cloud File  │ │  / Ollama APIs   │        │
+│     │   pgvector    │ │   Storage    │ │                  │        │
+│     └──────────────┘ └──────────────┘ └──────────────────┘        │
+└────────────────────────────────────────────────────────────────────┘
 ```
+
+### Database Schema
+
+PostgreSQL with pgvector extension — 7 tables with full referential integrity:
+
+| Table | Key Columns | Purpose |
+|-------|------------|---------|
+| `users` | id (UUID), email, hashed_password, provider | Authentication (credentials + OAuth) |
+| `projects` | id, user_id (FK), name, goal, constraints (JSONB) | Isolated project workspaces |
+| `documents` | id, project_id (FK), raw_text, summary, key_concepts (JSONB) | PDF intelligence |
+| `code_insights` | id, project_id (FK), code_snippet, explanation, components (JSONB) | Developer module history |
+| `tasks` | id, project_id (FK), description, priority, status, source_text | Workflow automation |
+| `embeddings` | id, project_id (FK), source_type, content_chunk, embedding (Vector 768) | RAG vector store |
+| `chat_messages` | id, project_id (FK), role, content, context_used (JSONB), drift_warnings (JSONB) | Persistent chat with metadata |
 
 ---
 
@@ -242,21 +171,17 @@ work-flow/
 
 ### Prerequisites
 
-- **Node.js** 20+ and npm
-- **Python** 3.11+ and pip
-- **Neon** account (free-tier PostgreSQL with pgvector)
-- **Appwrite** account (free-tier file storage)
-- **API Keys**: Google AI Studio (Gemini), Groq (optional), GitHub OAuth App
+- Node.js 20+ · Python 3.12+ · Neon account · Appwrite account · Gemini API key
 
-### 1. Clone & Install
+### Quick Start
 
 ```bash
-git clone <your-repo-url>
+# Clone
+git clone https://github.com/ved-jadhav-10/work-flow.git
 cd work-flow
 
 # Frontend
-cd client
-npm install
+cd client && npm install
 
 # Backend
 cd ../server
@@ -265,31 +190,23 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 2. Environment Variables
+### Environment Setup
 
 **`server/.env`**
-
 ```env
-DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
-
+DATABASE_URL=postgresql://user:pass@ep-xxx.aws.neon.tech/neondb?sslmode=require
 APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
 APPWRITE_PROJECT_ID=...
 APPWRITE_API_KEY=...
 APPWRITE_BUCKET_ID=...
-
 GEMINI_API_KEY=...
 GROQ_API_KEY=...
-
 JWT_SECRET=generate-a-random-secret
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
-
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=phi3:mini
 ```
 
 **`client/.env.local`**
-
 ```env
 BACKEND_URL=http://localhost:8000
 AUTH_SECRET=generate-a-random-secret
@@ -297,104 +214,55 @@ GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 ```
 
-### 3. Database Setup
+### Database Setup
 
-1. Enable pgvector in your Neon SQL Editor:
-   ```sql
-   CREATE EXTENSION IF NOT EXISTS vector;
-   ```
-2. Run the migration files in order:
-   - `server/migrations/001_create_users.sql`
-   - `server/migrations/002_create_project_tables.sql`
-   - `server/migrations/003_add_drift_and_routing.sql`
+```sql
+-- Run in Neon SQL Editor, then execute migration files in order
+CREATE EXTENSION IF NOT EXISTS vector;
+```
 
-### 4. Run Development Servers
+### Run
 
 ```bash
 # Terminal 1 — Backend
-cd server
-uvicorn main:app --reload --port 8000
+cd server && uvicorn main:app --reload --port 8000
 
 # Terminal 2 — Frontend
-cd client
-npm run dev
+cd client && npm run dev
 ```
 
 | Service | URL |
 |---------|-----|
 | Frontend | http://localhost:3000 |
-| Backend API Docs | http://localhost:8000/docs |
+| API Docs (Swagger) | http://localhost:8000/docs |
 | Health Check | http://localhost:8000/api/health |
 
 ---
 
-## Usage
+## How It Works
 
-1. **Register** — email/password or GitHub OAuth at `/register`
-2. **Create a project** — set name, goal, and constraints from the dashboard
-3. **Learning** — upload PDFs, generate summaries, extract concepts
-4. **Developer** — paste code for explanations, bug detection, README generation
-5. **Workflow** — paste transcripts to extract prioritised tasks
-6. **Chat** — context-aware AI assistant referencing all project content
-
----
-
-## Testing
-
-```bash
-cd server
-pytest
-```
-
-Covers: LLM provider fallback, PDF extraction/chunking, embedding generation, vector similarity search.
+1. **Register** — email/password or GitHub OAuth
+2. **Create a project** — define name, goal, and constraints
+3. **Feed the knowledge base** — upload PDFs (Learning), paste code (Developer), paste transcripts (Workflow)
+4. **Chat with full context** — the AI draws from everything you've added, cites its sources, and warns when it drifts from your constraints
+5. **Iterate** — every new upload strengthens the context; every accepted drift evolves your project decisions
 
 ---
 
-## Status
+## API Reference
 
-| Phase | Feature | Status |
-|-------|---------|--------|
-| 0 | Environment Setup | ✅ Complete |
-| 1 | Project Scaffold | ✅ Complete |
-| 2 | Authentication (NextAuth v5) | ✅ Complete |
-| 3 | Project System | ✅ Complete |
-| 4 | LLM & PDF Services | ✅ Complete |
-| 5 | Learning Module | ✅ Complete |
-| 6 | Developer Module | ✅ Complete |
-| 7 | Workflow Module | ✅ Complete |
-| 8 | Context Engine & RAG | 🔜 Next |
-| 9 | Drift Detection | 📋 Planned |
-| 10 | Deployment & Polish | 📋 Planned |
+All endpoints are documented via FastAPI's auto-generated Swagger UI at `/docs`.
 
----
+| Module | Endpoints |
+|--------|----------|
+| **Auth** | `POST /register` · `POST /login` · `POST /oauth` · `GET /me` |
+| **Projects** | `POST /` · `GET /` · `GET /{id}` · `PUT /{id}` · `DELETE /{id}` |
+| **Learning** | `POST /upload` · `GET /` · `POST /{doc_id}/summarize` · `POST /{doc_id}/concepts` · `POST /{doc_id}/steps` |
+| **Developer** | `POST /explain` · `POST /debug` · `POST /readme` · `GET /` · `DELETE /{id}` |
+| **Workflow** | `POST /extract` · `GET /tasks` · `PUT /tasks/{id}` · `DELETE /tasks/{id}` |
+| **Chat** | `POST /chat` · `GET /history` |
 
-## Roadmap
-
-### Q1 2026
-
-- ✅ Core auth, project management, and all three intelligence modules
-- ✅ Next.js 15 migration with NextAuth v5
-- ✅ Cinematic landing page with canvas starfield
-- 🔜 Context Persistence Engine & RAG-powered chat
-
-### Q2 2026
-
-- Drift detection and constraint enforcement
-- Smart query routing
-- Hybrid inference (cloud / local toggle)
-- Production deployment (Vercel + Render)
-
-### Q3 2026
-
-- Team collaboration features
-- Advanced analytics dashboard
-- Plugin system for custom modules
-
-### Q4 2026
-
-- Self-hosted option (Docker Compose)
-- Enterprise features (SSO, audit logs)
-- Fine-tuned domain-specific models
+All endpoints accept an `X-Inference-Mode` header (`cloud` / `local` / `groq`) to control which LLM provider handles the request.
 
 ---
 
@@ -403,42 +271,79 @@ Covers: LLM provider fallback, PDF extraction/chunking, embedding generation, ve
 ### Frontend — Vercel
 
 ```bash
-cd client
-npm run build   # produces .next/
+cd client && npm run build
 # Deploy via Vercel CLI or Git integration
 ```
 
-Set `BACKEND_URL`, `AUTH_SECRET`, and OAuth env vars in the Vercel dashboard.
-
 ### Backend — Render
 
-A `render.yaml` is included at the repo root. Connect the GitHub repo to Render, set the environment variables listed above, and deploy.
+A `render.yaml` is included at the repo root. Connect the GitHub repo to Render, set environment variables, and deploy. The backend is fully Dockerised (Python 3.12, multi-stage build, non-root user).
 
-### Post-Deploy Checklist
+---
 
-- [ ] Set `BACKEND_URL` to production backend URL
-- [ ] Update CORS origins in FastAPI `main.py`
-- [ ] Update GitHub OAuth redirect URI
-- [ ] Verify all features in production
-- [ ] Set up monitoring (Sentry, etc.)
+## Testing
+
+```bash
+cd server && pytest
+```
+
+Covers LLM provider fallback chains, PDF extraction and chunking, embedding generation, and vector similarity search.
+
+---
+
+## Project Structure
+
+```
+work-flow/
+├── client/                     # Next.js 15 frontend
+│   ├── src/
+│   │   ├── middleware.ts       # Auth route protection
+│   │   ├── app/                # App Router pages
+│   │   ├── components/         # StarryBackground, Sidebar, Glass UI
+│   │   ├── lib/                # auth, api client, inference mode
+│   │   └── types/              # Shared TypeScript interfaces
+│   └── public/                 # Logo, hero background
+│
+├── server/                     # FastAPI backend
+│   ├── main.py                 # App entry + CORS + routers
+│   ├── config.py               # Pydantic Settings
+│   ├── database.py             # SQLAlchemy engine
+│   ├── models/                 # 7 ORM models
+│   ├── schemas/                # 6 Pydantic schema files
+│   ├── routers/                # 6 API route files
+│   ├── services/               # 11 business logic services
+│   │   └── prompts/            # Structured LLM prompts
+│   ├── middleware/             # JWT auth dependency
+│   ├── migrations/             # 3 SQL migration files
+│   ├── tests/                  # pytest test suite
+│   ├── Dockerfile              # Multi-stage production build
+│   └── requirements.txt
+│
+├── render.yaml                 # Render deployment config
+└── package.json                # Root workspace scripts
+```
+
+---
+
+## Team
+
+Ved Jadhav
+Aditya Rajput
+Palash Kurkute
+Harshil Biyani
+Ansh Dudhe
 
 ---
 
 ## Acknowledgements
 
-- **Next.js** & **React** for the frontend framework
-- **FastAPI** for the async Python backend
-- **Neon** for managed PostgreSQL with pgvector
-- **Appwrite** for managed file storage
-- **Google Gemini**, **Groq**, and **Ollama** for AI inference
-- **Framer Motion** for animations
-- **Tailwind CSS** for utility-first styling
+[Next.js](https://nextjs.org) · [React](https://react.dev) · [FastAPI](https://fastapi.tiangolo.com) · [Neon](https://neon.tech) · [Appwrite](https://appwrite.io) · [Google Gemini](https://ai.google.dev) · [Groq](https://groq.com) · [Ollama](https://ollama.com) · [Framer Motion](https://www.framer.com/motion) · [Tailwind CSS](https://tailwindcss.com)
 
 ---
 
 ## License
 
-MIT — see `LICENSE` for details.
+MIT
 
 ---
 

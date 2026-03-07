@@ -1,10 +1,10 @@
 {
+  "private": true,
+  "name": "work-flow",
+  "description": "Workflow — Persistent AI context layer for developers and knowledge workers",
   "scripts": {
     "dev": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
     "start": "npm run start --prefix client"
-  },
-  "dependencies": {
-    "next-auth": "^5.0.0-beta.30"
   }
 }
