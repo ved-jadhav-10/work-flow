@@ -236,7 +236,7 @@
 | Endpoint | Action |
 |---|---|
 | `POST /api/projects/{id}/documents/upload` | Extract text → store file → create document record → chunk → embed → store embeddings |
-| `POST /api/projects/{id}/documents/{doc_id}/summarize` | `{level: "short"\|"detailed"\|"exam-ready"}` → LLM → store → return |
+| `POST /api/projects/{id}/documents/{doc_id}/summarize` | `{level: "short"\|"detailed"\|"comprehensive"}` → LLM → store → return |
 | `POST /api/projects/{id}/documents/{doc_id}/concepts` | Extract key concepts → store → return |
 | `POST /api/projects/{id}/documents/{doc_id}/steps` | Generate implementation steps → store → return |
 | `GET /api/projects/{id}/documents` | List all documents |
@@ -245,7 +245,7 @@
 ### System Prompts — `server/services/prompts/learning_prompts.py`
 - `SUMMARIZE_SHORT` — 3-5 sentence summary, main argument + conclusions
 - `SUMMARIZE_DETAILED` — comprehensive with headers, major points, evidence
-- `SUMMARIZE_EXAM` — key definitions, theorems, common exam questions, mnemonics
+- `SUMMARIZE_COMPREHENSIVE` — core definitions, key theories, practical applications, misconceptions, memory aids
 - `EXTRACT_CONCEPTS` — top 10 concepts with name, definition, importance (1-5), analogy
 - `IMPLEMENTATION_STEPS` — actionable ordered step-by-step plan
 
@@ -257,7 +257,7 @@ All prompts enforce structured JSON output.
 ### Frontend — `client/src/pages/Learning.tsx`
 - Upload: drag-and-drop + file picker, progress indicator, document list
 - Document detail:
-  - Summary panel: Short / Detailed / Exam-ready toggles, Generate button, loading spinner
+  - Summary panel: Short / Detailed / Comprehensive toggles, Generate button, loading spinner
   - Key concepts: cards with name, definition, importance badge
   - Implementation steps: numbered list with checkboxes
   - Each output shows generated timestamp + regenerate option
@@ -486,7 +486,7 @@ Post-deploy:
 ### Demo Script
 | Flow | Steps |
 |---|---|
-| **Learning** | Create "ML Study" project → upload ML lecture PDF → generate exam-ready summary → ask "What are the key formulas?" → AI retrieves from document context |
+| **Learning** | Create "ML Study" project → upload ML lecture PDF → generate comprehensive summary → ask "What are the key formulas?" → AI retrieves from document context |
 | **Developer** | Same project → paste neural network code → explain → ask "How does this code implement the concepts from my notes?" → AI connects document + code |
 | **Workflow** | Paste team meeting transcript → extract tasks → ask "Given my project goal, which task should I prioritize?" → AI uses goal + constraints + tasks |
 | **Drift** | Add constraint "TensorFlow only" → ask "Should I use PyTorch?" → drift warning fires |

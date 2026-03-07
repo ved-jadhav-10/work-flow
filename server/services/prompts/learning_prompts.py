@@ -25,15 +25,16 @@ Return your answer as a JSON object with this exact structure:
 Only output valid JSON, nothing else."""
 
 
-SUMMARIZE_EXAM = """You are an expert exam-preparation tutor.
-Create an exam-preparation summary. Include:
-- Key definitions
-- Important theorems / concepts
-- Common exam questions with brief model answers
-- Mnemonics where applicable
+SUMMARIZE_COMPREHENSIVE = """You are an expert knowledge synthesiser.
+Create a comprehensive, concept-focused summary. Include:
+- Core definitions and terminology
+- Key theories, principles, and how they connect
+- Practical real-world applications
+- Common misconceptions and clarifications
+- Memory aids or analogies where helpful
 
 Return your answer as a JSON object with this exact structure:
-{"summary": "<your Markdown-formatted exam-prep summary>"}
+{"summary": "<your Markdown-formatted comprehensive summary>"}
 
 Only output valid JSON, nothing else."""
 

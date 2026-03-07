@@ -20,6 +20,14 @@ import {
   Pencil,
   Check,
   X,
+  Plus,
+  Clipboard,
+  Brain,
+  StickyNote,
+  ArrowUpDown,
+  Lightbulb,
+  GitBranch,
+  RefreshCw,
 } from "lucide-react";
 import { workflowApi } from "@/lib/api";
 
@@ -47,6 +55,24 @@ interface ExtractResponse {
   extracted_count: number;
   truncated: boolean;
   source_type: string;
+}
+
+interface ReprioritizeSuggestion {
+  task_id: string;
+  current_priority: string;
+  suggested_priority: string;
+  reason: string;
+}
+
+interface PracticalSuggestion {
+  task_description: string;
+  suggestion: string;
+  type: "breakdown" | "dependency" | "improvement";
+}
+
+interface AnalyzeResponse {
+  reprioritizations: ReprioritizeSuggestion[];
+  suggestions: PracticalSuggestion[];
 }
 
 /* ── Helpers ───────────────────────────────────────────────────────────────── */
@@ -267,7 +293,7 @@ export default function WorkflowPage() {
   const projectId = (params?.id ?? "") as string;
 
   const [text, setText] = useState("");
-  const [sourceType, setSourceType] = useState<"transcript" | "email">("transcript");
+  const [sourceType, setSourceType] = useState<"transcript" | "email" | "notes">("transcript");
   const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState("");
 
@@ -282,6 +308,16 @@ export default function WorkflowPage() {
     count: number;
     truncated: boolean;
   } | null>(null);
+
+  /* New state */
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTaskDesc, setNewTaskDesc] = useState("");
+  const [newTaskPriority, setNewTaskPriority] = useState<"high" | "medium" | "low">("medium");
+  const [addingTask, setAddingTask] = useState(false);
+  const [filterTab, setFilterTab] = useState<"all" | "pending" | "done">("all");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<AnalyzeResponse | null>(null);
+  const [copiedExport, setCopiedExport] = useState(false);
 
   // ── Load tasks ────────────────────────────────────────────────────────────
 
@@ -420,11 +456,79 @@ export default function WorkflowPage() {
     }
   }
 
-  // ── Group tasks by priority ───────────────────────────────────────────────
+  // ── Manual task creation ──────────────────────────────────────────────────
+
+  async function handleAddTask() {
+    if (!newTaskDesc.trim()) return;
+    setAddingTask(true);
+    try {
+      await workflowApi.createTask(projectId, {
+        description: newTaskDesc.trim(),
+        priority: newTaskPriority,
+      });
+      setNewTaskDesc("");
+      setNewTaskPriority("medium");
+      setShowAddForm(false);
+      await loadTasks();
+    } catch (e: any) {
+      setError(e.message || "Failed to create task");
+    } finally {
+      setAddingTask(false);
+    }
+  }
+
+  // ── AI Analysis ───────────────────────────────────────────────────────────
+
+  async function handleAnalyze() {
+    setAnalyzing(true);
+    setAnalysis(null);
+    try {
+      const data = (await workflowApi.analyzeTasks(projectId)) as AnalyzeResponse;
+      setAnalysis(data);
+    } catch (e: any) {
+      setError(e.message || "AI analysis failed");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  // ── Export as markdown ────────────────────────────────────────────────────
+
+  function handleExport() {
+    const lines: string[] = ["# Tasks\n"];
+    for (const p of ["high", "medium", "low"] as const) {
+      const group = tasks.filter((t) => t.priority === p);
+      if (group.length === 0) continue;
+      lines.push(`## ${p.charAt(0).toUpperCase() + p.slice(1)} Priority\n`);
+      for (const t of group) {
+        const check = t.status === "done" ? "x" : " ";
+        lines.push(`- [${check}] ${t.description}`);
+      }
+      lines.push("");
+    }
+    navigator.clipboard.writeText(lines.join("\n"));
+    setCopiedExport(true);
+    setTimeout(() => setCopiedExport(false), 2000);
+  }
+
+  // ── Apply reprioritisation suggestion ─────────────────────────────────────
+
+  async function applyReprioritize(taskId: string, newPriority: string) {
+    await handleUpdatePriority(taskId, newPriority);
+    setAnalysis((prev) =>
+      prev
+        ? { ...prev, reprioritizations: prev.reprioritizations.filter((r) => r.task_id !== taskId) }
+        : null
+    );
+  }
+
+  // ── Group tasks by priority (with filter) ──────────────────────────────────
+
+  const filteredTasks = filterTab === "all" ? tasks : tasks.filter((t) => t.status === filterTab);
 
   const grouped = (["high", "medium", "low"] as const).reduce(
     (acc, p) => {
-      acc[p] = tasks
+      acc[p] = filteredTasks
         .filter((t) => t.priority === p)
         .sort((a, b) => {
           if (a.status !== b.status) return a.status === "done" ? 1 : -1;
@@ -439,6 +543,8 @@ export default function WorkflowPage() {
   const charLimit = 20000;
   const isOverLimit = charCount > charLimit;
 
+  const progressPercent = stats.total > 0 ? Math.round((stats.by_status.done / stats.total) * 100) : 0;
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -446,7 +552,7 @@ export default function WorkflowPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
         <ListTodo className="w-6 h-6 text-accent" />
-        <h1 className="text-2xl font-bold">Workflow</h1>
+        <h1 className="text-2xl font-bold">EasyAutomate</h1>
       </div>
       <p className="text-muted text-sm mb-8">
         Paste a meeting transcript or email thread to extract and manage actionable tasks.
@@ -457,26 +563,23 @@ export default function WorkflowPage() {
         <div className="flex flex-col gap-4">
           {/* Source type toggle */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setSourceType("transcript")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                sourceType === "transcript"
-                  ? "bg-white/10 border-white/20 text-white"
-                  : "bg-surface-2 border-border text-white/70 hover:border-white/15"
-              }`}
-            >
-              <Mic className="w-4 h-4" /> Transcript
-            </button>
-            <button
-              onClick={() => setSourceType("email")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                sourceType === "email"
-                  ? "bg-white/10 border-white/20 text-white"
-                  : "bg-surface-2 border-border text-white/70 hover:border-white/15"
-              }`}
-            >
-              <Mail className="w-4 h-4" /> Email
-            </button>
+            {([
+              { key: "transcript" as const, icon: Mic, label: "Transcript" },
+              { key: "email" as const, icon: Mail, label: "Email" },
+              { key: "notes" as const, icon: StickyNote, label: "Notes" },
+            ]).map(({ key, icon: Icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setSourceType(key)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                  sourceType === key
+                    ? "bg-white/10 border-white/20 text-white"
+                    : "bg-surface-2 border-border text-white/70 hover:border-white/15"
+                }`}
+              >
+                <Icon className="w-4 h-4" /> {label}
+              </button>
+            ))}
           </div>
 
           {/* Textarea */}
@@ -487,7 +590,9 @@ export default function WorkflowPage() {
               placeholder={
                 sourceType === "transcript"
                   ? "Paste your meeting transcript here…\n\nExample:\nAlice: We need to update the onboarding flow by Friday.\nBob: I'll handle the backend changes. Can someone review the designs?\nAlice: John, please review and send feedback by EOD tomorrow."
-                  : "Paste your email thread here…\n\nExample:\nFrom: Sarah\nTo: Team\n\nHi all, can you please update the API docs and deploy to staging by next Monday? Also, Bob please schedule a sync with the client."
+                  : sourceType === "email"
+                  ? "Paste your email thread here…\n\nExample:\nFrom: Sarah\nTo: Team\n\nHi all, can you please update the API docs and deploy to staging by next Monday? Also, Bob please schedule a sync with the client."
+                  : "Paste your notes here…\n\nExample:\n- Need to set up CI/CD pipeline for the new service\n- Research auth providers — decide between Auth0 and Clerk\n- Design review scheduled for Thursday, prepare mockups"
               }
               rows={16}
               className={`w-full bg-surface-2 border rounded-2xl px-4 py-3 text-sm text-white/90 placeholder:text-muted-2 resize-none focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors font-mono leading-relaxed ${
@@ -588,7 +693,187 @@ export default function WorkflowPage() {
         </div>
 
         {/* ── Right: Task List ──────────────────────────────────────── */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
+          {/* Progress bar */}
+          {stats.total > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-white/70">Progress</span>
+                <span className="text-white font-medium">{progressPercent}%</span>
+              </div>
+              <div className="h-2 bg-surface-2 border border-border rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-linear-to-r from-accent to-emerald-400 rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Toolbar: filter tabs + action buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Filter tabs */}
+            {(["all", "pending", "done"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setFilterTab(tab)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                  filterTab === tab
+                    ? "bg-white/10 border-white/20 text-white"
+                    : "bg-surface-2 border-border text-white/60 hover:border-white/15"
+                }`}
+              >
+                {tab === "all" ? "All" : tab === "pending" ? "Pending" : "Done"}
+                {tab === "all" && ` (${stats.total})`}
+                {tab === "pending" && ` (${stats.by_status.pending})`}
+                {tab === "done" && ` (${stats.by_status.done})`}
+              </button>
+            ))}
+
+            <div className="flex-1" />
+
+            {/* Add task */}
+            <button
+              onClick={() => setShowAddForm((v) => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-accent/20 border border-accent/40 text-accent hover:bg-accent/30 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Task
+            </button>
+
+            {/* Export */}
+            {tasks.length > 0 && (
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-surface-2 border border-border text-white/60 hover:border-white/15 hover:text-white/80 transition-colors"
+                title="Copy tasks as markdown"
+              >
+                {copiedExport ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Clipboard className="w-3.5 h-3.5" />}
+                {copiedExport ? "Copied!" : "Export"}
+              </button>
+            )}
+
+            {/* AI Analyze */}
+            {stats.by_status.pending > 0 && (
+              <button
+                onClick={handleAnalyze}
+                disabled={analyzing}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-500/20 border border-purple-500/40 text-purple-300 hover:bg-purple-500/30 disabled:opacity-50 transition-colors"
+              >
+                {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Brain className="w-3.5 h-3.5" />}
+                {analyzing ? "Analyzing…" : "AI Analyze"}
+              </button>
+            )}
+          </div>
+
+          {/* Manual add task form */}
+          {showAddForm && (
+            <div className="flex gap-2 items-start bg-surface-2 border border-border rounded-2xl p-3">
+              <input
+                autoFocus
+                value={newTaskDesc}
+                onChange={(e) => setNewTaskDesc(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) handleAddTask(); }}
+                placeholder="Task description…"
+                className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm text-white/90 placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
+              />
+              <select
+                value={newTaskPriority}
+                onChange={(e) => setNewTaskPriority(e.target.value as "high" | "medium" | "low")}
+                className="bg-surface border border-border rounded-xl px-2 py-2 text-xs text-white/80 focus:outline-none focus:border-accent/60"
+              >
+                <option value="high" className="bg-[#1a1a2e] text-white">High</option>
+                <option value="medium" className="bg-[#1a1a2e] text-white">Medium</option>
+                <option value="low" className="bg-[#1a1a2e] text-white">Low</option>
+              </select>
+              <button
+                onClick={handleAddTask}
+                disabled={addingTask || !newTaskDesc.trim()}
+                className="px-3 py-2 rounded-xl bg-accent/20 border border-accent/40 text-accent text-sm font-medium hover:bg-accent/30 disabled:opacity-50 transition-colors"
+              >
+                {addingTask ? <Loader2 className="w-4 h-4 animate-spin" /> : "Add"}
+              </button>
+              <button
+                onClick={() => { setShowAddForm(false); setNewTaskDesc(""); }}
+                className="px-2 py-2 rounded-xl bg-surface border border-border text-white/60 hover:bg-surface-2 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* AI Analysis Results */}
+          {analysis && (analysis.reprioritizations.length > 0 || analysis.suggestions.length > 0) && (
+            <div className="bg-purple-500/5 border border-purple-500/20 rounded-2xl p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium text-purple-300">
+                  <Brain className="w-4 h-4" /> AI Analysis
+                </div>
+                <button
+                  onClick={() => setAnalysis(null)}
+                  className="text-white/40 hover:text-white/70 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Reprioritisations */}
+              {analysis.reprioritizations.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-white/70">
+                    <ArrowUpDown className="w-3 h-3" /> Priority Suggestions
+                  </div>
+                  {analysis.reprioritizations.map((r, i) => {
+                    const task = tasks.find((t) => t.id === r.task_id);
+                    return (
+                      <div key={i} className="flex items-start gap-3 bg-surface-2 rounded-xl p-3 text-xs">
+                        <div className="flex-1 space-y-1">
+                          <p className="text-white/80">{task?.description ?? r.task_id}</p>
+                          <p className="text-white/50">{r.reason}</p>
+                          <div className="flex items-center gap-2">
+                            <PriorityBadge p={r.current_priority} />
+                            <span className="text-white/40">→</span>
+                            <PriorityBadge p={r.suggested_priority} />
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => applyReprioritize(r.task_id, r.suggested_priority)}
+                          className="shrink-0 px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors text-xs font-medium"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Practical suggestions */}
+              {analysis.suggestions.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-white/70">
+                    <Lightbulb className="w-3 h-3" /> Suggestions
+                  </div>
+                  {analysis.suggestions.map((s, i) => {
+                    const typeIcon = s.type === "breakdown" ? <GitBranch className="w-3 h-3" /> : s.type === "dependency" ? <RefreshCw className="w-3 h-3" /> : <Lightbulb className="w-3 h-3" />;
+                    const typeColor = s.type === "breakdown" ? "text-blue-400" : s.type === "dependency" ? "text-yellow-400" : "text-emerald-400";
+                    return (
+                      <div key={i} className="bg-surface-2 rounded-xl p-3 text-xs space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={typeColor}>{typeIcon}</span>
+                          <span className={`${typeColor} font-medium capitalize`}>{s.type}</span>
+                          <span className="text-white/40">·</span>
+                          <span className="text-white/60 truncate">{s.task_description}</span>
+                        </div>
+                        <p className="text-white/80 pl-5">{s.suggestion}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Task list */}
           {loadingTasks ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
@@ -598,7 +883,14 @@ export default function WorkflowPage() {
               <ListTodo className="w-8 h-8 text-white/30 mx-auto mb-3" />
               <p className="text-muted-2 text-sm">
                 No tasks yet. Paste a transcript or email and hit{" "}
-                <strong className="text-white/70">Extract Tasks</strong>.
+                <strong className="text-white/70">Extract Tasks</strong>, or use{" "}
+                <strong className="text-white/70">+ Add Task</strong> above.
+              </p>
+            </div>
+          ) : filteredTasks.length === 0 ? (
+            <div className="border border-dashed border-white/15 rounded-2xl p-8 text-center bg-surface-2 backdrop-blur-sm">
+              <p className="text-muted-2 text-sm">
+                No {filterTab} tasks.
               </p>
             </div>
           ) : (

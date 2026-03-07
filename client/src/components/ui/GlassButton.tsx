@@ -17,7 +17,7 @@ export default function GlassButton({
 
   const styles: Record<Variant, string> = {
     primary:
-      "bg-white/10 hover:bg-white/[0.17] border border-white/20 text-white backdrop-blur-sm",
+      "bg-accent/20 hover:bg-accent/30 border border-accent/40 text-white backdrop-blur-sm hover:shadow-[0_0_16px_rgba(56,189,248,0.25)]",
     secondary:
       "bg-surface-2 hover:bg-surface-3 border border-border text-white/90",
     ghost: "bg-transparent hover:bg-white/[0.06] text-white/80",

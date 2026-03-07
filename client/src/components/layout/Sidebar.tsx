@@ -25,10 +25,10 @@ const NAV_ITEMS = [
 
 const PROJECT_NAV_ITEMS = (projectId: string) => [
   { href: `/dashboard/projects/${projectId}`, label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: `/dashboard/projects/${projectId}/learning`, label: "Learning", icon: BookOpen },
-  { href: `/dashboard/projects/${projectId}/developer`, label: "Developer", icon: Code2 },
-  { href: `/dashboard/projects/${projectId}/workflow`, label: "Workflow", icon: ListTodo },
-  { href: `/dashboard/projects/${projectId}/chat`, label: "Chat", icon: MessageSquare },
+  { href: `/dashboard/projects/${projectId}/learning`, label: "EasyLearn", icon: BookOpen },
+  { href: `/dashboard/projects/${projectId}/developer`, label: "EasyCode", icon: Code2 },
+  { href: `/dashboard/projects/${projectId}/workflow`, label: "EasyAutomate", icon: ListTodo },
+  { href: `/dashboard/projects/${projectId}/chat`, label: "Context Chat", icon: MessageSquare },
 ];
 
 interface SidebarProps {

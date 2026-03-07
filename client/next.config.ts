@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
       // All other backend routes
       { source: "/api/projects/:path*", destination: `${BACKEND}/api/projects/:path*` },
       { source: "/api/files/:path*",    destination: `${BACKEND}/api/files/:path*` },
+      { source: "/api/dashboard/:path*", destination: `${BACKEND}/api/dashboard/:path*` },
       { source: "/api/health",          destination: `${BACKEND}/api/health` },
     ];
   },

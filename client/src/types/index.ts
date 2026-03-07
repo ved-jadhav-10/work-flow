@@ -43,7 +43,7 @@ export interface ProjectUpdate {
 
 // ── Document ──────────────────────────────────────────────────────────────────
 
-export type SummaryLevel = "short" | "detailed" | "exam-ready";
+export type SummaryLevel = "short" | "detailed" | "comprehensive";
 
 export interface Document {
   id: string;

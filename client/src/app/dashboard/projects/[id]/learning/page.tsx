@@ -294,7 +294,7 @@ export default function LearningPage() {
               <h1
                 className="text-3xl font-semibold tracking-tight text-white"
               >
-                Knowledge Base
+                EasyLearn
               </h1>
               <p
                 className="text-sm text-gray-500 mt-0.5"
@@ -510,7 +510,7 @@ export default function LearningPage() {
                   {/* Level selector */}
                   <div className="flex items-center gap-2 mb-4">
                     {(
-                      ["short", "detailed", "exam-ready"] as SummaryLevel[]
+                      ["short", "detailed", "comprehensive"] as SummaryLevel[]
                     ).map((level) => (
                       <motion.button
                         key={level}
@@ -563,7 +563,7 @@ export default function LearningPage() {
                     )}
                     {summaryLoading
                       ? "Generating…"
-                      : "Generate Exam-Ready Notes"}
+                      : "Generate Smart Notes"}
                   </motion.button>
                 </PanelSection>
 

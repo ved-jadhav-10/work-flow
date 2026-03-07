@@ -493,17 +493,17 @@ const MODULE_META: Record<
   { label: string; icon: ReactElement; color: string }
 > = {
   learning: {
-    label: "Learning",
+    label: "EasyLearn",
     icon: <BookOpen className="w-3 h-3" />,
     color: "text-blue-400 border-blue-800 bg-blue-950/40",
   },
   developer: {
-    label: "Developer",
+    label: "EasyCode",
     icon: <Code2 className="w-3 h-3" />,
     color: "text-green-400 border-green-800 bg-green-950/40",
   },
   workflow: {
-    label: "Workflow",
+    label: "EasyAutomate",
     icon: <CheckSquare className="w-3 h-3" />,
     color: "text-amber-400 border-amber-800 bg-amber-950/40",
   },

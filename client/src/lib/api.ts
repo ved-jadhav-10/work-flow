@@ -173,10 +173,21 @@ export const workflowApi = {
   listTasks: (projectId: string) =>
     request(`/api/projects/${projectId}/tasks`),
 
-  extractTasks: (projectId: string, data: { text: string; source_type: "transcript" | "email" }) =>
+  extractTasks: (projectId: string, data: { text: string; source_type: "transcript" | "email" | "notes" }) =>
     request(`/api/projects/${projectId}/workflow/extract`, {
       method: "POST",
       body: JSON.stringify(data),
+    }),
+
+  createTask: (projectId: string, data: { description: string; priority: "high" | "medium" | "low" }) =>
+    request(`/api/projects/${projectId}/tasks`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  analyzeTasks: (projectId: string) =>
+    request(`/api/projects/${projectId}/workflow/analyze`, {
+      method: "POST",
     }),
 
   updateTask: (projectId: string, taskId: string, data: Record<string, unknown>) =>
@@ -206,4 +217,25 @@ export const chatApi = {
 
 export const healthApi = {
   check: () => fetch(`${API_BASE}/api/health`).then((r) => r.json()),
+};
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+export interface DashboardStats {
+  total_documents: number;
+  total_insights: number;
+  total_tasks: number;
+  total_chats: number;
+  recent_activity: {
+    id: string;
+    type: "document" | "insight" | "task" | "chat";
+    label: string;
+    project_id: string;
+    project_name: string;
+    created_at: string;
+  }[];
+}
+
+export const dashboardApi = {
+  stats: () => request<DashboardStats>("/api/dashboard/stats"),
 };

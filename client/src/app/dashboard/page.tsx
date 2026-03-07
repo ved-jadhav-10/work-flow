@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { projectsApi } from "@/lib/api";
+import { projectsApi, dashboardApi, type DashboardStats } from "@/lib/api";
 import DashboardLeftPanel from "@/components/layout/DashboardLeftPanel";
 import type { Project } from "@/types";
 
@@ -20,10 +20,6 @@ const CSS_KEYFRAMES = `
 @keyframes pulseGlow {
   0%,100% { box-shadow: 0 0 0px rgba(56,189,248,0); border-color: rgba(56,189,248,0.22); }
   50%      { box-shadow: 0 0 12px rgba(56,189,248,0.25); border-color: rgba(56,189,248,0.50); }
-}
-@keyframes pillGlow {
-  0%,100% { box-shadow: 0 0 6px rgba(255,215,0,0.15); }
-  50%      { box-shadow: 0 0 18px rgba(255,215,0,0.38); }
 }
 @keyframes barBloom {
   0%   { filter: brightness(1); }
@@ -81,71 +77,66 @@ function GradText({ children, className = "", from = "#FFD700", to = "#38BDF8" }
   );
 }
 
-const FILTERS = [
-  { key: "all",      label: "All Context"     },
-  { key: "learning", label: "Learning Docs"   },
-  { key: "code",     label: "Code Insights"   },
-  { key: "tasks",    label: "Automated Tasks" },
-];
-
-const MODULES = [
-  {
-    key: "learning",
-    icon: BookOpen,
-    label: "Learning Intelligence",
-    title: "Document Processing",
-    accent: "#38BDF8",
-    accentRgb: "56,189,248",
-    stats: [
-      { label: "PDFs indexed",       value: "—" },
-      { label: "Concepts extracted", value: "—" },
-    ],
-    badge: "RAG Ready",
-    desc: "Upload PDFs, extract concepts, generate summaries — all persisted to context.",
-  },
-  {
-    key: "developer",
-    icon: Code2,
-    label: "Developer Productivity",
-    title: "Code Analysis",
-    accent: "#FFD700",
-    accentRgb: "255,215,0",
-    stats: [
-      { label: "Bugs detected",     value: "—" },
-      { label: "READMEs generated", value: "—" },
-    ],
-    badge: "Drift Watch",
-    desc: "Deep code explanation, bug detection, and auto README — cross-referenced with docs.",
-  },
-  {
-    key: "workflow",
-    icon: ListTodo,
-    label: "Workflow Automation",
-    title: "Task Automation",
-    accent: "#a78bfa",
-    accentRgb: "167,139,250",
-    stats: [
-      { label: "Tasks extracted", value: "—" },
-      { label: "High priority",   value: "—" },
-    ],
-    badge: "Active",
-    desc: "Extract action items from transcripts and emails with priority classification.",
-  },
-  {
-    key: "chat",
-    icon: MessageSquare,
-    label: "Unified Context Chat",
-    title: "RAG Engine",
-    accent: "#34d399",
-    accentRgb: "52,211,153",
-    stats: [
-      { label: "Sources connected", value: "—" },
-      { label: "Queries handled",   value: "—" },
-    ],
-    badge: "Online",
-    desc: "Ask anything — the AI searches your full project context for grounded answers.",
-  },
-];
+function buildModules(stats: DashboardStats | null) {
+  return [
+    {
+      key: "learning",
+      icon: BookOpen,
+      label: "EasyLearn",
+      title: "Document Processing",
+      accent: "#38BDF8",
+      accentRgb: "56,189,248",
+      stats: [
+        { label: "PDFs indexed",       value: stats?.total_documents ?? 0 },
+        { label: "Concepts extracted", value: "—" },
+      ],
+      badge: "RAG Ready",
+      desc: "Upload PDFs, extract concepts, generate summaries — all persisted to context.",
+    },
+    {
+      key: "developer",
+      icon: Code2,
+      label: "EasyCode",
+      title: "Code Analysis",
+      accent: "#FFD700",
+      accentRgb: "255,215,0",
+      stats: [
+        { label: "Code insights",     value: stats?.total_insights ?? 0 },
+        { label: "Analyses run",      value: "—" },
+      ],
+      badge: "Drift Watch",
+      desc: "Deep code explanation, bug detection, and auto README — cross-referenced with docs.",
+    },
+    {
+      key: "workflow",
+      icon: ListTodo,
+      label: "EasyAutomate",
+      title: "Task Automation",
+      accent: "#a78bfa",
+      accentRgb: "167,139,250",
+      stats: [
+        { label: "Tasks extracted", value: stats?.total_tasks ?? 0 },
+        { label: "High priority",   value: "—" },
+      ],
+      badge: "Active",
+      desc: "Extract action items from transcripts and emails with priority classification.",
+    },
+    {
+      key: "chat",
+      icon: MessageSquare,
+      label: "Context Chat",
+      title: "RAG Engine",
+      accent: "#34d399",
+      accentRgb: "52,211,153",
+      stats: [
+        { label: "Queries handled",   value: stats?.total_chats ?? 0 },
+        { label: "Sources connected", value: (stats ? stats.total_documents + stats.total_insights + stats.total_tasks : 0) },
+      ],
+      badge: "Online",
+      desc: "Ask anything — the AI searches your full project context for grounded answers.",
+    },
+  ];
+}
 
 
 
@@ -158,7 +149,7 @@ export default function DashboardPage() {
   const [projects, setProjects]   = useState<Project[]>([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState("");
-  const [activeFilter, setFilter] = useState("all");
+  const [stats, setStats]         = useState<DashboardStats | null>(null);
   const scrollRef   = useRef<HTMLDivElement>(null);
   const [parallaxY, setParallaxY] = useState(0);
 
@@ -171,6 +162,10 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { loadProjects(); }, []);
+
+  useEffect(() => {
+    dashboardApi.stats().then(setStats).catch(() => {});
+  }, []);
 
   async function loadProjects() {
     try {
@@ -196,6 +191,8 @@ export default function DashboardPage() {
 
   const userName    = session?.user?.name ?? "You";
   const userInitial = userName[0]?.toUpperCase() ?? "U";
+
+  const MODULES = buildModules(stats);
 
   return (
     <>
@@ -271,27 +268,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* ── Filter pills ──────────────────────────────────────────── */}
-            <div className="flex items-center gap-2 flex-wrap pt-1">
-              {FILTERS.map(({ key, label }) => {
-                const active = activeFilter === key;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setFilter(key)}
-                    className="px-4 py-2 rounded-full text-[12px] font-semibold transition-all duration-200"
-                    style={
-                      active
-                        ? { background: "rgba(255,215,0,0.10)", border: "1px solid rgba(255,215,0,0.42)", color: "#FFD700", animation: "pillGlow 2.5s ease-in-out infinite" }
-                        : { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)", color: "rgba(148,163,184,0.75)", backdropFilter: "blur(12px)" }
-                    }
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-
             {error && (
               <div className="p-3 rounded-xl text-[12px]" style={{ background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.22)", color: "#fca5a5" }}>
                 {error}
@@ -312,8 +288,8 @@ export default function DashboardPage() {
                   <Glass
                     key={mod.key}
                     glow={mod.accent}
-                    className="p-6 flex flex-col gap-4 cursor-pointer group hover:scale-[1.012] transition-transform"
-                    style={{ animation: `floatY ${6 + idx}s ease-in-out infinite`, animationDelay: `${idx * 0.6}s` }}
+                    className="p-6 flex flex-col gap-4 group hover:scale-[1.005] transition-transform"
+                    style={{ animationDelay: `${idx * 0.6}s` }}
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between">

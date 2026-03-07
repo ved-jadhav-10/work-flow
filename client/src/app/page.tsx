@@ -10,6 +10,7 @@ import {
   Lock,
   GitBranch,
   Sparkles,
+  MessageSquare,
 } from "lucide-react";
 import AppBackground from "@/components/layout/AppBackground";
 
@@ -120,6 +121,7 @@ export default function LandingPage() {
             </span>
             <em
               style={{
+                fontFamily: "var(--font-playfair), serif",
                 fontStyle: "italic",
                 background: "linear-gradient(135deg, #d4aa70 0%, #f0d098 50%, #c49a5a 100%)",
                 WebkitBackgroundClip: "text",
@@ -234,7 +236,7 @@ export default function LandingPage() {
 
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-light text-white tracking-tight mb-3">
-            Three modules, one brain
+            Four modules, one brain
           </h2>
           <p className="text-white/60 text-sm">Each module shares the same persistent context</p>
         </div>
@@ -243,15 +245,15 @@ export default function LandingPage() {
           <FeatureRow
             icon={<BookOpen className="w-4 h-4" />}
             iconColor="#60a5fa"
-            label="Learning Intelligence"
+            label="EasyLearn"
             title="Turn documents into structured knowledge"
-            description="Upload PDFs, lecture notes, or any text. Generate exam-ready summaries, extract key concepts, and build step-by-step guides — all persisted to your project context."
-            bullets={["Short, detailed, or exam-ready summaries","Key concept extraction","Implementation step generation","RAG retrieval across all documents"]}
+            description="Upload PDFs, lecture notes, or any text. Generate smart summaries, extract key concepts, and build step-by-step guides — all persisted to your project context."
+            bullets={["Short, detailed, or comprehensive summaries","Key concept extraction","Implementation step generation","RAG retrieval across all documents"]}
           />
           <FeatureRow
             icon={<Code2 className="w-4 h-4" />}
             iconColor="#a389c8"
-            label="Developer Productivity"
+            label="EasyCode"
             title="Understand and improve your code"
             description="Paste any snippet for a full architectural breakdown, bug detection, and auto-generated README docs. Every insight is cross-referenced with your project documents."
             bullets={["Deep code explanation","Bug detection and fix suggestions","Automatic README generation","Code × document cross-context querying"]}
@@ -259,11 +261,76 @@ export default function LandingPage() {
           <FeatureRow
             icon={<ListTodo className="w-4 h-4" />}
             iconColor="#d4aa70"
-            label="Workflow Automation"
+            label="EasyAutomate"
             title="Extract tasks from any communication"
             description="Paste a meeting transcript or email thread and let AI extract action items with priority classification. Query tasks in the context-aware chat."
             bullets={["Transcript and email task extraction","Priority classification","Assignee and deadline hints","Task-aware AI advice"]}
           />
+        </div>
+      </section>
+
+      {/* ══ CONTEXT CHAT CALLOUT ══════════════════════════════════════════ */}
+      <section className="max-w-5xl mx-auto px-6 pb-28">
+        <div
+          className="relative rounded-3xl overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, rgba(10,18,38,0.92) 0%, rgba(8,20,40,0.92) 100%)",
+            border: "1px solid rgba(52,211,153,0.15)",
+            boxShadow: "0 0 60px rgba(52,211,153,0.05) inset",
+          }}
+        >
+          {/* Glow accent */}
+          <div
+            className="absolute -top-16 -left-16 w-48 h-48 rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.10) 0%, transparent 70%)" }}
+          />
+          <div
+            className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full pointer-events-none"
+            style={{ background: "radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%)" }}
+          />
+
+          <div className="relative z-10 flex flex-col sm:flex-row gap-10 items-center p-10 sm:p-14">
+            {/* Left — icon + text */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-5">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", boxShadow: "0 0 20px rgba(52,211,153,0.15)" }}
+                >
+                  <MessageSquare className="w-5 h-5" style={{ color: "#34d399" }} />
+                </div>
+                <span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{ color: "#34d399" }}>Context Chat</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-light text-white tracking-tight mb-4 leading-snug">
+                Ask anything — backed by<br className="hidden sm:block" /> your full project context
+              </h2>
+              <p className="text-white/60 text-[13px] leading-relaxed max-w-md">
+                Context Chat searches across all your documents, code insights, and tasks using RAG-powered retrieval
+                to give grounded, accurate answers. It even detects when your question drifts from the project scope.
+              </p>
+            </div>
+
+            {/* Right — key points */}
+            <div className="flex-1 w-full grid grid-cols-1 gap-2">
+              {[
+                "RAG-powered full-project search",
+                "Cross-module context aggregation",
+                "Smart drift detection warnings",
+                "Source citations in every answer",
+                "Module-aware query routing",
+                "Persistent chat history",
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl"
+                  style={{ background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.08)" }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#34d399", boxShadow: "0 0 6px rgba(52,211,153,0.45)" }} />
+                  <span className="text-[13px] text-white/80">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

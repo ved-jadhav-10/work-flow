@@ -20,7 +20,7 @@ from services.llm_service import LLMService, get_llm_service
 from services.prompts.learning_prompts import (
     SUMMARIZE_SHORT,
     SUMMARIZE_DETAILED,
-    SUMMARIZE_EXAM,
+    SUMMARIZE_COMPREHENSIVE,
     EXTRACT_CONCEPTS,
     IMPLEMENTATION_STEPS,
     STRICT_JSON_SUFFIX,
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 _SUMMARY_PROMPTS = {
     "short": SUMMARIZE_SHORT,
     "detailed": SUMMARIZE_DETAILED,
-    "exam-ready": SUMMARIZE_EXAM,
+    "comprehensive": SUMMARIZE_COMPREHENSIVE,
 }
 
 

@@ -17,6 +17,8 @@ from models.project import Project
 from models.task import Task
 from models.user import User
 from schemas.workflow import (
+    AnalyzeResponse,
+    CreateTaskRequest,
     ExtractTasksRequest,
     ExtractTasksResponse,
     TaskListResponse,
@@ -133,6 +135,68 @@ async def extract_tasks(
         extracted_count=len(saved_tasks),
         truncated=result["truncated"],
         source_type=result["source_type"],
+    )
+
+
+# ── POST /tasks (manual creation) ────────────────────────────────────────────
+
+@router.post("/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
+def create_task(
+    project_id: str,
+    body: CreateTaskRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a single task manually."""
+    project = _get_project_or_404(project_id, current_user, db)
+
+    task = Task(
+        project_id=project.id,
+        description=body.description.strip(),
+        priority=body.priority,
+        status="pending",
+        source_text=None,
+    )
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+    return TaskResponse.model_validate(task)
+
+
+# ── POST /workflow/analyze ────────────────────────────────────────────────────
+
+@router.post("/workflow/analyze", response_model=AnalyzeResponse)
+async def analyze_tasks_endpoint(
+    project_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    x_inference_mode: str = Header(default="cloud"),
+):
+    """AI-powered analysis: reprioritisation suggestions + practical tips."""
+    _get_project_or_404(project_id, current_user, db)
+
+    pending_tasks = (
+        db.query(Task)
+        .filter(Task.project_id == project_id, Task.status == "pending")
+        .order_by(Task.created_at.desc())
+        .all()
+    )
+    if not pending_tasks:
+        return AnalyzeResponse(reprioritizations=[], suggestions=[])
+
+    task_data = [
+        {"id": str(t.id), "priority": t.priority, "description": t.description}
+        for t in pending_tasks
+    ]
+
+    try:
+        result = await workflow_service.analyze_tasks(task_data, mode=x_inference_mode)
+    except Exception as exc:
+        raise _llm_error(exc)
+
+    return AnalyzeResponse(
+        reprioritizations=result.get("reprioritizations", []),
+        suggestions=result.get("suggestions", []),
     )
 
 

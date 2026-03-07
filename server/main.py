@@ -118,8 +118,10 @@ from routers import learning as learning_router
 from routers import developer as developer_router
 from routers import workflow as workflow_router
 from routers import chat as chat_router
+from routers import dashboard as dashboard_router
 
 app.include_router(auth_router.router, prefix="/api/auth", tags=["auth"])
+app.include_router(dashboard_router.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(projects_router.router, prefix="/api/projects", tags=["projects"])
 app.include_router(
     learning_router.router,

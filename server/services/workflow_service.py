@@ -11,7 +11,7 @@ import re
 from typing import Any
 
 from services.llm_service import get_llm_service
-from services.prompts.workflow_prompts import EXTRACT_TASKS, STRICT_JSON_SUFFIX
+from services.prompts.workflow_prompts import EXTRACT_TASKS, ANALYZE_TASKS, STRICT_JSON_SUFFIX
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +40,13 @@ def _parse_json_array(raw: str) -> list[dict[str, Any]]:
     data = json.loads(_clean_json(raw))
     if not isinstance(data, list):
         raise ValueError("Expected a JSON array from LLM")
+    return data
+
+
+def _parse_json_object(raw: str) -> dict[str, Any]:
+    data = json.loads(_clean_json(raw))
+    if not isinstance(data, dict):
+        raise ValueError("Expected a JSON object from LLM")
     return data
 
 
@@ -102,3 +109,39 @@ async def extract_tasks(text: str, source_type: str, mode: str = "cloud") -> dic
         truncated,
     )
     return {"tasks": tasks, "source_type": source_type, "truncated": truncated}
+
+
+async def analyze_tasks(
+    tasks: list[dict[str, Any]], mode: str = "cloud"
+) -> dict[str, Any]:
+    """
+    AI-powered analysis of existing tasks: reprioritisation
+    recommendations and practical suggestions.
+    """
+    if not tasks:
+        return {"reprioritizations": [], "suggestions": []}
+
+    task_lines = "\n".join(
+        f"- [{t['id']}] ({t['priority']}) {t['description']}"
+        for t in tasks
+    )
+    prompt = f"Here are the current pending tasks:\n\n{task_lines}"
+
+    llm = get_llm_service(mode)
+    text, provider, _ = await llm.generate(prompt, ANALYZE_TASKS)
+    try:
+        result = _parse_json_object(text)
+    except (json.JSONDecodeError, ValueError):
+        logger.warning("Malformed JSON from %s — retrying with strict suffix", provider)
+        text2, _, _ = await llm.generate(prompt, ANALYZE_TASKS + STRICT_JSON_SUFFIX)
+        result = _parse_json_object(text2)
+
+    logger.info(
+        "AI analysis: %d reprioritisations, %d suggestions",
+        len(result.get("reprioritizations", [])),
+        len(result.get("suggestions", [])),
+    )
+    return {
+        "reprioritizations": result.get("reprioritizations", []),
+        "suggestions": result.get("suggestions", []),
+    }

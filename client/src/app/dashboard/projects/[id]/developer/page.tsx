@@ -255,7 +255,7 @@ export default function DeveloperPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
         <Code2 className="w-6 h-6 text-accent" />
-        <h1 className="text-2xl font-bold">Developer Tools</h1>
+        <h1 className="text-2xl font-bold">EasyCode</h1>
       </div>
       <p className="text-muted text-sm mb-6">
         Paste code to get AI-powered explanations, debugging, and README generation.
@@ -328,7 +328,7 @@ export default function DeveloperPage() {
                 className="bg-surface-2 border border-border text-sm rounded-xl px-3 py-2 text-white/90 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
               >
                 {LANGUAGES.map((l) => (
-                  <option key={l} value={l}>
+                  <option key={l} value={l} className="bg-[#1a1a2e] text-white">
                     {l}
                   </option>
                 ))}
@@ -344,7 +344,7 @@ export default function DeveloperPage() {
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder={`Paste your ${language} code here…`}
+              placeholder="Paste your code here…"
               spellCheck={false}
               className="w-full h-72 bg-surface-2 border border-border rounded-2xl p-4 text-sm font-mono text-white/90 resize-y focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 placeholder:text-muted-2"
             />

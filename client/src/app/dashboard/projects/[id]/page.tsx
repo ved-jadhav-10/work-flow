@@ -120,28 +120,28 @@ export default function ProjectOverviewPage() {
   const QUICK_LINKS = [
     {
       href: `/dashboard/projects/${projectId}/learning`,
-      label: "Learning",
+      label: "EasyLearn",
       icon: FileText,
       count: project.document_count ?? 0,
       desc: "Documents & summaries",
     },
     {
       href: `/dashboard/projects/${projectId}/developer`,
-      label: "Developer",
+      label: "EasyCode",
       icon: Code2,
       count: project.insight_count ?? 0,
       desc: "Code insights",
     },
     {
       href: `/dashboard/projects/${projectId}/workflow`,
-      label: "Workflow",
+      label: "EasyAutomate",
       icon: ListTodo,
       count: project.task_count ?? 0,
       desc: "Tasks & actions",
     },
     {
       href: `/dashboard/projects/${projectId}/chat`,
-      label: "Chat",
+      label: "Context Chat",
       icon: MessageSquare,
       count: null,
       desc: "Context-aware AI chat",

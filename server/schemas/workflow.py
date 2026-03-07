@@ -13,7 +13,12 @@ from pydantic import BaseModel, Field, field_serializer
 
 class ExtractTasksRequest(BaseModel):
     text: str = Field(..., min_length=1)
-    source_type: Literal["transcript", "email"] = "transcript"
+    source_type: Literal["transcript", "email", "notes"] = "transcript"
+
+
+class CreateTaskRequest(BaseModel):
+    description: str = Field(..., min_length=1)
+    priority: Literal["high", "medium", "low"] = "medium"
 
 
 class TaskUpdate(BaseModel):
@@ -60,3 +65,21 @@ class TaskListResponse(BaseModel):
     total: int
     by_priority: dict[str, int]
     by_status: dict[str, int]
+
+
+class ReprioritizeSuggestion(BaseModel):
+    task_id: str
+    current_priority: str
+    suggested_priority: str
+    reason: str
+
+
+class PracticalSuggestion(BaseModel):
+    task_description: str
+    suggestion: str
+    type: Literal["breakdown", "dependency", "improvement"]
+
+
+class AnalyzeResponse(BaseModel):
+    reprioritizations: list[ReprioritizeSuggestion]
+    suggestions: list[PracticalSuggestion]

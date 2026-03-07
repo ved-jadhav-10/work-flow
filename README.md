@@ -34,7 +34,7 @@ Violations surface as inline warnings with severity levels and the exact constra
 
 ### Learning Module — PDF Intelligence
 Drag-and-drop PDF uploads with automatic text extraction (PyMuPDF), table extraction (pdfplumber), intelligent chunking, and vector embedding. AI-powered capabilities:
-- **Smart Summarisation** — Short, Detailed, or Exam-ready summaries
+- **Smart Summarisation** — Short, Detailed, or Comprehensive summaries
 - **Concept Extraction** — Key concepts with importance scores
 - **Implementation Steps** — Actionable next steps generated from document content
 

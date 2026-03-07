@@ -2,25 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  BookOpen, AlertTriangle, ListTodo, GitBranch, Bot,
-  TrendingUp, Database, Zap, Settings,
+  BookOpen, Code2, ListTodo, MessageSquare,
+  Settings, FileText, Clock,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { projectsApi } from "@/lib/api";
-
-/* ── Keyframes ─────────────────────────────────────────────────────────── */
-const CSS_KEYFRAMES = `
-@keyframes floatY {
-  0%,100% { transform: translateY(0px); }
-  50%      { transform: translateY(-5px); }
-}
-@keyframes barBloom {
-  0%   { filter: brightness(1); }
-  50%  { filter: brightness(1.35) saturate(1.4); }
-  100% { filter: brightness(1); }
-}
-`;
+import { projectsApi, dashboardApi, type DashboardStats } from "@/lib/api";
 
 /* ── Glass card helper ─────────────────────────────────────────────────── */
 function Glass({
@@ -51,43 +38,53 @@ function Glass({
   );
 }
 
-/* ── Static data ───────────────────────────────────────────────────────── */
-const CHART_WEEKS = ["W1", "W2", "W3", "W4", "W5", "W6", "W7"];
-const CHART_DATA = [
-  { docs: 30, code: 20, tasks: 15 },
-  { docs: 45, code: 30, tasks: 25 },
-  { docs: 40, code: 55, tasks: 30 },
-  { docs: 60, code: 45, tasks: 40 },
-  { docs: 50, code: 60, tasks: 50 },
-  { docs: 75, code: 50, tasks: 45 },
-  { docs: 65, code: 70, tasks: 60 },
-];
+/* ── Activity icon + color helper ──────────────────────────────────────── */
+const ACTIVITY_META: Record<string, { icon: React.ComponentType<any>; accent: string }> = {
+  document: { icon: BookOpen,       accent: "#38BDF8" },
+  insight:  { icon: Code2,          accent: "#FFD700" },
+  task:     { icon: ListTodo,       accent: "#a78bfa" },
+  chat:     { icon: MessageSquare,  accent: "#34d399" },
+};
 
-const RECENT_AI = [
-  { label: "Summarised 3 PDFs",             icon: BookOpen,      accent: "#38BDF8", time: "2h ago" },
-  { label: "Bug found in auth.py",           icon: AlertTriangle, accent: "#FFD700", time: "4h ago" },
-  { label: "7 tasks extracted from meeting", icon: ListTodo,      accent: "#a78bfa", time: "6h ago" },
-  { label: "README generated for API",       icon: GitBranch,     accent: "#FFD700", time: "1d ago" },
-  { label: "RAG query answered",             icon: Bot,           accent: "#34d399", time: "1d ago" },
-];
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
 
 /* ── Component ─────────────────────────────────────────────────────────── */
 export default function DashboardLeftPanel() {
   const { data: session } = useSession();
   const [projectCount, setProjectCount] = useState<number>(0);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     projectsApi.list()
       .then((data: any) => setProjectCount(data.projects?.length ?? 0))
+      .catch(() => {});
+
+    dashboardApi.stats()
+      .then(setStats)
       .catch(() => {});
   }, []);
 
   const userName    = session?.user?.name ?? "You";
   const userInitial = userName[0]?.toUpperCase() ?? "U";
 
+  const STAT_ITEMS = [
+    { icon: FileText,       label: "Documents",  value: stats?.total_documents ?? 0, color: "#38BDF8" },
+    { icon: Code2,          label: "Insights",    value: stats?.total_insights ?? 0,  color: "#FFD700" },
+    { icon: ListTodo,       label: "Tasks",       value: stats?.total_tasks ?? 0,     color: "#a78bfa" },
+    { icon: MessageSquare,  label: "Chats",       value: stats?.total_chats ?? 0,     color: "#34d399" },
+  ];
+
   return (
     <>
-      <style>{CSS_KEYFRAMES}</style>
       <div
         className="relative z-10 flex flex-col w-[300px] shrink-0 overflow-y-auto py-7 px-5 gap-5 border-r"
         style={{
@@ -97,7 +94,7 @@ export default function DashboardLeftPanel() {
           scrollbarWidth: "none",
         } as React.CSSProperties}
       >
-        {/* User card */}
+        {/* ── User card ───────────────────────────────────────────────── */}
         <Glass className="p-5 flex flex-col items-center text-center gap-3" glow="#FFD700">
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold shrink-0"
@@ -105,15 +102,12 @@ export default function DashboardLeftPanel() {
               background: "linear-gradient(135deg,#FFD700,#f59e0b)",
               color: "#060B19",
               boxShadow: "0 0 28px rgba(255,215,0,0.32)",
-              animation: "floatY 5s ease-in-out infinite",
             }}
           >
             {userInitial}
           </div>
           <div>
-            <p className="text-[14px] font-semibold text-white">
-              {userName}
-            </p>
+            <p className="text-[14px] font-semibold text-white">{userName}</p>
             <p className="text-[11px] truncate max-w-[200px]" style={{ color: "rgba(148,163,184,0.65)" }}>
               {session?.user?.email ?? ""}
             </p>
@@ -135,97 +129,86 @@ export default function DashboardLeftPanel() {
           </div>
         </Glass>
 
-        {/* Context Health chart */}
+        {/* ── Context Stats ───────────────────────────────────────────── */}
         <Glass className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[12px] font-semibold text-white">
-                Context Health
-              </p>
-              <p className="text-[10px] mt-0.5" style={{ color: "rgba(148,163,184,0.60)" }}>Data ingestion this week</p>
-            </div>
-            <TrendingUp className="w-4 h-4" style={{ color: "#38BDF8" }} />
-          </div>
-          <div className="flex items-end gap-1.5 h-[80px] mb-2">
-            {CHART_DATA.map((d, i) => (
-              <div key={i} className="flex-1 flex flex-col justify-end gap-0.5">
-                <div
-                  className="w-full rounded-sm"
-                  style={{
-                    height: `${d.docs * 0.5}px`,
-                    background: "linear-gradient(to top,rgba(56,189,248,0.4),rgba(56,189,248,0.75))",
-                    boxShadow: i === 6 ? "0 0 10px rgba(56,189,248,0.45)" : "none",
-                    animation: i === 6 ? "barBloom 2.5s ease infinite" : "none",
-                  }}
-                />
-                <div className="w-full rounded-sm" style={{ height: `${d.code * 0.3}px`, background: "linear-gradient(to top,rgba(255,215,0,0.35),rgba(255,215,0,0.65))" }} />
-                <div className="w-full rounded-sm" style={{ height: `${d.tasks * 0.25}px`, background: "linear-gradient(to top,rgba(167,139,250,0.35),rgba(167,139,250,0.60))" }} />
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-1.5">
-            {CHART_WEEKS.map((w) => (
-              <p key={w} className="flex-1 text-center text-[9px]" style={{ color: "rgba(148,163,184,0.40)" }}>{w}</p>
-            ))}
-          </div>
-          <div className="flex items-center gap-3 mt-3">
-            {[
-              { color: "rgba(56,189,248,0.75)",  label: "Docs"  },
-              { color: "rgba(255,215,0,0.65)",   label: "Code"  },
-              { color: "rgba(167,139,250,0.65)", label: "Tasks" },
-            ].map(({ color, label }) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-sm shrink-0" style={{ background: color }} />
-                <span className="text-[10px]" style={{ color: "rgba(148,163,184,0.60)" }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </Glass>
-
-        {/* Recent AI Decisions */}
-        <Glass className="p-5 flex flex-col gap-0.5">
-          <p className="text-[12px] font-semibold text-white mb-3">
-            Recent AI Decisions
-          </p>
-          {RECENT_AI.map(({ label, icon: Icon, accent, time }) => (
-            <div
-              key={label}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all hover:bg-white/[0.03]"
-            >
+          <p className="text-[12px] font-semibold text-white mb-4">Context Overview</p>
+          <div className="grid grid-cols-2 gap-3">
+            {STAT_ITEMS.map(({ icon: Icon, label, value, color }) => (
               <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: `${accent}14`, border: `1px solid ${accent}28`, boxShadow: `0 0 8px ${accent}18` }}
+                key={label}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5"
+                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
               >
-                <Icon className="w-3.5 h-3.5" style={{ color: accent }} />
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: `${color}14`, border: `1px solid ${color}28` }}
+                >
+                  <Icon className="w-3.5 h-3.5" style={{ color }} />
+                </div>
+                <div>
+                  <p className="text-[15px] font-bold text-white leading-none">{value}</p>
+                  <p className="text-[9px] mt-0.5" style={{ color: "rgba(148,163,184,0.55)" }}>{label}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-medium text-white truncate">{label}</p>
-                <p className="text-[10px]" style={{ color: "rgba(148,163,184,0.48)" }}>{time}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </Glass>
 
-        {/* Quick actions */}
-        <Glass className="p-4 flex items-center justify-around">
-          {[
-            { icon: Database, label: "Context",   color: "#38BDF8",             href: undefined },
-            { icon: Zap,      label: "Inference",  color: "#FFD700",             href: undefined },
-            { icon: Settings, label: "Settings",   color: "rgba(148,163,184,0.70)", href: "/dashboard/settings" },
-          ].map(({ icon: Icon, label, color, href }) => {
-            const el = (
-              <div key={label} className="flex flex-col items-center gap-1.5 cursor-pointer group">
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center transition-all group-hover:scale-110"
-                  style={{ background: `${color}12`, border: `1px solid ${color}28` }}
-                >
-                  <Icon className="w-4 h-4" style={{ color }} />
-                </div>
-                <span className="text-[10px]" style={{ color: "rgba(148,163,184,0.60)" }}>{label}</span>
-              </div>
-            );
-            return href ? <Link key={label} href={href}>{el}</Link> : el;
-          })}
+        {/* ── Recent Activity ─────────────────────────────────────────── */}
+        <Glass className="p-5 flex flex-col gap-0.5 flex-1 min-h-0">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-3.5 h-3.5" style={{ color: "rgba(148,163,184,0.55)" }} />
+            <p className="text-[12px] font-semibold text-white">Recent Activity</p>
+          </div>
+          {!stats || stats.recent_activity.length === 0 ? (
+            <p className="text-[11px] text-center py-6" style={{ color: "rgba(148,163,184,0.45)" }}>
+              No activity yet — start by creating a project.
+            </p>
+          ) : (
+            <div className="space-y-0.5 overflow-y-auto" style={{ scrollbarWidth: "none" } as React.CSSProperties}>
+              {stats.recent_activity.map((item) => {
+                const meta = ACTIVITY_META[item.type] ?? ACTIVITY_META.document;
+                const Icon = meta.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    href={`/dashboard/projects/${item.project_id}`}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/[0.03]"
+                  >
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                      style={{
+                        background: `${meta.accent}14`,
+                        border: `1px solid ${meta.accent}28`,
+                        boxShadow: `0 0 8px ${meta.accent}18`,
+                      }}
+                    >
+                      <Icon className="w-3.5 h-3.5" style={{ color: meta.accent }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-medium text-white truncate">{item.label}</p>
+                      <p className="text-[9px] truncate" style={{ color: "rgba(148,163,184,0.48)" }}>
+                        {item.project_name} · {timeAgo(item.created_at)}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </Glass>
+
+        {/* ── Quick actions ───────────────────────────────────────────── */}
+        <Glass className="p-4 flex items-center justify-center">
+          <Link href="/dashboard/settings" className="flex flex-col items-center gap-1.5 cursor-pointer group">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all group-hover:scale-110"
+              style={{ background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.18)" }}
+            >
+              <Settings className="w-4 h-4" style={{ color: "rgba(148,163,184,0.70)" }} />
+            </div>
+            <span className="text-[10px]" style={{ color: "rgba(148,163,184,0.60)" }}>Settings</span>
+          </Link>
         </Glass>
       </div>
     </>
