@@ -27,6 +27,7 @@ from schemas.workflow import (
 )
 from services import workflow_service
 from services.context_engine import update_context
+from routers.projects import cache_invalidate
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +119,7 @@ async def extract_tasks(
     db.commit()
     for t in saved_tasks:
         db.refresh(t)
-
-    # Feed context engine with task summary
+    cache_invalidate(str(project.id))
     try:
         task_preview = "; ".join(t.description for t in saved_tasks[:5])
         await update_context(
@@ -160,6 +160,7 @@ def create_task(
     db.add(task)
     db.commit()
     db.refresh(task)
+    cache_invalidate(project_id)
     return TaskResponse.model_validate(task)
 
 
@@ -264,6 +265,7 @@ def update_task(
 
     db.commit()
     db.refresh(task)
+    cache_invalidate(project_id)
     return TaskResponse.model_validate(task)
 
 
@@ -281,3 +283,4 @@ def delete_task(
     task = _get_task_or_404(task_id, project_id, db)
     db.delete(task)
     db.commit()
+    cache_invalidate(project_id)

@@ -5,13 +5,12 @@ meeting transcripts and email threads.
 
 from __future__ import annotations
 
-import json
 import logging
-import re
 from typing import Any
 
 from services.llm_service import get_llm_service
 from services.prompts.workflow_prompts import EXTRACT_TASKS, ANALYZE_TASKS, STRICT_JSON_SUFFIX
+from services.utils import parse_json_array, parse_json_object
 
 logger = logging.getLogger(__name__)
 
@@ -29,37 +28,16 @@ def _truncate_text(text: str) -> tuple[str, bool]:
     return truncated, True
 
 
-def _clean_json(raw: str) -> str:
-    raw = raw.strip()
-    raw = re.sub(r"^```(?:json)?\s*", "", raw)
-    raw = re.sub(r"\s*```$", "", raw)
-    return raw.strip()
-
-
-def _parse_json_array(raw: str) -> list[dict[str, Any]]:
-    data = json.loads(_clean_json(raw))
-    if not isinstance(data, list):
-        raise ValueError("Expected a JSON array from LLM")
-    return data
-
-
-def _parse_json_object(raw: str) -> dict[str, Any]:
-    data = json.loads(_clean_json(raw))
-    if not isinstance(data, dict):
-        raise ValueError("Expected a JSON object from LLM")
-    return data
-
-
 async def _llm_json_array(prompt: str, system_prompt: str, mode: str = "cloud") -> list[dict[str, Any]]:
     """Call LLM, parse JSON array. Retry once on malformed JSON."""
     llm = get_llm_service(mode)
     text, provider, _ = await llm.generate(prompt, system_prompt)
     try:
-        return _parse_json_array(text)
-    except (json.JSONDecodeError, ValueError):
+        return parse_json_array(text)
+    except (ValueError, Exception):
         logger.warning("Malformed JSON from %s — retrying with strict suffix", provider)
         text2, _, _ = await llm.generate(prompt, system_prompt + STRICT_JSON_SUFFIX)
-        return _parse_json_array(text2)
+        return parse_json_array(text2)
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
@@ -130,11 +108,11 @@ async def analyze_tasks(
     llm = get_llm_service(mode)
     text, provider, _ = await llm.generate(prompt, ANALYZE_TASKS)
     try:
-        result = _parse_json_object(text)
-    except (json.JSONDecodeError, ValueError):
+        result = parse_json_object(text)
+    except (ValueError, Exception):
         logger.warning("Malformed JSON from %s — retrying with strict suffix", provider)
         text2, _, _ = await llm.generate(prompt, ANALYZE_TASKS + STRICT_JSON_SUFFIX)
-        result = _parse_json_object(text2)
+        result = parse_json_object(text2)
 
     logger.info(
         "AI analysis: %d reprioritisations, %d suggestions",

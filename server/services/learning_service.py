@@ -11,9 +11,7 @@ Every function:
 
 from __future__ import annotations
 
-import json
 import logging
-import re
 from typing import Any
 
 from services.llm_service import LLMService, get_llm_service
@@ -25,6 +23,7 @@ from services.prompts.learning_prompts import (
     IMPLEMENTATION_STEPS,
     STRICT_JSON_SUFFIX,
 )
+from services.utils import clean_json, parse_json_object
 
 logger = logging.getLogger(__name__)
 
@@ -37,19 +36,6 @@ _SUMMARY_PROMPTS = {
 
 # ── JSON helpers ──────────────────────────────────────────────────────────────
 
-def _clean_json(raw: str) -> str:
-    """Strip markdown code fences and leading/trailing whitespace."""
-    raw = raw.strip()
-    # Remove ```json ... ``` wrapping
-    raw = re.sub(r"^```(?:json)?\s*", "", raw)
-    raw = re.sub(r"\s*```$", "", raw)
-    return raw.strip()
-
-
-def _parse_json(raw: str) -> dict[str, Any]:
-    return json.loads(_clean_json(raw))
-
-
 async def _llm_json(
     llm: LLMService,
     prompt: str,
@@ -58,14 +44,14 @@ async def _llm_json(
     """Call LLM, parse JSON. On failure, retry once with stricter instructions."""
     text, provider, latency = await llm.generate(prompt, system_prompt)
     try:
-        return _parse_json(text)
-    except json.JSONDecodeError:
+        return parse_json_object(text)
+    except (ValueError, Exception):
         logger.warning("Malformed JSON from %s — retrying with strict suffix", provider)
         text2, provider2, latency2 = await llm.generate(
             prompt,
             system_prompt + STRICT_JSON_SUFFIX,
         )
-        return _parse_json(text2)  # let it raise if still bad
+        return parse_json_object(text2)  # let it raise if still bad
 
 
 # ── Public API ────────────────────────────────────────────────────────────────

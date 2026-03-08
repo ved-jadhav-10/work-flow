@@ -20,6 +20,10 @@ google-genai>=1.0.0
 groq==0.11.0
 httpx==0.27.2
 
+# Optional AI providers (install if you want additional fallbacks):
+# openai>=1.12.0        # For GPT models
+# anthropic>=0.18.0     # For Claude models
+
 # ── File storage & PDF processing ─────────────────────────────────────────────
 appwrite==15.2.0
 pymupdf==1.26.7

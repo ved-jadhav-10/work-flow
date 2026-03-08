@@ -17,14 +17,14 @@ import {
   Lock,
 } from "lucide-react";
 
-const INFERENCE_MODE_KEY = "inference_mode";
+import { INFERENCE_MODE_KEY } from "@/lib/inference";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Projects", icon: LayoutDashboard, exact: true },
 ];
 
 const PROJECT_NAV_ITEMS = (projectId: string) => [
-  { href: `/dashboard/projects/${projectId}`, label: "Overview", icon: LayoutDashboard, exact: true },
+  { href: `/dashboard/projects/${projectId}/overview`, label: "Overview", icon: LayoutDashboard, exact: true },
   { href: `/dashboard/projects/${projectId}/learning`, label: "EasyLearn", icon: BookOpen },
   { href: `/dashboard/projects/${projectId}/developer`, label: "EasyCode", icon: Code2 },
   { href: `/dashboard/projects/${projectId}/workflow`, label: "EasyAutomate", icon: ListTodo },
@@ -90,7 +90,7 @@ export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
             className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
               isActive(item.href, item.exact)
                 ? "text-white"
-                : "border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]"
+                : "border-transparent text-white/60 hover:text-white hover:bg-white/4"
             }`}
             style={
               isActive(item.href, item.exact)
@@ -118,7 +118,7 @@ export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
                 className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
                   isActive(item.href, item.exact)
                     ? "text-white"
-                    : "border-transparent text-white/60 hover:text-white hover:bg-white/[0.04]"
+                    : "border-transparent text-white/60 hover:text-white hover:bg-white/4"
                 }`}
                 style={
                   isActive(item.href, item.exact)
@@ -145,14 +145,14 @@ export default function Sidebar({ projectId: propProjectId }: SidebarProps) {
         )}
         <Link
           href="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.05] transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors"
         >
           <Settings className="w-4 h-4" />
           Settings
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.05] transition-colors"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Sign Out

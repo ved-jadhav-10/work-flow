@@ -14,6 +14,16 @@ from typing import Optional
 
 import httpx
 
+try:
+    from google.genai.errors import ClientError as GeminiClientError
+except ImportError:
+    GeminiClientError = None  # type: ignore[assignment,misc]
+
+try:
+    from groq import APIStatusError as GroqAPIStatusError
+except ImportError:
+    GroqAPIStatusError = None  # type: ignore[assignment,misc]
+
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -105,6 +115,53 @@ class GroqProvider(LLMProvider):
         return response.choices[0].message.content or ""
 
 
+# ── OpenRouter ────────────────────────────────────────────────────────────────
+
+class OpenRouterProvider(LLMProvider):
+    name = "openrouter"
+
+    def __init__(self, api_key: str, model: str = "meta-llama/llama-3-8b-instruct"):
+        self.api_key = api_key
+        self.model = model
+        self._key_set = bool(api_key)
+
+    async def generate(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.3,
+        max_tokens: int = 4096,
+    ) -> str:
+        logger.debug("OpenRouter: calling model=%s key_set=%s prompt_len=%d", self.model, self._key_set, len(prompt))
+        messages: list[dict] = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://workflow-app.local",  # Required by OpenRouter
+                    "X-Title": "WorkFlow App",  # Optional but recommended
+                },
+                json={
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                },
+            )
+            if response.status_code != 200:
+                error_text = response.text
+                logger.error(f"OpenRouter error: {response.status_code} - {error_text}")
+            response.raise_for_status()
+            data = response.json()
+            return data["choices"][0]["message"]["content"] or ""
+
+
 # ── Ollama (local) ────────────────────────────────────────────────────────────
 
 class OllamaProvider(LLMProvider):
@@ -138,11 +195,17 @@ class OllamaProvider(LLMProvider):
 # ── Orchestrator ──────────────────────────────────────────────────────────────
 
 class LLMService:
-    """Try primary provider, fall back on 429 / timeout / connection error."""
+    """Try primary provider, fall back through a chain of providers on errors."""
 
-    def __init__(self, primary: LLMProvider, fallback: Optional[LLMProvider] = None):
+    def __init__(self, primary: LLMProvider, fallback: Optional[LLMProvider] = None, fallbacks: Optional[list[LLMProvider]] = None):
         self.primary = primary
-        self.fallback = fallback
+        # Support both single fallback (backward compatibility) and multiple fallbacks
+        if fallbacks:
+            self.providers = [primary] + fallbacks
+        elif fallback:
+            self.providers = [primary, fallback]
+        else:
+            self.providers = [primary]
 
     async def generate(
         self,
@@ -153,7 +216,7 @@ class LLMService:
     ) -> tuple[str, str, float]:
         """Return (text, provider_name, latency_ms)."""
         errors: list[str] = []
-        for provider in [self.primary, self.fallback]:
+        for provider in self.providers:
             if provider is None:
                 continue
             start = time.perf_counter()
@@ -172,10 +235,8 @@ class LLMService:
                 errors.append(detail)
                 logger.warning("LLM FAIL %s — trying fallback", detail)
             except Exception as exc:
-                # Lazily resolve provider-specific error types
-                from google.genai.errors import ClientError as GeminiClientError
-                from groq import APIStatusError as GroqAPIStatusError
-                api_errors = (httpx.HTTPStatusError, GroqAPIStatusError, GeminiClientError)
+                _available = [t for t in (httpx.HTTPStatusError, GroqAPIStatusError, GeminiClientError) if t is not None]
+                api_errors = tuple(_available)
                 if isinstance(exc, api_errors):
                     status = getattr(exc, "status_code", None) or getattr(getattr(exc, "response", None), "status_code", None)
                     detail = f"provider={provider.name} status={status} error={exc}"
@@ -198,9 +259,9 @@ class LLMService:
 def get_llm_service(mode: str = "cloud") -> LLMService:
     """
     mode:
-      "cloud"  → Gemini primary, Groq fallback
+      "cloud"  → Gemini primary, Groq → OpenRouter fallback chain
       "local"  → Ollama only
-      "groq"   → Groq primary, Gemini fallback
+      "groq"   → Groq primary, Gemini → OpenRouter fallback chain
     """
     logger.info("Creating LLM service: mode=%s", mode)
 
@@ -208,17 +269,20 @@ def get_llm_service(mode: str = "cloud") -> LLMService:
         logger.warning("GEMINI_API_KEY is empty or not set")
     if not settings.groq_api_key:
         logger.warning("GROQ_API_KEY is empty or not set")
+    if not settings.openrouter_api_key:
+        logger.warning("OPENROUTER_API_KEY is empty or not set")
 
     gemini = GeminiProvider(api_key=settings.gemini_api_key)
     groq = GroqProvider(api_key=settings.groq_api_key)
+    openrouter = OpenRouterProvider(api_key=settings.openrouter_api_key)
     ollama = OllamaProvider(base_url=settings.ollama_base_url, model=settings.ollama_model)
 
     if mode == "local":
         logger.info("LLM mode=local → Ollama (model=%s, url=%s)", settings.ollama_model, settings.ollama_base_url)
         return LLMService(primary=ollama)
     elif mode == "groq":
-        logger.info("LLM mode=groq → Groq primary, Gemini fallback")
-        return LLMService(primary=groq, fallback=gemini)
+        logger.info("LLM mode=groq → Groq primary, Gemini → OpenRouter fallback chain")
+        return LLMService(primary=groq, fallbacks=[gemini, openrouter])
     else:  # "cloud" (default)
-        logger.info("LLM mode=cloud → Gemini primary, Groq fallback")
-        return LLMService(primary=gemini, fallback=groq)
+        logger.info("LLM mode=cloud → Gemini primary, Groq → OpenRouter fallback chain")
+        return LLMService(primary=gemini, fallbacks=[groq, openrouter])

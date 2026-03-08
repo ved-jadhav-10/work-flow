@@ -3,10 +3,11 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 
 const API_URL = process.env.BACKEND_URL || "http://localhost:8000";
-const AUTH_SECRET =
-  process.env.AUTH_SECRET ||
-  process.env.NEXTAUTH_SECRET ||
-  "dev-insecure-secret-change-me";
+
+if (!process.env.AUTH_SECRET && !process.env.NEXTAUTH_SECRET) {
+  throw new Error("AUTH_SECRET or NEXTAUTH_SECRET must be set");
+}
+const AUTH_SECRET = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET!;
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: AUTH_SECRET,

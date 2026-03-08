@@ -18,7 +18,7 @@ class ConceptItem(BaseModel):
 # ── Requests ──────────────────────────────────────────────────────────────────
 
 class SummarizeRequest(BaseModel):
-    level: str = Field(..., pattern="^(short|detailed|exam-ready)$")
+    level: str = Field(..., pattern="^(short|detailed|comprehensive)$")
 
 
 # ── Responses ─────────────────────────────────────────────────────────────────

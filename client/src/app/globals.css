@@ -74,3 +74,25 @@ body {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-6px); }
 }
+
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0px rgba(56,189,248,0); border-color: rgba(56,189,248,0.22); }
+  50%      { box-shadow: 0 0 12px rgba(56,189,248,0.25); border-color: rgba(56,189,248,0.50); }
+}
+
+@keyframes barBloom {
+  0%   { filter: brightness(1); }
+  50%  { filter: brightness(1.35) saturate(1.4); }
+  100% { filter: brightness(1); }
+}
+
+@keyframes floatY {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-5px); }
+}
+
+@keyframes starSpin {
+  from { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  to   { transform: rotate(360deg) scale(1); }
+}

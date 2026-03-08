@@ -8,11 +8,11 @@ services:
     runtime: docker
     dockerfilePath: ./server/Dockerfile
     dockerContext: ./server
-    plan: free          # change to starter/standard for production
+    plan: free # change to starter/standard for production
     envVars:
       # ── Database ───────────────────────────────────────────────────────
       - key: DATABASE_URL
-        sync: false     # set manually in Render dashboard
+        sync: false # set manually in Render dashboard
 
       # ── Appwrite ───────────────────────────────────────────────────────
       - key: APPWRITE_ENDPOINT
@@ -29,10 +29,12 @@ services:
         sync: false
       - key: GROQ_API_KEY
         sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
 
       # ── Auth ───────────────────────────────────────────────────────────
       - key: JWT_SECRET
-        generateValue: true   # Render auto-generates a secure random string
+        generateValue: true # Render auto-generates a secure random string
 
       # ── CORS — add your production frontend URL here ───────────────────
       - key: BACKEND_CORS_ORIGINS

@@ -31,10 +31,9 @@ Rules:
 - Extract between 0 and 20 tasks maximum."""
 
 
-STRICT_JSON_SUFFIX = """
-
-IMPORTANT: Your previous response was not valid JSON. 
-Output ONLY the raw JSON array — no markdown, no code fences, no explanation."""
+# ── Retry wrapper ──────────────────────────────────────────────────────────────
+# Imported from services.prompts — kept here for backward compatibility
+from services.prompts import STRICT_JSON_SUFFIX  # noqa: F401
 
 
 # ── AI Task Analysis (Reprioritise + Suggestions) ────────────────────────────

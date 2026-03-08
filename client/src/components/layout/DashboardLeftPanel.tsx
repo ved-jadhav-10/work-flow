@@ -76,13 +76,6 @@ export default function DashboardLeftPanel() {
   const userName    = session?.user?.name ?? "You";
   const userInitial = userName[0]?.toUpperCase() ?? "U";
 
-  const STAT_ITEMS = [
-    { icon: FileText,       label: "Documents",  value: stats?.total_documents ?? 0, color: "#38BDF8" },
-    { icon: Code2,          label: "Insights",    value: stats?.total_insights ?? 0,  color: "#FFD700" },
-    { icon: ListTodo,       label: "Tasks",       value: stats?.total_tasks ?? 0,     color: "#a78bfa" },
-    { icon: MessageSquare,  label: "Chats",       value: stats?.total_chats ?? 0,     color: "#34d399" },
-  ];
-
   return (
     <>
       <div
@@ -129,43 +122,33 @@ export default function DashboardLeftPanel() {
           </div>
         </Glass>
 
-        {/* ── Context Stats ───────────────────────────────────────────── */}
-        <Glass className="p-5">
-          <p className="text-[12px] font-semibold text-white mb-4">Context Overview</p>
-          <div className="grid grid-cols-2 gap-3">
-            {STAT_ITEMS.map(({ icon: Icon, label, value, color }) => (
-              <div
-                key={label}
-                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5"
-                style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
+        {/* ── Recent Activity (Expanded) ──────────────────────────────── */}
+        <Glass className="p-5 flex flex-col gap-2 flex-1 min-h-0">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" style={{ color: "rgba(148,163,184,0.55)" }} />
+              <p className="text-[13px] font-semibold text-white">Recent Activity</p>
+            </div>
+            {stats?.recent_activity && stats.recent_activity.length > 0 && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: "rgba(56,189,248,0.15)", color: "#38BDF8" }}>
+                {stats.recent_activity.length}
+              </span>
+            )}
+          </div>
+          {!stats || !stats.recent_activity || stats.recent_activity.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <div 
+                className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                style={{ background: "rgba(148,163,184,0.08)", border: "1px solid rgba(148,163,184,0.12)" }}
               >
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: `${color}14`, border: `1px solid ${color}28` }}
-                >
-                  <Icon className="w-3.5 h-3.5" style={{ color }} />
-                </div>
-                <div>
-                  <p className="text-[15px] font-bold text-white leading-none">{value}</p>
-                  <p className="text-[9px] mt-0.5" style={{ color: "rgba(148,163,184,0.55)" }}>{label}</p>
-                </div>
+                <Clock className="w-6 h-6" style={{ color: "rgba(148,163,184,0.40)" }} />
               </div>
-            ))}
-          </div>
-        </Glass>
-
-        {/* ── Recent Activity ─────────────────────────────────────────── */}
-        <Glass className="p-5 flex flex-col gap-0.5 flex-1 min-h-0">
-          <div className="flex items-center gap-2 mb-3">
-            <Clock className="w-3.5 h-3.5" style={{ color: "rgba(148,163,184,0.55)" }} />
-            <p className="text-[12px] font-semibold text-white">Recent Activity</p>
-          </div>
-          {!stats || stats.recent_activity.length === 0 ? (
-            <p className="text-[11px] text-center py-6" style={{ color: "rgba(148,163,184,0.45)" }}>
-              No activity yet — start by creating a project.
-            </p>
+              <p className="text-[11px] text-center max-w-[200px]" style={{ color: "rgba(148,163,184,0.45)" }}>
+                No activity yet — start by creating a project and adding tasks, documents, or insights.
+              </p>
+            </div>
           ) : (
-            <div className="space-y-0.5 overflow-y-auto" style={{ scrollbarWidth: "none" } as React.CSSProperties}>
+            <div className="space-y-1 overflow-y-auto flex-1" style={{ scrollbarWidth: "none" } as React.CSSProperties}>
               {stats.recent_activity.map((item) => {
                 const meta = ACTIVITY_META[item.type] ?? ACTIVITY_META.document;
                 const Icon = meta.icon;
@@ -173,22 +156,25 @@ export default function DashboardLeftPanel() {
                   <Link
                     key={item.id}
                     href={`/dashboard/projects/${item.project_id}`}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all hover:bg-white/[0.03]"
+                    className="flex items-start gap-3 px-3 py-3 rounded-xl transition-all hover:bg-white/[0.04] border border-transparent hover:border-white/[0.08] group"
                   >
                     <div
-                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all group-hover:scale-110"
                       style={{
                         background: `${meta.accent}14`,
                         border: `1px solid ${meta.accent}28`,
                         boxShadow: `0 0 8px ${meta.accent}18`,
                       }}
                     >
-                      <Icon className="w-3.5 h-3.5" style={{ color: meta.accent }} />
+                      <Icon className="w-4 h-4" style={{ color: meta.accent }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium text-white truncate">{item.label}</p>
-                      <p className="text-[9px] truncate" style={{ color: "rgba(148,163,184,0.48)" }}>
-                        {item.project_name} · {timeAgo(item.created_at)}
+                      <p className="text-[11px] font-medium text-white leading-tight">{item.label}</p>
+                      <p className="text-[9px] mt-1 truncate" style={{ color: "rgba(148,163,184,0.55)" }}>
+                        {item.project_name}
+                      </p>
+                      <p className="text-[9px] mt-0.5" style={{ color: "rgba(148,163,184,0.40)" }}>
+                        {timeAgo(item.created_at)}
                       </p>
                     </div>
                   </Link>

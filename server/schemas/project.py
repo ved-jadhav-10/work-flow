@@ -38,6 +38,8 @@ class ProjectResponse(BaseModel):
     document_count: int = 0
     task_count: int = 0
     insight_count: int = 0
+    concept_count: int = 0
+    high_priority_task_count: int = 0
 
     @field_serializer("id", "user_id")
     def serialize_uuid(self, v: UUID) -> str:

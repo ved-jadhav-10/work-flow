@@ -31,6 +31,7 @@ from services.developer_service import parse_insight
 from services.context_engine import update_context
 from services import embedding_service
 from models.embedding import Embedding
+from routers.projects import cache_invalidate
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ async def explain_code(
     db.add(insight)
     db.commit()
     db.refresh(insight)
+    cache_invalidate(project_id)
 
     # Feed context engine + generate embeddings for code insight
     try:
@@ -165,6 +167,7 @@ async def debug_code(
     db.add(insight)
     db.commit()
     db.refresh(insight)
+    cache_invalidate(project_id)
 
     # Feed context engine + generate embeddings for debug insight
     try:
@@ -238,6 +241,7 @@ async def generate_readme(
     db.add(insight)
     db.commit()
     db.refresh(insight)
+    cache_invalidate(project_id)
 
     return ReadmeResponse(
         id=insight.id,
@@ -307,4 +311,5 @@ def delete_insight(
 
     db.delete(insight)
     db.commit()
+    cache_invalidate(project_id)
     logger.info("Deleted code insight %s from project %s", insight_id, project_id)

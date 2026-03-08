@@ -1,8 +1,9 @@
 """Project CRUD API router."""
 
+import time
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func as sql_func
+from sqlalchemy import func as sql_func, case, literal_column
 
 from database import get_db
 from models.project import Project
@@ -20,19 +21,66 @@ from middleware.auth import get_current_user
 
 router = APIRouter()
 
+# ── simple in-memory cache (project_id → (data_dict, expiry_ts)) ──────────────
+_PROJECT_CACHE: dict[str, tuple[dict, float]] = {}
+_CACHE_TTL = 30  # seconds
+
+
+def _cache_get(project_id: str) -> dict | None:
+    entry = _PROJECT_CACHE.get(str(project_id))
+    if entry and time.monotonic() < entry[1]:
+        return entry[0]
+    _PROJECT_CACHE.pop(str(project_id), None)
+    return None
+
+
+def _cache_set(project_id: str, data: dict) -> None:
+    _PROJECT_CACHE[str(project_id)] = (data, time.monotonic() + _CACHE_TTL)
+
+
+def cache_invalidate(project_id: str) -> None:
+    """Call this whenever a project or its child resources are mutated."""
+    _PROJECT_CACHE.pop(str(project_id), None)
+
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 def _enrich(project: Project, db: Session) -> dict:
-    """Add aggregate counts to a project before returning."""
-    doc_count = db.query(sql_func.count(Document.id)).filter(Document.project_id == project.id).scalar() or 0
-    task_count = db.query(sql_func.count(Task.id)).filter(Task.project_id == project.id).scalar() or 0
-    insight_count = db.query(sql_func.count(CodeInsight.id)).filter(CodeInsight.project_id == project.id).scalar() or 0
+    """Add aggregate counts to a project before returning (cached)."""
+    pid = str(project.id)
+    cached = _cache_get(pid)
+    if cached:
+        return cached
+
+    # Single query: all five counts in one round-trip using conditional aggregates
+    row = db.query(
+        sql_func.count(Document.id).label("document_count"),
+        sql_func.coalesce(
+            sql_func.sum(sql_func.jsonb_array_length(Document.key_concepts)), 0
+        ).label("concept_count"),
+    ).filter(Document.project_id == project.id).one()
+
+    task_row = db.query(
+        sql_func.count(Task.id).label("task_count"),
+        sql_func.sum(
+            case((Task.priority == "high", 1), else_=0)
+        ).label("high_priority_task_count"),
+    ).filter(Task.project_id == project.id).one()
+
+    insight_count = (
+        db.query(sql_func.count(CodeInsight.id))
+        .filter(CodeInsight.project_id == project.id)
+        .scalar() or 0
+    )
 
     data = {c.name: getattr(project, c.name) for c in project.__table__.columns}
-    data["document_count"] = doc_count
-    data["task_count"] = task_count
+    data["document_count"] = row.document_count or 0
+    data["concept_count"] = int(row.concept_count or 0)
+    data["task_count"] = task_row.task_count or 0
+    data["high_priority_task_count"] = int(task_row.high_priority_task_count or 0)
     data["insight_count"] = insight_count
+
+    _cache_set(pid, data)
     return data
 
 
@@ -128,4 +176,5 @@ def delete_project(
     project = _get_project_or_404(project_id, current_user, db)
     db.delete(project)
     db.commit()
+    cache_invalidate(project_id)
     return None

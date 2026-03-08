@@ -7,6 +7,8 @@
  * to port 3000.  In production set NEXT_PUBLIC_API_URL to the backend URL.
  */
 
+import { INFERENCE_MODE_KEY, getInferenceMode } from "@/lib/inference";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 async function getBackendToken(): Promise<string | null> {
@@ -21,7 +23,7 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const token = await getBackendToken();
-  const inferenceMode = _getInferenceMode();
+  const inferenceMode = getInferenceMode() === "local" ? "local" : undefined;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -49,15 +51,6 @@ async function request<T>(
   return res.json();
 }
 
-// ── Inference mode ───────────────────────────────────────────────────────────
-// Reads from localStorage (set by Settings page). Falls back to 'cloud'.
-
-const INFERENCE_MODE_KEY = "inference_mode";
-
-function _getInferenceMode(): string | undefined {
-  if (typeof window === "undefined") return undefined;
-  return localStorage.getItem(INFERENCE_MODE_KEY) ?? undefined;
-}
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
@@ -68,21 +61,64 @@ export const authApi = {
   me: () => request("/api/auth/me"),
 };
 
+// ── Project response cache (stale-while-revalidate, 30 s TTL) ─────────────────
+// Keeps the last-known data so navigating back to a project is instant.
+const _projectCache = new Map<string, { data: unknown; expiresAt: number }>();
+const _CACHE_TTL_MS = 30_000;
+
+function _cacheGet<T>(key: string): T | undefined {
+  const entry = _projectCache.get(key);
+  if (entry && Date.now() < entry.expiresAt) return entry.data as T;
+  _projectCache.delete(key);
+  return undefined;
+}
+
+function _cacheSet(key: string, data: unknown): void {
+  _projectCache.set(key, { data, expiresAt: Date.now() + _CACHE_TTL_MS });
+}
+
+function _cacheDel(...keys: string[]): void {
+  keys.forEach((k) => _projectCache.delete(k));
+}
+
 // ── Projects ──────────────────────────────────────────────────────────────────
 
 export const projectsApi = {
-  list: () => request("/api/projects"),
+  list: async () => {
+    const key = "projects:list";
+    const hit = _cacheGet<unknown>(key);
+    if (hit) return hit;
+    const data = await request("/api/projects");
+    _cacheSet(key, data);
+    return data;
+  },
 
-  get: (id: string) => request(`/api/projects/${id}`),
+  get: async (id: string) => {
+    const key = `projects:${id}`;
+    const hit = _cacheGet<unknown>(key);
+    if (hit) return hit;
+    const data = await request(`/api/projects/${id}`);
+    _cacheSet(key, data);
+    return data;
+  },
 
-  create: (data: { name: string; goal: string; constraints: string[] }) =>
-    request("/api/projects", { method: "POST", body: JSON.stringify(data) }),
+  create: async (data: { name: string; goal: string; constraints: string[] }) => {
+    const result = await request("/api/projects", { method: "POST", body: JSON.stringify(data) });
+    _cacheDel("projects:list");
+    return result;
+  },
 
-  update: (id: string, data: Record<string, unknown>) =>
-    request(`/api/projects/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+  update: async (id: string, data: Record<string, unknown>) => {
+    const result = await request(`/api/projects/${id}`, { method: "PUT", body: JSON.stringify(data) });
+    _cacheDel(`projects:${id}`, "projects:list");
+    return result;
+  },
 
-  delete: (id: string) =>
-    request(`/api/projects/${id}`, { method: "DELETE" }),
+  delete: async (id: string) => {
+    const result = await request(`/api/projects/${id}`, { method: "DELETE" });
+    _cacheDel(`projects:${id}`, "projects:list");
+    return result;
+  },
 };
 
 // ── Learning ──────────────────────────────────────────────────────────────────
@@ -226,6 +262,8 @@ export interface DashboardStats {
   total_insights: number;
   total_tasks: number;
   total_chats: number;
+  total_concepts: number;
+  high_priority_tasks: number;
   recent_activity: {
     id: string;
     type: "document" | "insight" | "task" | "chat";

@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     # AI providers
     gemini_api_key: str
     groq_api_key: str
+    openrouter_api_key: str
 
     # Auth
     jwt_secret: str

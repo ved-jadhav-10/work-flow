@@ -1,107 +1,130 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
-  ArrowLeft,
-  Save,
-  Loader2,
-  Plus,
-  X,
-  FileText,
+  BookOpen,
   Code2,
   ListTodo,
   MessageSquare,
-  Brain,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { projectsApi } from "@/lib/api";
 import type { Project } from "@/types";
-import GlassCard from "@/components/ui/GlassCard";
-import GlassButton from "@/components/ui/GlassButton";
 
-export default function ProjectOverviewPage() {
+/* ─── inline Glass card ────────────────────────────────────────────────────── */
+function Glass({
+  children,
+  className = "",
+  glow,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  glow?: string;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border backdrop-blur-xl transition-all duration-300 ${className}`}
+      style={{
+        background: "rgba(6,11,25,0.52)",
+        borderColor: "rgba(255,255,255,0.10)",
+        boxShadow: glow
+          ? `0 0 18px ${glow}0d, inset 0 1px 0 rgba(255,255,255,0.10)`
+          : "inset 0 1px 0 rgba(255,255,255,0.10)",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ─── module definitions ───────────────────────────────────────────────────── */
+const MODULES = (projectId: string, project: Project) => [
+  {
+    key: "learning",
+    href: `/dashboard/projects/${projectId}/learning`,
+    icon: BookOpen,
+    label: "EasyLearn",
+    title: "Document Processing",
+    accent: "#38BDF8",
+    accentRgb: "56,189,248",
+    stats: [
+      { value: project.document_count ?? 0, label: "PDFs indexed" },
+      { value: project.concept_count ?? 0, label: "Topics extracted" },
+    ],
+    badge: "RAG Ready",
+    desc: "Upload PDFs, extract concepts, and generate summaries — all persisted to context.",
+  },
+  {
+    key: "developer",
+    href: `/dashboard/projects/${projectId}/developer`,
+    icon: Code2,
+    label: "EasyCode",
+    title: "Code Analysis",
+    accent: "#FFD700",
+    accentRgb: "255,215,0",
+    stats: [
+      { value: project.insight_count ?? 0, label: "Code insights" },
+      { value: project.insight_count ?? 0, label: "Analyses run" },
+    ],
+    badge: "Drift Watch",
+    desc: "Deep code explanation, bug detection, and auto README — cross-referenced with docs.",
+  },
+  {
+    key: "workflow",
+    href: `/dashboard/projects/${projectId}/workflow`,
+    icon: ListTodo,
+    label: "EasyAutomate",
+    title: "Task Automation",
+    accent: "#a78bfa",
+    accentRgb: "167,139,250",
+    stats: [
+      { value: project.task_count ?? 0, label: "Tasks extracted" },
+      { value: project.high_priority_task_count ?? 0, label: "High priority" },
+    ],
+    badge: "Active",
+    desc: "Extract action items from transcripts and emails with priority classification.",
+  },
+  {
+    key: "chat",
+    href: `/dashboard/projects/${projectId}/chat`,
+    icon: MessageSquare,
+    label: "Context Chat",
+    title: "RAG Engine",
+    accent: "#34d399",
+    accentRgb: "52,211,153",
+    stats: [
+      { value: (project.document_count ?? 0) + (project.insight_count ?? 0) + (project.task_count ?? 0), label: "Sources connected" },
+      { value: project.document_count ?? 0, label: "Documents loaded" },
+    ],
+    badge: "Online",
+    desc: "Ask anything — the AI searches your full project context for grounded answers.",
+  },
+];
+
+/* ─── page ─────────────────────────────────────────────────────────────────── */
+export default function ProjectHomePage() {
   const params = useParams();
-  const router = useRouter();
   const projectId = (params?.id ?? "") as string;
 
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Editable fields
-  const [name, setName] = useState("");
-  const [goal, setGoal] = useState("");
-  const [constraints, setConstraints] = useState<string[]>([]);
-  const [decisions, setDecisions] = useState<string[]>([]);
-  const [openQuestions, setOpenQuestions] = useState<string[]>([]);
-  const [constraintInput, setConstraintInput] = useState("");
-  const [decisionInput, setDecisionInput] = useState("");
-  const [questionInput, setQuestionInput] = useState("");
-
   useEffect(() => {
-    loadProject();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!projectId) return;
+    projectsApi
+      .get(projectId)
+      .then((data: any) => setProject(data))
+      .catch((err: any) => setError(err.message || "Failed to load project"))
+      .finally(() => setLoading(false));
   }, [projectId]);
-
-  async function loadProject() {
-    try {
-      setLoading(true);
-      const data: any = await projectsApi.get(projectId);
-      setProject(data);
-      setName(data.name);
-      setGoal(data.goal);
-      setConstraints(data.constraints ?? []);
-      setDecisions(data.decisions ?? []);
-      setOpenQuestions(data.open_questions ?? []);
-    } catch (err: any) {
-      setError(err.message || "Failed to load project");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSave() {
-    try {
-      setSaving(true);
-      setError("");
-      const updated: any = await projectsApi.update(projectId, {
-        name,
-        goal,
-        constraints,
-        decisions,
-        open_questions: openQuestions,
-      });
-      setProject(updated);
-    } catch (err: any) {
-      setError(err.message || "Failed to save");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function addItem(
-    list: string[],
-    setList: (v: string[]) => void,
-    input: string,
-    setInput: (v: string) => void
-  ) {
-    const trimmed = input.trim();
-    if (trimmed && !list.includes(trimmed)) {
-      setList([...list, trimmed]);
-      setInput("");
-    }
-  }
-
-  function removeItem(list: string[], setList: (v: string[]) => void, index: number) {
-    setList(list.filter((_, i) => i !== index));
-  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full p-8">
-        <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: "#38BDF8" }} />
       </div>
     );
   }
@@ -110,242 +133,110 @@ export default function ProjectOverviewPage() {
     return (
       <div className="p-8 text-white">
         <p className="text-red-400">{error || "Project not found"}</p>
-        <Link href="/dashboard" className="text-accent hover:underline text-sm mt-2 block">
+        <Link href="/dashboard" className="text-sm mt-2 block" style={{ color: "#38BDF8" }}>
           Back to Projects
         </Link>
       </div>
     );
   }
 
-  const QUICK_LINKS = [
-    {
-      href: `/dashboard/projects/${projectId}/learning`,
-      label: "EasyLearn",
-      icon: FileText,
-      count: project.document_count ?? 0,
-      desc: "Documents & summaries",
-    },
-    {
-      href: `/dashboard/projects/${projectId}/developer`,
-      label: "EasyCode",
-      icon: Code2,
-      count: project.insight_count ?? 0,
-      desc: "Code insights",
-    },
-    {
-      href: `/dashboard/projects/${projectId}/workflow`,
-      label: "EasyAutomate",
-      icon: ListTodo,
-      count: project.task_count ?? 0,
-      desc: "Tasks & actions",
-    },
-    {
-      href: `/dashboard/projects/${projectId}/chat`,
-      label: "Context Chat",
-      icon: MessageSquare,
-      count: null,
-      desc: "Context-aware AI chat",
-    },
-  ];
+  const modules = MODULES(projectId, project);
 
   return (
-    <div className="p-8 text-white max-w-3xl">
-      {/* Back */}
-      <Link
-        href="/dashboard"
-        className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        All Projects
-      </Link>
-
-      {error && (
-        <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
-          {error}
-        </div>
-      )}
-
-      {/* Title + save */}
-      <div className="flex items-start justify-between mb-8">
-        <div className="flex-1 mr-4">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full text-2xl font-bold bg-transparent border-b border-transparent hover:border-white/15 focus:border-accent/60 focus:outline-none pb-1 transition-colors"
-          />
-          <p className="text-muted-2 text-xs mt-2">
-            Created {new Date(project.created_at).toLocaleDateString()}
+    <div className="p-8 max-w-4xl w-full">
+      {/* Project header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-white truncate">{project.name}</h1>
+        {project.goal && (
+          <p className="text-[13px] mt-1.5 max-w-xl leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>
+            {project.goal}
           </p>
-        </div>
-        <GlassButton
-          onClick={handleSave}
-          disabled={saving}
-          variant="primary"
-          className="rounded-xl px-4 py-2"
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Save
-        </GlassButton>
+        )}
       </div>
 
-      {/* Quick links */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        {QUICK_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="bg-surface border border-border rounded-2xl p-4 hover:border-white/20 transition-colors backdrop-blur-sm"
-          >
-            <link.icon className="w-5 h-5 text-accent mb-2" />
-            <p className="text-sm font-medium">{link.label}</p>
-            <p className="text-xs text-muted-2">
-              {link.count !== null ? `${link.count} items` : link.desc}
-            </p>
+      {/* Section label */}
+      <p
+        className="text-[11px] font-semibold tracking-[0.16em] uppercase mb-5"
+        style={{
+          background: "linear-gradient(90deg,#FFD700,#38BDF8)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+        }}
+      >
+        Intelligence Modules
+      </p>
+
+      {/* 2×2 module grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {modules.map((mod) => (
+          <Link key={mod.key} href={mod.href} className="group block">
+            <Glass
+              glow={mod.accent}
+              className="p-6 flex flex-col gap-4 h-full group-hover:scale-[1.005] transition-transform"
+            >
+              {/* Header row */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: `rgba(${mod.accentRgb},0.10)`,
+                      border: `1px solid rgba(${mod.accentRgb},0.28)`,
+                      boxShadow: `0 0 14px rgba(${mod.accentRgb},0.18)`,
+                    }}
+                  >
+                    <mod.icon className="w-4 h-4" style={{ color: mod.accent }} />
+                  </div>
+                  <div>
+                    <p
+                      className="text-xs font-semibold tracking-widest uppercase opacity-90"
+                      style={{ color: mod.accent }}
+                    >
+                      {mod.label}
+                    </p>
+                    <h3 className="text-[14px] font-semibold leading-tight text-white">
+                      {mod.title}
+                    </h3>
+                  </div>
+                </div>
+                <span
+                  className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full shrink-0"
+                  style={{
+                    background: `rgba(${mod.accentRgb},0.12)`,
+                    border: `1px solid rgba(${mod.accentRgb},0.30)`,
+                    color: mod.accent,
+                    boxShadow: `0 0 8px rgba(${mod.accentRgb},0.20)`,
+                  }}
+                >
+                  {mod.badge}
+                </span>
+              </div>
+
+              {/* Stats */}
+              <div className="flex gap-6">
+                {mod.stats.map((s) => (
+                  <div key={s.label} className="flex flex-col gap-0.5">
+                    <p className="text-[22px] font-bold leading-none text-white">{s.value}</p>
+                    <p className="text-sm text-slate-400">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Description */}
+              <p className="text-[12px] leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>
+                {mod.desc}
+              </p>
+
+              {/* Hover shimmer */}
+              <div
+                className="h-px w-full rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: `linear-gradient(90deg,transparent,${mod.accent},transparent)` }}
+              />
+            </Glass>
           </Link>
         ))}
       </div>
-
-      {/* Context health bar */}
-      <GlassCard className="mb-8 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Brain className="w-4 h-4 text-accent" />
-          <h3 className="text-sm font-medium text-white/90">AI Context Health</h3>
-        </div>
-        <p className="text-xs text-muted mb-3">
-          Your AI assistant draws from all project data below to give context-aware answers.
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
-            <FileText className="w-4 h-4 text-accent mx-auto mb-1" />
-            <p className="text-lg font-semibold text-white">{project.document_count ?? 0}</p>
-            <p className="text-[10px] text-muted-2">Documents</p>
-          </div>
-          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
-            <Code2 className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-            <p className="text-lg font-semibold text-white">{project.insight_count ?? 0}</p>
-            <p className="text-[10px] text-muted-2">Code Insights</p>
-          </div>
-          <div className="text-center p-2 bg-surface-2 border border-border rounded-xl">
-            <ListTodo className="w-4 h-4 text-gold mx-auto mb-1" />
-            <p className="text-lg font-semibold text-white">{project.task_count ?? 0}</p>
-            <p className="text-[10px] text-muted-2">Tasks</p>
-          </div>
-        </div>
-        {((project.document_count ?? 0) + (project.insight_count ?? 0) + (project.task_count ?? 0)) === 0 && (
-          <p className="text-xs text-muted-2 mt-3 text-center">
-            Upload documents, analyze code, or extract tasks to enrich your AI context.
-          </p>
-        )}
-      </GlassCard>
-
-      {/* Goal */}
-      <section className="mb-6">
-        <label className="block text-sm font-medium text-gray-300 mb-2">Goal</label>
-        <textarea
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2.5 bg-surface-2 border border-border rounded-xl text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors resize-none"
-          placeholder="What is this project about?"
-        />
-      </section>
-
-      {/* Constraints */}
-      <TagSection
-        label="Constraints"
-        items={constraints}
-        input={constraintInput}
-        setInput={setConstraintInput}
-        onAdd={() => addItem(constraints, setConstraints, constraintInput, setConstraintInput)}
-        onRemove={(i) => removeItem(constraints, setConstraints, i)}
-        placeholder="Add constraint"
-      />
-
-      {/* Decisions */}
-      <TagSection
-        label="Decisions"
-        items={decisions}
-        input={decisionInput}
-        setInput={setDecisionInput}
-        onAdd={() => addItem(decisions, setDecisions, decisionInput, setDecisionInput)}
-        onRemove={(i) => removeItem(decisions, setDecisions, i)}
-        placeholder="Record a design decision"
-      />
-
-      {/* Open Questions */}
-      <TagSection
-        label="Open Questions"
-        items={openQuestions}
-        input={questionInput}
-        setInput={setQuestionInput}
-        onAdd={() => addItem(openQuestions, setOpenQuestions, questionInput, setQuestionInput)}
-        onRemove={(i) => removeItem(openQuestions, setOpenQuestions, i)}
-        placeholder="Add an unresolved question"
-      />
     </div>
-  );
-}
-
-// ── Reusable tag list section ────────────────────────────────────────────────
-
-function TagSection({
-  label,
-  items,
-  input,
-  setInput,
-  onAdd,
-  onRemove,
-  placeholder,
-}: {
-  label: string;
-  items: string[];
-  input: string;
-  setInput: (v: string) => void;
-  onAdd: () => void;
-  onRemove: (i: number) => void;
-  placeholder: string;
-}) {
-  return (
-    <section className="mb-6">
-      <label className="block text-sm font-medium text-gray-300 mb-2">{label}</label>
-      <div className="flex gap-2 mb-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              onAdd();
-            }
-          }}
-          placeholder={placeholder}
-          className="flex-1 px-4 py-2 bg-surface-2 border border-border rounded-xl text-white placeholder:text-muted-2 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20 transition-colors text-sm"
-        />
-        <button
-          type="button"
-          onClick={onAdd}
-          className="px-3 py-2 bg-surface-2 hover:bg-surface-3 border border-border rounded-xl text-white/80 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      </div>
-      {items.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {items.map((item, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-surface-2 border border-border rounded-full text-sm text-white/80"
-            >
-              {item}
-              <button onClick={() => onRemove(i)} className="hover:text-red-300 transition-colors">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-    </section>
   );
 }

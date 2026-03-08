@@ -7,6 +7,7 @@ Downloads are proxied through the backend to keep the API key server-side.
 
 from __future__ import annotations
 
+import asyncio
 import io
 import logging
 import uuid
@@ -55,7 +56,8 @@ async def upload_file(file_bytes: bytes, filename: str, project_id: str) -> str:
         _guess_content_type(filename),
     )
 
-    storage.create_file(
+    await asyncio.to_thread(
+        storage.create_file,
         bucket_id=settings.appwrite_bucket_id,
         file_id=file_id,
         file=input_file,
@@ -70,7 +72,8 @@ async def upload_file(file_bytes: bytes, filename: str, project_id: str) -> str:
 async def download_file(file_id: str) -> bytes:
     """Download file content from Appwrite Storage. Returns raw bytes."""
     storage = _get_storage()
-    result = storage.get_file_download(
+    result = await asyncio.to_thread(
+        storage.get_file_download,
         bucket_id=settings.appwrite_bucket_id,
         file_id=file_id,
     )
@@ -82,7 +85,8 @@ async def download_file(file_id: str) -> bytes:
 async def get_file_metadata(file_id: str) -> dict:
     """Get file metadata (name, size, mimeType, etc.) from Appwrite."""
     storage = _get_storage()
-    return storage.get_file(
+    return await asyncio.to_thread(
+        storage.get_file,
         bucket_id=settings.appwrite_bucket_id,
         file_id=file_id,
     )
@@ -93,7 +97,8 @@ async def get_file_metadata(file_id: str) -> dict:
 async def delete_file(file_id: str) -> None:
     """Delete a file from Appwrite Storage given its file ID."""
     storage = _get_storage()
-    storage.delete_file(
+    await asyncio.to_thread(
+        storage.delete_file,
         bucket_id=settings.appwrite_bucket_id,
         file_id=file_id,
     )

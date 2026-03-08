@@ -3,39 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   FolderOpen, FileText, Code2, ListTodo, Loader2, Trash2,
-  BookOpen, MessageSquare,
   Bell, Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { projectsApi, dashboardApi, type DashboardStats } from "@/lib/api";
+import { projectsApi } from "@/lib/api";
 import DashboardLeftPanel from "@/components/layout/DashboardLeftPanel";
 import type { Project } from "@/types";
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   CSS Keyframes
-───────────────────────────────────────────────────────────────────────────── */
-
-const CSS_KEYFRAMES = `
-@keyframes pulseGlow {
-  0%,100% { box-shadow: 0 0 0px rgba(56,189,248,0); border-color: rgba(56,189,248,0.22); }
-  50%      { box-shadow: 0 0 12px rgba(56,189,248,0.25); border-color: rgba(56,189,248,0.50); }
-}
-@keyframes barBloom {
-  0%   { filter: brightness(1); }
-  50%  { filter: brightness(1.35) saturate(1.4); }
-  100% { filter: brightness(1); }
-}
-@keyframes floatY {
-  0%,100% { transform: translateY(0px); }
-  50%      { transform: translateY(-5px); }
-}
-@keyframes starSpin {
-  from { transform: rotate(0deg) scale(1); }
-  50%  { transform: rotate(180deg) scale(1.15); }
-  to   { transform: rotate(360deg) scale(1); }
-}
-`;
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Helpers
@@ -77,67 +51,6 @@ function GradText({ children, className = "", from = "#FFD700", to = "#38BDF8" }
   );
 }
 
-function buildModules(stats: DashboardStats | null) {
-  return [
-    {
-      key: "learning",
-      icon: BookOpen,
-      label: "EasyLearn",
-      title: "Document Processing",
-      accent: "#38BDF8",
-      accentRgb: "56,189,248",
-      stats: [
-        { label: "PDFs indexed",       value: stats?.total_documents ?? 0 },
-        { label: "Concepts extracted", value: "—" },
-      ],
-      badge: "RAG Ready",
-      desc: "Upload PDFs, extract concepts, generate summaries — all persisted to context.",
-    },
-    {
-      key: "developer",
-      icon: Code2,
-      label: "EasyCode",
-      title: "Code Analysis",
-      accent: "#FFD700",
-      accentRgb: "255,215,0",
-      stats: [
-        { label: "Code insights",     value: stats?.total_insights ?? 0 },
-        { label: "Analyses run",      value: "—" },
-      ],
-      badge: "Drift Watch",
-      desc: "Deep code explanation, bug detection, and auto README — cross-referenced with docs.",
-    },
-    {
-      key: "workflow",
-      icon: ListTodo,
-      label: "EasyAutomate",
-      title: "Task Automation",
-      accent: "#a78bfa",
-      accentRgb: "167,139,250",
-      stats: [
-        { label: "Tasks extracted", value: stats?.total_tasks ?? 0 },
-        { label: "High priority",   value: "—" },
-      ],
-      badge: "Active",
-      desc: "Extract action items from transcripts and emails with priority classification.",
-    },
-    {
-      key: "chat",
-      icon: MessageSquare,
-      label: "Context Chat",
-      title: "RAG Engine",
-      accent: "#34d399",
-      accentRgb: "52,211,153",
-      stats: [
-        { label: "Queries handled",   value: stats?.total_chats ?? 0 },
-        { label: "Sources connected", value: (stats ? stats.total_documents + stats.total_insights + stats.total_tasks : 0) },
-      ],
-      badge: "Online",
-      desc: "Ask anything — the AI searches your full project context for grounded answers.",
-    },
-  ];
-}
-
 
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -149,7 +62,6 @@ export default function DashboardPage() {
   const [projects, setProjects]   = useState<Project[]>([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState("");
-  const [stats, setStats]         = useState<DashboardStats | null>(null);
   const scrollRef   = useRef<HTMLDivElement>(null);
   const [parallaxY, setParallaxY] = useState(0);
 
@@ -162,10 +74,6 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => { loadProjects(); }, []);
-
-  useEffect(() => {
-    dashboardApi.stats().then(setStats).catch(() => {});
-  }, []);
 
   async function loadProjects() {
     try {
@@ -192,11 +100,8 @@ export default function DashboardPage() {
   const userName    = session?.user?.name ?? "You";
   const userInitial = userName[0]?.toUpperCase() ?? "U";
 
-  const MODULES = buildModules(stats);
-
   return (
     <>
-      <style>{CSS_KEYFRAMES}</style>
 
       {/* Fixed nebula background */}
       <div
@@ -242,7 +147,8 @@ export default function DashboardPage() {
             >
               <div>
                 <h1 className="text-[28px] font-bold tracking-tight leading-snug">
-                  <span className="text-slate-50 drop-shadow-md">Project Cosmos Overview</span>
+                  <span className="text-slate-50 drop-shadow-md">Your&nbsp;</span>
+                  <GradText>Workspace</GradText>
                 </h1>
                 <p className="text-[12px] mt-0.5" style={{ color: "rgba(148,163,184,0.75)" }}>
                   Your persistent AI context — always in sync.
@@ -273,65 +179,6 @@ export default function DashboardPage() {
                 {error}
               </div>
             )}
-
-            {/* ── Intelligence Modules ──────────────────────────────────── */}
-            <div>
-              <p
-                className="text-[11px] font-semibold tracking-[0.16em] uppercase mb-5"
-                style={{ background: "linear-gradient(90deg,#FFD700,#38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
-              >
-                Intelligence Modules
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {MODULES.map((mod, idx) => (
-                  <Glass
-                    key={mod.key}
-                    glow={mod.accent}
-                    className="p-6 flex flex-col gap-4 group hover:scale-[1.005] transition-transform"
-                    style={{ animationDelay: `${idx * 0.6}s` }}
-                  >
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ background: `rgba(${mod.accentRgb},0.10)`, border: `1px solid rgba(${mod.accentRgb},0.28)`, boxShadow: `0 0 14px rgba(${mod.accentRgb},0.18)` }}
-                        >
-                          <mod.icon className="w-4 h-4" style={{ color: mod.accent }} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold tracking-widest uppercase opacity-90" style={{ color: mod.accent }}>{mod.label}</p>
-                          <h3 className="text-[14px] font-semibold leading-tight text-white">{mod.title}</h3>
-                        </div>
-                      </div>
-                      <span
-                        className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full shrink-0"
-                        style={{ background: `rgba(${mod.accentRgb},0.12)`, border: `1px solid rgba(${mod.accentRgb},0.30)`, color: mod.accent, boxShadow: `0 0 8px rgba(${mod.accentRgb},0.20)` }}
-                      >
-                        {mod.badge}
-                      </span>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex gap-6">
-                      {mod.stats.map((s) => (
-                        <div key={s.label} className="flex flex-col gap-0.5">
-                          <p className="text-[22px] font-bold leading-none text-white">{s.value}</p>
-                          <p className="text-sm text-slate-400">{s.label}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-[12px] leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>{mod.desc}</p>
-
-                    {/* Hover shimmer line */}
-                    <div className="h-px w-full rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg,transparent,${mod.accent},transparent)` }} />
-                  </Glass>
-                ))}
-              </div>
-            </div>
 
             {/* ── Projects list ──────────────────────────────────────────── */}
             <div>

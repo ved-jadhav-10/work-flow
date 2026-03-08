@@ -25,6 +25,8 @@ export interface Project {
   document_count?: number;
   task_count?: number;
   insight_count?: number;
+  concept_count?: number;
+  high_priority_task_count?: number;
 }
 
 export interface ProjectCreate {
@@ -50,7 +52,7 @@ export interface Document {
   project_id: string;
   filename: string;
   file_url: string;
-  doc_type: "pdf" | "text";
+  doc_type: "pdf" | "text" | "md";
   summary?: string;
   summary_level?: SummaryLevel;
   key_concepts?: Concept[];

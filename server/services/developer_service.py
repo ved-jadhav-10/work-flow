@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from typing import Any
 
 from services.llm_service import get_llm_service
@@ -22,6 +21,7 @@ from services.prompts.developer_prompts import (
     GENERATE_README,
     STRICT_JSON_SUFFIX,
 )
+from services.utils import parse_json_object
 
 logger = logging.getLogger(__name__)
 
@@ -59,11 +59,11 @@ async def _llm_json(prompt: str, system_prompt: str, mode: str = "cloud") -> dic
     llm = get_llm_service(mode)
     text, provider, _ = await llm.generate(prompt, system_prompt)
     try:
-        return _parse_json(text)
-    except json.JSONDecodeError:
+        return parse_json_object(text)
+    except (ValueError, Exception):
         logger.warning("Malformed JSON from %s — retrying with strict suffix", provider)
         text2, _, _ = await llm.generate(prompt, system_prompt + STRICT_JSON_SUFFIX)
-        return _parse_json(text2)
+        return parse_json_object(text2)
 
 
 # ── Public API ────────────────────────────────────────────────────────────────

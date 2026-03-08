@@ -28,6 +28,7 @@ from schemas.learning import (
 )
 from services import pdf_service, file_storage, embedding_service, learning_service
 from services.context_engine import update_context
+from routers.projects import cache_invalidate
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _get_project_or_403(project_id: str, user: User, db: Session) -> Project:
+def _get_project_or_404(project_id: str, user: User, db: Session) -> Project:
     """Ensure the project exists and belongs to the current user."""
     project = db.query(Project).filter(
         Project.id == project_id,
@@ -75,7 +76,7 @@ async def upload_document(
     db: Session = Depends(get_db),
 ):
     """Upload a file, extract text, generate embeddings, and store everything."""
-    project = _get_project_or_403(project_id, current_user, db)
+    project = _get_project_or_404(project_id, current_user, db)
 
     # Validate extension
     ext = _ext(file.filename or "file.bin")
@@ -112,6 +113,7 @@ async def upload_document(
     db.add(doc)
     db.commit()
     db.refresh(doc)
+    cache_invalidate(project_id)
 
     # 4. Chunk text and generate embeddings (background-ish — still awaited here)
     try:
@@ -144,7 +146,7 @@ def list_documents(
     db: Session = Depends(get_db),
 ):
     """List all documents in a project."""
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     docs = (
         db.query(Document)
         .filter(Document.project_id == project_id)
@@ -163,7 +165,7 @@ def get_document(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
     return _doc_response(doc)
 
@@ -179,7 +181,7 @@ async def summarize_document(
     db: Session = Depends(get_db),
     x_inference_mode: str = Header(default="cloud"),
 ):
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
 
     if not doc.raw_text:
@@ -218,7 +220,7 @@ async def extract_concepts(
     db: Session = Depends(get_db),
     x_inference_mode: str = Header(default="cloud"),
 ):
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
 
     if not doc.raw_text:
@@ -233,6 +235,7 @@ async def extract_concepts(
     # Persist
     doc.key_concepts = concepts
     db.commit()
+    cache_invalidate(project_id)
 
     # Feed context engine
     try:
@@ -258,7 +261,7 @@ async def generate_steps(
     db: Session = Depends(get_db),
     x_inference_mode: str = Header(default="cloud"),
 ):
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     doc = _get_document_or_404(doc_id, project_id, db)
 
     if not doc.raw_text:
@@ -297,7 +300,7 @@ async def delete_document(
     db: Session = Depends(get_db),
 ):
     """Delete a document: removes Appwrite file, embeddings, and DB record."""
-    _get_project_or_403(project_id, current_user, db)
+    _get_project_or_404(project_id, current_user, db)
     doc = _get_document_or_404(str(doc_id), project_id, db)
 
     # 1. Delete from Appwrite Storage (best-effort — don't fail if already gone)
@@ -316,7 +319,9 @@ async def delete_document(
     # 3. Delete DB record (cascade handles any child rows)
     db.delete(doc)
     db.commit()
+    cache_invalidate(project_id)
     logger.info("Deleted document %s from project %s", doc_id, project_id)
+
 
 def _doc_response(doc: Document) -> DocumentResponse:
     """Convert ORM Document to Pydantic response, enriching key_concepts."""
