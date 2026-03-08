@@ -54,7 +54,7 @@ const MODULES = (projectId: string, project: Project) => [
       { value: project.concept_count ?? 0, label: "Topics extracted" },
     ],
     badge: "RAG Ready",
-    desc: "Upload PDFs, extract concepts, and generate summaries — all persisted to context.",
+    desc: "Upload PDFs, extract concepts, and generate summaries. All persisted to context.",
   },
   {
     key: "developer",
@@ -69,7 +69,7 @@ const MODULES = (projectId: string, project: Project) => [
       { value: project.insight_count ?? 0, label: "Analyses run" },
     ],
     badge: "Drift Watch",
-    desc: "Deep code explanation, bug detection, and auto README — cross-referenced with docs.",
+    desc: "Deep code explanation, bug detection, and auto README, cross-referenced with docs.",
   },
   {
     key: "workflow",
@@ -99,7 +99,7 @@ const MODULES = (projectId: string, project: Project) => [
       { value: project.document_count ?? 0, label: "Documents loaded" },
     ],
     badge: "Online",
-    desc: "Ask anything — the AI searches your full project context for grounded answers.",
+    desc: "Ask anything. The AI searches your full project context for grounded answers.",
   },
 ];
 

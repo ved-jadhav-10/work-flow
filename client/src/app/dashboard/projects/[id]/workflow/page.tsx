@@ -214,7 +214,7 @@ function TaskCard({
         <div className="relative">
           <button
             onClick={() => setShowPriorityMenu((v) => !v)}
-            className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/6 transition-colors"
             title="Change priority"
           >
             <ChevronDown className="w-4 h-4 text-white/60" />
@@ -228,7 +228,7 @@ function TaskCard({
                     onUpdatePriority(task.id, p);
                     setShowPriorityMenu(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-white/[0.06] transition-colors flex items-center gap-2 ${
+                  className={`w-full text-left px-3 py-2 text-xs hover:bg-white/6 transition-colors flex items-center gap-2 ${
                     task.priority === p ? "text-white font-medium" : "text-white/70"
                   }`}
                 >
@@ -243,7 +243,7 @@ function TaskCard({
         {/* Edit */}
         <button
           onClick={() => { setEditing(true); setShowPriorityMenu(false); }}
-          className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+          className="p-1.5 rounded-xl hover:bg-white/6 transition-colors"
           title="Edit description"
         >
           <Pencil className="w-4 h-4 text-white/60" />
@@ -261,7 +261,7 @@ function TaskCard({
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+              className="p-1.5 rounded-xl hover:bg-white/6 transition-colors"
               title="Cancel"
             >
               <X className="w-4 h-4 text-white/60" />
@@ -270,7 +270,7 @@ function TaskCard({
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
-            className="p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 rounded-xl hover:bg-white/6 transition-colors"
             title="Delete task"
           >
             <Trash2 className="w-4 h-4 text-white/60 hover:text-red-300" />
@@ -620,7 +620,7 @@ export default function WorkflowPage() {
           <button
             onClick={handleExtract}
             disabled={extracting || isOverLimit}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white/10 border border-white/20 hover:bg-white/[0.17] disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl text-sm font-semibold transition-colors backdrop-blur-sm"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-white/10 border border-white/20 hover:bg-white/17 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl text-sm font-semibold transition-colors backdrop-blur-sm"
           >
             {extracting ? (
               <>

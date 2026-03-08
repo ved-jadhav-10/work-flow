@@ -115,7 +115,7 @@ export default function DashboardPage() {
       />
       {/* Radial overlay */}
       <div
-        className="fixed inset-0 z-[1]"
+        className="fixed inset-0 z-1"
         style={{
           background:
             "radial-gradient(ellipse 90% 70% at 50% 60%, rgba(6,11,25,0.55) 0%, rgba(6,11,25,0.18) 70%, transparent 100%), " +
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                   <GradText>Workspace</GradText>
                 </h1>
                 <p className="text-[12px] mt-0.5" style={{ color: "rgba(148,163,184,0.75)" }}>
-                  Your persistent AI context — always in sync.
+                  Your persistent AI context, always in sync.
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   <p className="font-semibold text-base text-white mb-1">
                     No projects yet
                   </p>
-                  <p className="text-[12px] mb-6 max-w-[240px] mx-auto leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>
+                  <p className="text-[12px] mb-6 max-w-60 mx-auto leading-relaxed" style={{ color: "rgba(148,163,184,0.72)" }}>
                     Create your first project to start building persistent AI context
                   </p>
                   <Link

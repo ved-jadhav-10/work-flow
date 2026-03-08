@@ -65,7 +65,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ══ HERO ══════════════════════════════════════════════════════════ */}
-      <section className="relative h-screen min-h-[740px] flex flex-col overflow-hidden">
+      <section className="relative h-screen min-h-185 flex flex-col overflow-hidden">
 
         {/* Background image */}
         <div
@@ -88,9 +88,9 @@ export default function LandingPage() {
         />
 
         {/* Top fade */}
-        <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-[#060d1f]/70 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-[#060d1f]/70 to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#060d1f] via-[#060d1f]/70 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-linear-to-t from-[#060d1f] via-[#060d1f]/70 to-transparent" />
 
         {/* Warm gold glow behind text */}
         <div
@@ -137,7 +137,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-white/70 max-w-sm mx-auto mb-10 text-[14px] leading-[1.75] tracking-wide">
-            Tools for thinkers, dreamers, and makers —
+            Tools for thinkers, dreamers, and makers.
             AI that holds your full context, always.
           </p>
 
@@ -166,9 +166,9 @@ export default function LandingPage() {
       <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-28">
         {/* Section label */}
         <div className="flex items-center gap-3 mb-14 justify-center">
-          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
+          <div className="h-px flex-1 max-w-20" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
           <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: "#d4aa70" }}>How it works</span>
-          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
+          <div className="h-px flex-1 max-w-20" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
         </div>
 
         <div className="text-center mb-14">
@@ -209,7 +209,7 @@ export default function LandingPage() {
                 className="text-[3rem] font-black leading-none select-none"
                 style={{ color, opacity: 0.18 }}>{step}</span>
               {/* Accent line */}
-              <div className="w-8 h-[2px] rounded-full" style={{ background: color, opacity: 0.6 }} />
+              <div className="w-8 h-0.5 rounded-full" style={{ background: color, opacity: 0.6 }} />
               <h3 className="font-semibold text-white text-[15px]">{title}</h3>
               <p className="text-white/60 text-[13px] leading-relaxed">{desc}</p>
               {/* Connector arrow (not on last) */}
@@ -229,9 +229,9 @@ export default function LandingPage() {
       <section id="features" className="max-w-5xl mx-auto px-6 pb-28">
         {/* Section label */}
         <div className="flex items-center gap-3 mb-14 justify-center">
-          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
+          <div className="h-px flex-1 max-w-20" style={{ background: "linear-gradient(to right, transparent, rgba(212,170,112,0.35))" }} />
           <span className="text-[11px] font-semibold tracking-[0.18em] uppercase" style={{ color: "#d4aa70" }}>Features</span>
-          <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
+          <div className="h-px flex-1 max-w-20" style={{ background: "linear-gradient(to left, transparent, rgba(212,170,112,0.35))" }} />
         </div>
 
         <div className="text-center mb-16">
@@ -247,7 +247,7 @@ export default function LandingPage() {
             iconColor="#60a5fa"
             label="EasyLearn"
             title="Turn documents into structured knowledge"
-            description="Upload PDFs, lecture notes, or any text. Generate smart summaries, extract key concepts, and build step-by-step guides — all persisted to your project context."
+            description="Upload PDFs, lecture notes, or any text. Generate smart summaries, extract key concepts, and build step-by-step guides. All persisted to your project context."
             bullets={["Short, detailed, or comprehensive summaries","Key concept extraction","Implementation step generation","RAG retrieval across all documents"]}
           />
           <FeatureRow
@@ -302,7 +302,7 @@ export default function LandingPage() {
                 <span className="text-[11px] font-semibold tracking-[0.15em] uppercase" style={{ color: "#34d399" }}>Context Chat</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-light text-white tracking-tight mb-4 leading-snug">
-                Ask anything — backed by<br className="hidden sm:block" /> your full project context
+                Ask anything, backed by<br className="hidden sm:block" /> your full project context
               </h2>
               <p className="text-white/60 text-[13px] leading-relaxed max-w-md">
                 Context Chat searches across all your documents, code insights, and tasks using RAG-powered retrieval
@@ -399,7 +399,7 @@ export default function LandingPage() {
               bg: "rgba(110,231,183,0.08)",
               border: "rgba(110,231,183,0.18)",
               title: "Privacy Mode",
-              desc: "Toggle to local inference via Ollama. All AI processing runs on your machine — no data sent to external servers.",
+              desc: "Toggle to local inference via Ollama. All AI processing runs on your machine. No data sent to external servers.",
             },
             {
               icon: <GitBranch className="w-5 h-5" />,

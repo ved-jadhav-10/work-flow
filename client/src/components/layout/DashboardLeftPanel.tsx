@@ -79,7 +79,7 @@ export default function DashboardLeftPanel() {
   return (
     <>
       <div
-        className="relative z-10 flex flex-col w-[300px] shrink-0 overflow-y-auto py-7 px-5 gap-5 border-r"
+        className="relative z-10 flex flex-col w-75 shrink-0 overflow-y-auto py-7 px-5 gap-5 border-r"
         style={{
           background: "rgba(6,11,25,0.60)",
           backdropFilter: "blur(28px)",
@@ -101,7 +101,7 @@ export default function DashboardLeftPanel() {
           </div>
           <div>
             <p className="text-[14px] font-semibold text-white">{userName}</p>
-            <p className="text-[11px] truncate max-w-[200px]" style={{ color: "rgba(148,163,184,0.65)" }}>
+            <p className="text-[11px] truncate max-w-50" style={{ color: "rgba(148,163,184,0.65)" }}>
               {session?.user?.email ?? ""}
             </p>
           </div>
@@ -143,8 +143,8 @@ export default function DashboardLeftPanel() {
               >
                 <Clock className="w-6 h-6" style={{ color: "rgba(148,163,184,0.40)" }} />
               </div>
-              <p className="text-[11px] text-center max-w-[200px]" style={{ color: "rgba(148,163,184,0.45)" }}>
-                No activity yet — start by creating a project and adding tasks, documents, or insights.
+              <p className="text-[11px] text-center max-w-50" style={{ color: "rgba(148,163,184,0.45)" }}>
+                No activity yet. Start by creating a project and adding tasks, documents, or insights.
               </p>
             </div>
           ) : (
@@ -156,7 +156,7 @@ export default function DashboardLeftPanel() {
                   <Link
                     key={item.id}
                     href={`/dashboard/projects/${item.project_id}`}
-                    className="flex items-start gap-3 px-3 py-3 rounded-xl transition-all hover:bg-white/[0.04] border border-transparent hover:border-white/[0.08] group"
+                    className="flex items-start gap-3 px-3 py-3 rounded-xl transition-all hover:bg-white/4 border border-transparent hover:border-white/8 group"
                   >
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all group-hover:scale-110"

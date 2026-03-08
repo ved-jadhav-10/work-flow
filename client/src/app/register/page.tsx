@@ -53,7 +53,7 @@ export default function RegisterPage() {
         // Auth.js v5 throws instead of returning { error } on server failures
         const msg: string = signInErr?.message ?? "";
         if (msg.includes("DOCTYPE") || msg.includes("JSON") || msg.includes("AuthError")) {
-          setError("Registered! But the auth service had an error — please sign in manually.");
+          setError("Registered! But the auth service had an error. Please sign in manually.");
         } else {
           setError("Registered but sign-in failed. Please go to login.");
         }
@@ -118,7 +118,7 @@ export default function RegisterPage() {
           <h1 className="text-4xl font-bold text-white leading-tight">
             Get Started<br />with Us
           </h1>
-          <p className="text-white/65 text-[13px] leading-relaxed max-w-[200px]">
+          <p className="text-white/65 text-[13px] leading-relaxed max-w-50">
             Complete these easy steps to register your account.
           </p>
         </div>

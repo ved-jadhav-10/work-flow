@@ -222,7 +222,7 @@ function ModeOption({
       onClick={onSelect}
       className={`w-full flex items-start gap-4 p-4 rounded-2xl border text-left transition-all backdrop-blur-sm ${
         selected
-          ? "border-accent/40 bg-white/[0.06]"
+          ? "border-accent/40 bg-white/6"
           : "border-border bg-surface-2 hover:border-white/15"
       }`}
     >

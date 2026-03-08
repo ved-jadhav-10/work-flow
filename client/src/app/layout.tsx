@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Workflow — Where ideas bloom under starlight",
+  title: "Workflow: Where Ideas Bloom Under Starlight",
   description:
     "Workflow is a persistent AI context layer that eliminates productivity loss caused by context switching, while accelerating EasyLearn and EasyCode workflows through structured intelligence generation.",
 };

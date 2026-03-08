@@ -132,7 +132,7 @@ export const learningApi = {
 
   uploadDocument: async (projectId: string, file: File) => {
     const token = await getBackendToken();
-    const inferenceMode = _getInferenceMode();
+    const inferenceMode = getInferenceMode() === "local" ? "local" : undefined;
     const formData = new FormData();
     formData.append("file", file);
 

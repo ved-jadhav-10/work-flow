@@ -24,8 +24,8 @@ export default function AppBackground({
     >
       {/* Ambient glows + vignette */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-44 -left-44 h-[520px] w-[520px] rounded-full bg-accent/10 blur-[120px]" />
-        <div className="absolute bottom-[-140px] right-[-160px] h-[560px] w-[560px] rounded-full bg-gold/8 blur-[140px]" />
+        <div className="absolute -top-44 -left-44 h-130 w-130 rounded-full bg-accent/10 blur-[120px]" />
+        <div className="absolute -bottom-35 -right-40 h-140 w-140 rounded-full bg-gold/8 blur-[140px]" />
 
         {/* Slight central vignette (hero already adds its own) */}
         {!isHero && (
@@ -39,9 +39,9 @@ export default function AppBackground({
         )}
 
         {/* Top fade for headers */}
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/60 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-background/60 to-transparent" />
         {/* Bottom fade */}
-        <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-52 bg-linear-to-t from-background via-background/60 to-transparent" />
       </div>
 
       {/* Content */}

@@ -100,7 +100,7 @@ function LoginContent() {
             ✓
           </div>
           <p className="text-[13px] font-medium text-[#0b0f1a] leading-snug">
-            Your AI context is waiting — pick up right where you left off.
+            Your AI context is waiting. Pick up right where you left off.
           </p>
         </div>
       </div>
