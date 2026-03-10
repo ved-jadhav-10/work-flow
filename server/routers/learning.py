@@ -100,7 +100,14 @@ async def upload_document(
         raw_text = file_bytes.decode("utf-8", errors="replace")
 
     # 2. Upload to Appwrite Storage
-    storage_path = await file_storage.upload_file(file_bytes, file.filename, str(project.id))
+    try:
+        storage_path = await file_storage.upload_file(file_bytes, file.filename, str(project.id))
+    except Exception as exc:
+        logger.exception("Appwrite upload failed for %s", file.filename)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"File storage unavailable: {exc}",
+        )
 
     # 3. Create DB record
     doc = Document(

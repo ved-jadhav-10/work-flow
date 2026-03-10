@@ -16,7 +16,7 @@ services:
 
       # ── Appwrite ───────────────────────────────────────────────────────
       - key: APPWRITE_ENDPOINT
-        value: https://cloud.appwrite.io/v1
+        value: https://nyc.cloud.appwrite.io/v1
       - key: APPWRITE_PROJECT_ID
         sync: false
       - key: APPWRITE_API_KEY
