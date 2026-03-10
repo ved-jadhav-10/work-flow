@@ -202,6 +202,18 @@ function LoginContent() {
               Sign up
             </Link>
           </p>
+
+          {/* Test account note */}
+          <div
+            className="rounded-xl px-4 py-3 text-[12px] leading-relaxed space-y-1"
+            style={{ background: "rgba(212,170,112,0.08)", border: "1px solid rgba(212,170,112,0.18)", color: "rgba(255,255,255,0.65)" }}
+          >
+            <p className="font-medium" style={{ color: "rgba(212,170,112,0.85)" }}>Note</p>
+            <p>If you don&apos;t want to use your actual email, you can use the preloaded test account:</p>
+            <p className="font-mono" style={{ color: "rgba(255,255,255,0.80)" }}>
+              Email: user@mail.com<br />Password: 12345678
+            </p>
+          </div>
         </div>
       </div>
     </div>

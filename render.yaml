@@ -38,7 +38,7 @@ services:
 
       # ── CORS — add your production frontend URL here ───────────────────
       - key: BACKEND_CORS_ORIGINS
-        value: '["https://your-frontend.vercel.app","http://localhost:3000"]'
+        value: '["https://work-flow-orpin.vercel.app","http://localhost:3000"]'
 
       # ── Ollama (not available on cloud, only used locally) ─────────────
       - key: OLLAMA_BASE_URL
